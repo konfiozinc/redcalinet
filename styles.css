@@ -1,0 +1,157 @@
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #faf7f2;
+            background-image: radial-gradient(circle at 15% 30%, rgba(210, 180, 140, 0.08) 0%, rgba(250, 247, 242, 0) 70%);
+            min-height: 100vh;
+        }
+
+        .font-playfair { font-family: 'Playfair Display', serif; }
+
+        .champagne-gradient {
+            background: linear-gradient(135deg, #f5ede0, #e9dbc9, #dbc8ae);
+            box-shadow: 0 8px 18px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 245, 0.8);
+            transition: transform 0.12s ease, box-shadow 0.2s;
+        }
+        
+        .champagne-gradient:active {
+            transform: translateY(2px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+        }
+
+        .whatsapp-gradient {
+            background: linear-gradient(135deg, #25D366, #20B859, #128C7E);
+            box-shadow: 0 8px 18px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+        }
+
+        .button-3d { transition: transform 0.12s linear, box-shadow 0.2s; }
+        .button-3d:active { transform: translateY(2px); }
+
+        .text-shadow { text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2); }
+        .name-color { color: #c2a575; }
+        
+        .icon-bg-white {
+            background: white;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+        }
+
+        .install-tab-active {
+            border-bottom-width: 2px;
+            border-color: #c2a575;
+            color: #c2a575;
+        }
+
+        .popup-transition {
+            transition: opacity 0.25s ease;
+        }
+        .popup-transition.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        
+        .custom-scroll::-webkit-scrollbar { width: 4px; }
+        .custom-scroll::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #dbc8ae; border-radius: 10px; }
+
+        .badge-expert {
+            background: linear-gradient(135deg, #faf5eb, #f2e8da);
+            color: #b2926a;
+            font-size: 0.7rem;
+            font-weight: 600;
+            border-radius: 30px;
+            padding: 0.2rem 0.8rem;
+            display: inline-block;
+            border: 1px solid rgba(194, 165, 117, 0.2);
+        }
+
+        .icon-whatsapp { color: #25D366; }
+        .icon-spa { color: #d4a373; }
+        .icon-draw { color: #bc9a6c; }
+        .icon-palette { color: #e0b08a; }
+        .icon-camera { color: #c2a575; }
+        .icon-heart { color: #e0a890; }
+        .icon-map { color: #ea4335; }
+        .icon-qr { color: #c2a575; }
+        .icon-contact { color: #5c4b32; }
+        .icon-hair-comb { color: #b87333; }
+
+        /* Botones de redes sociales con colores originales */
+        .social-btn {
+            transition: all 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+        }
+        .social-btn:hover {
+            transform: translateY(-3px) scale(1.08);
+            filter: brightness(1.05);
+            box-shadow: 0 8px 22px rgba(0, 0, 0, 0.25);
+        }
+        .btn-facebook { background: linear-gradient(145deg, #1877f2, #0d65d9); }
+        .btn-instagram { background: linear-gradient(135deg, #feda77, #d62976, #962fbf, #4f5bd5); }
+        .btn-tiktok { background: linear-gradient(145deg, #010101, #161616, #25f4ee, #fe2c55); background-size: 200%; background-position: left; }
+        .btn-tiktok:hover { background-position: right; }
+
+        .carousel-container {
+            position: relative;
+            overflow: hidden;
+            border-radius: 1rem;
+        }
+        .carousel-track {
+            display: flex;
+            transition: transform 0.4s ease-in-out;
+        }
+        .carousel-slide {
+            flex: 0 0 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+        .carousel-slide img {
+            height: 280px;
+            width: 100%;
+            object-fit: cover;
+            border-radius: 1rem;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        }
+        .carousel-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0,0,0,0.5);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            cursor: pointer;
+            transition: background 0.2s;
+            z-index: 10;
+        }
+        .carousel-btn:hover {
+            background: rgba(0,0,0,0.8);
+        }
+        .carousel-prev { left: 8px; }
+        .carousel-next { right: 8px; }
+        .carousel-dots {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 12px;
+            margin-bottom: 8px;
+        }
+        .carousel-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #d4c4a8;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .carousel-dot.active {
+            background: #c2a575;
+            width: 22px;
+            border-radius: 10px;
+        }
+html,body{overflow-x:hidden}img,svg,video{max-width:100%;height:auto}table{max-width:100%}
