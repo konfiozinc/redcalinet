@@ -1,0 +1,15 @@
+# Sistema
+.DS_Store
+Thumbs.db
+Desktop.ini
+desktop.ini
+*.log
+
+# Editores
+.vscode/
+.idea/
+*.swp
+*~
+
+# Node (por si se usan herramientas locales de captura/compresión)
+node_modules/

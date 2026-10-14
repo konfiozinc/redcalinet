@@ -1,228 +1,325 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es-CO">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Nicole Montalvo | Estilista Profesional - Visajismo & Peinados</title>
-    
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Font Awesome 6 -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
-    
-    
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Red CaliNet — Calidad de ventas por internet | Bello, Antioquia</title>
+<meta name="description" content="Red CaliNet en Bello, Antioquia: streaming, tecnología (iPhone y Honor), seguros y trámites. Servicio garantizado, lo primordial para nosotros es el cliente. Atención por WhatsApp y punto físico.">
+<meta name="author" content="Red CaliNet">
+<meta name="theme-color" content="#173a68">
+<link rel="canonical" href="https://konfiozinc.github.io/redcalinet/">
+
+<!-- Open Graph / Twitter -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Red CaliNet">
+<meta property="og:locale" content="es_CO">
+<meta property="og:title" content="Red CaliNet — Calidad de ventas por internet">
+<meta property="og:description" content="Streaming, tecnología, seguros y trámites en Bello, Antioquia. Servicio garantizado: lo primordial para nosotros es el cliente.">
+<meta property="og:url" content="https://konfiozinc.github.io/redcalinet/">
+<meta property="og:image" content="https://konfiozinc.github.io/redcalinet/assets/logo/og-image.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Logo de Red CaliNet">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Red CaliNet — Calidad de ventas por internet">
+<meta name="twitter:description" content="Streaming, tecnología, seguros y trámites en Bello, Antioquia. Servicio garantizado.">
+<meta name="twitter:image" content="https://konfiozinc.github.io/redcalinet/assets/logo/og-image.jpg">
+
+<!-- Iconos -->
+<link rel="icon" type="image/webp" sizes="32x32" href="assets/logo/favicon-32.webp">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/logo/favicon-32.png">
+<link rel="icon" type="image/webp" sizes="64x64" href="assets/logo/favicon-64.webp">
+<link rel="apple-touch-icon" sizes="180x180" href="assets/logo/apple-touch-icon.png">
+
+<!-- Tipografía (no bloqueante) -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"></noscript>
+
 <link rel="stylesheet" href="styles.css">
-
-
 </head>
-<body class="flex items-center justify-center p-4 sm:p-5">
+<body>
 
-    <div class="w-full max-w-[380px] mx-auto bg-white rounded-3xl overflow-hidden relative shadow-2xl ring-1 ring-black/5">
-        
-        <a href="#" id="installButton" aria-label="Instalar tarjeta" class="absolute top-4 left-4 z-30 w-11 h-11 bg-black/25 backdrop-blur-md border border-white/50 rounded-full flex items-center justify-center text-white transition-all duration-200 hover:bg-black/35">
-            <i class="fas fa-mobile-alt text-xl"></i>
+<a class="skip" href="#inicio">Saltar al contenido</a>
+
+<!-- ============ Sprite SVG (todo inline, sin CDN) ============ -->
+<svg class="sprite" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <g id="ui" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></g>
+  </defs>
+
+  <symbol id="i-whatsapp" viewBox="0 0 24 24">
+    <path fill="currentColor" d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+  </symbol>
+
+  <symbol id="i-instagram" viewBox="0 0 24 24">
+    <path fill="currentColor" d="M12 0C8.74 0 8.333.015 7.053.072 5.775.132 4.905.333 4.14.63c-.789.306-1.459.717-2.126 1.384S.935 3.35.63 4.14C.333 4.905.131 5.775.072 7.053.012 8.333 0 8.74 0 12s.015 3.667.072 4.947c.06 1.277.261 2.148.558 2.913.306.788.717 1.459 1.384 2.126.667.666 1.336 1.079 2.126 1.384.766.296 1.636.499 2.913.558C8.333 23.988 8.74 24 12 24s3.667-.015 4.947-.072c1.277-.06 2.148-.262 2.913-.558.788-.306 1.459-.718 2.126-1.384.666-.667 1.079-1.335 1.384-2.126.296-.765.499-1.636.558-2.913.06-1.28.072-1.687.072-4.947s-.015-3.667-.072-4.947c-.06-1.277-.262-2.149-.558-2.913-.306-.789-.718-1.459-1.384-2.126C21.319 1.347 20.651.935 19.86.63c-.765-.297-1.636-.499-2.913-.558C15.667.012 15.26 0 12 0zm0 2.16c3.203 0 3.585.016 4.85.071 1.17.055 1.805.249 2.227.415.562.217.96.477 1.382.896.419.42.679.819.896 1.381.164.422.36 1.057.413 2.227.057 1.266.07 1.646.07 4.85s-.015 3.585-.074 4.85c-.061 1.17-.256 1.805-.421 2.227-.224.562-.479.96-.899 1.382-.419.419-.824.679-1.38.896-.42.164-1.065.36-2.235.413-1.274.057-1.649.07-4.859.07-3.211 0-3.586-.015-4.859-.074-1.171-.061-1.816-.256-2.236-.421-.569-.224-.96-.479-1.379-.899-.421-.419-.69-.824-.9-1.38-.165-.42-.359-1.065-.42-2.235-.045-1.26-.061-1.649-.061-4.844 0-3.196.016-3.586.061-4.861.061-1.17.255-1.814.42-2.234.21-.57.479-.96.9-1.381.419-.419.81-.689 1.379-.898.42-.166 1.051-.361 2.221-.421 1.275-.045 1.65-.06 4.859-.06l.045.03zm0 3.678a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4zm7.846-10.405a1.441 1.441 0 01-2.88 0 1.44 1.44 0 012.88 0z"/>
+  </symbol>
+
+  <symbol id="i-pin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12 21s7-6.1 7-11a7 7 0 1 0-14 0c0 4.9 7 11 7 11Z"/><circle cx="12" cy="10" r="2.6"/>
+  </symbol>
+
+  <symbol id="i-clock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="12" cy="12" r="9"/><path d="M12 7v5.3l3.2 2"/>
+  </symbol>
+
+  <symbol id="i-mail" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="3" y="5" width="18" height="14" rx="2.6"/><path d="m4.2 7.6 7.8 5.4 7.8-5.4"/>
+  </symbol>
+
+  <symbol id="i-shield" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12 3l7 3v5.6c0 4.3-2.9 7.9-7 9.4-4.1-1.5-7-5.1-7-9.4V6l7-3Z"/><path d="m9.2 12 2.2 2.2L15.4 10"/>
+  </symbol>
+
+  <symbol id="i-heart" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12 20s-7.4-4.6-8.4-9A4.9 4.9 0 0 1 12 6.7a4.9 4.9 0 0 1 8.4 4.3c-1 4.4-8.4 9-8.4 9Z"/>
+  </symbol>
+
+  <symbol id="i-chat" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M4 5.6h16a1 1 0 0 1 1 1v9.2a1 1 0 0 1-1 1H9.4L4 20.4V6.6a1 1 0 0 1 1-1Z"/><path d="M8.4 11.2h7.2"/>
+  </symbol>
+
+  <symbol id="i-streaming" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="2.6" y="4.4" width="18.8" height="15.2" rx="3.2"/><path d="M10.2 9.1l5 2.9-5 2.9V9.1Z"/>
+  </symbol>
+
+  <symbol id="i-tech" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="6.6" y="2.6" width="10.8" height="18.8" rx="3"/><path d="M10.6 18.4h2.8"/>
+  </symbol>
+
+  <symbol id="i-seguros" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12 3.6c4.4 0 7.8 3 8.4 7H3.6c.6-4 4-7 8.4-7Z"/><path d="M12 10.6v7.2a2.4 2.4 0 0 0 4.8 0"/>
+  </symbol>
+
+  <symbol id="i-tramites" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M7 3h7.2L18.5 7.3V21H7V3Z"/><path d="M14 3v4.4h4.4"/><path d="m10.2 14.4 1.8 1.8 3.4-3.6"/>
+  </symbol>
+
+  <symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="m5 12.6 4.4 4.4L19 7.6"/>
+  </symbol>
+
+  <symbol id="i-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M5 12h13.5"/><path d="m13.5 6.8 5.2 5.2-5.2 5.2"/>
+  </symbol>
+
+  <symbol id="i-store" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M3.6 9.4 5.4 4h13.2l1.8 5.4"/><path d="M4.6 9.4v9.2a1 1 0 0 0 1 1h12.8a1 1 0 0 0 1-1V9.4"/><path d="M3.6 9.4a2.6 2.6 0 0 0 5.2 0 2.6 2.6 0 0 0 5.2 0 2.6 2.6 0 0 0 5.2 0"/>
+  </symbol>
+</svg>
+
+<!-- ============ Cabecera ============ -->
+<header class="cabecera" id="cabecera">
+  <div class="contenedor cabecera__in">
+    <a class="marca" href="#inicio" aria-label="Red CaliNet, ir al inicio">
+      <img class="marca__logo" src="assets/logo/logo-200.webp" width="200" height="200" alt="Logo de Red CaliNet" fetchpriority="high">
+      <span class="marca__txt">
+        <strong>Red CaliNet</strong>
+        <small>Calidad de ventas por internet</small>
+      </span>
+    </a>
+
+    <nav class="nav" id="nav" aria-label="Navegación principal">
+      <a href="#inicio">Inicio</a>
+      <a href="#servicios">Servicios</a>
+      <a href="#nosotros">Nosotros</a>
+      <a href="#contacto">Contacto</a>
+    </nav>
+
+    <a class="btn btn--wa cabecera__cta" data-wa data-wa-texto="Hola, vi su página web y quiero información." target="_blank" rel="noopener">
+      <svg class="ico" aria-hidden="true"><use href="#i-whatsapp"></use></svg>Escríbenos
+    </a>
+
+    <button class="menu-btn" id="menuBtn" type="button" aria-label="Abrir menú" aria-expanded="false" aria-controls="nav">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<main>
+  <!-- ============ Hero ============ -->
+  <section class="hero" id="inicio">
+    <div class="contenedor hero__in">
+      <div class="hero__logo">
+        <img src="assets/logo/logo-500.webp" width="500" height="500" alt="Logo de Red CaliNet" fetchpriority="high">
+      </div>
+
+      <p class="hero__eyebrow" id="heroEyebrow">Bello, Antioquia</p>
+      <h1 id="heroTitulo">Calidad de ventas por internet</h1>
+      <p class="hero__sub" id="heroSub">Streaming, tecnología, seguros y trámites. Servicio garantizado, lo primordial para nosotros es el cliente.</p>
+
+      <div class="hero__cta">
+        <a class="btn btn--wa btn--lg" data-wa data-wa-texto="Hola, vi su página web y quiero información." target="_blank" rel="noopener">
+          <svg class="ico" aria-hidden="true"><use href="#i-whatsapp"></use></svg>Contáctanos por WhatsApp
         </a>
-        <a href="tel:+573009981576" aria-label="Llamar" class="absolute top-4 right-4 z-30 w-11 h-11 bg-black/25 backdrop-blur-md border border-white/50 rounded-full flex items-center justify-center text-white transition-all duration-200 hover:bg-black/35">
-            <i class="fas fa-phone-alt text-xl"></i>
+        <a class="btn btn--ghost btn--lg" href="#servicios">
+          Ver servicios<svg class="ico" aria-hidden="true"><use href="#i-arrow"></use></svg>
         </a>
+      </div>
 
-        <svg width="0" height="0" style="position:absolute">
-            <defs>
-                <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stop-color="#e9dbc9" />
-                    <stop offset="100%" stop-color="#c2a575" />
-                </linearGradient>
-            </defs>
-        </svg>
+      <ul class="chips" id="chips" aria-label="Servicios disponibles"></ul>
+    </div>
+  </section>
 
-        <div class="relative text-center pb-6 bg-white">
-            <div class="absolute top-0 left-0 w-full h-[340px]">
-                <img src="https://i.ibb.co/fG932QD1/Whats-App-Image-Nicole.jpg" 
-                     alt="Nicole Montalvo - Estilista Profesional" 
-                     class="w-full h-full object-cover object-top">
-                <div class="absolute bottom-0 left-0 w-full h-36 bg-gradient-to-t from-white via-white/90 to-transparent"></div>
-            </div>
-            <div class="relative z-10 pt-[280px]">
-                <div class="mt-2">
-                    <svg class="h-20 w-20 mx-auto drop-shadow-md" viewBox="0 0 100 100" fill="url(#logoGradient)">
-                        <path fill-rule="evenodd" clip-rule="evenodd" d="M38.9,80 L38.9,20 L28.9,20 L28.9,80 L38.9,80 Z M43.9,51.5 C38.4,51.5,38.9,59.5,43.9,59.5 L60.9,59.5 C72.9,59.5,72.9,43.5,60.9,43.5 L43.9,43.5 C38.9,43.5,38.9,51.5,43.9,51.5 Z M48.9,47.5 L60.9,47.5 C68.9,47.5,68.9,55.5,60.9,55.5 L48.9,55.5 L48.9,47.5 Z"></path>
-                        <path d="M78.6,50.1 L64,31.4 L58.4,35.6 L69.8,50.1 L58.4,64.5 L64,68.7 L78.6,50.1 Z"></path>
-                    </svg>
-                </div>
-                <div class="mt-2">
-                    <h1 class="font-playfair text-4xl tracking-wider uppercase name-color">
-                        <span class="font-light">Nicole</span> <span class="font-bold">Montalvo</span>
-                    </h1>
-                    <div class="flex justify-center gap-2 mt-2 flex-wrap">
-                        <span class="badge-expert">✨ Visajista Profesional</span>
-                        <span class="badge-expert">💇‍♀️ Especialista en Peinados</span>
-                        <span class="badge-expert">🎨 Colorimetría</span>
-                        <span class="badge-expert">📸 Maquillaje Editorial</span>
-                    </div>
-                </div>
-                <div class="mt-5">
-                    <h2 class="text-xl font-light text-gray-700">Especialista en <span class="font-semibold name-color">Belleza Integral</span></h2>
-                    <p class="text-[11px] text-gray-400 mt-1 tracking-wider font-medium">MAQUILLAJE • VISAJISMO • PEINADOS • COLORIMETRÍA</p>
-                </div>
-            </div>
+  <!-- ============ Servicios ============ -->
+  <section class="seccion" id="servicios">
+    <div class="contenedor">
+      <header class="sec-head revelar">
+        <p class="eyebrow">Servicios</p>
+        <h2>¿En qué te podemos ayudar?</h2>
+        <p class="sec-sub">Cuatro líneas de servicio. Escríbenos por WhatsApp y te confirmamos disponibilidad y precio, sin compromiso.</p>
+      </header>
+      <div class="grid grid--4" id="serviciosGrid"></div>
+    </div>
+  </section>
+
+  <!-- ============ Nosotros ============ -->
+  <section class="seccion seccion--alt" id="nosotros">
+    <div class="contenedor">
+      <header class="sec-head revelar">
+        <p class="eyebrow">Nosotros</p>
+        <h2>Servicio garantizado</h2>
+        <p class="sec-sub">Lo primordial para nosotros es el cliente. Por eso vendemos por internet, pero respondemos como un negocio de barrio: con nombre, con punto físico y con atención uno a uno.</p>
+      </header>
+
+      <div class="grid grid--3" id="beneficiosGrid"></div>
+    </div>
+  </section>
+
+  <!-- ============ Contacto ============ -->
+  <section class="seccion" id="contacto">
+    <div class="contenedor contacto__in">
+      <div>
+        <header class="sec-head sec-head--left revelar">
+          <p class="eyebrow">Contacto</p>
+          <h2>Cuéntanos qué necesitas</h2>
+          <p class="sec-sub">Completa el formulario y se abrirá WhatsApp con tu mensaje listo para enviar.</p>
+        </header>
+
+        <form class="form revelar" id="formContacto" novalidate>
+          <div class="campo">
+            <label for="fNombre">Tu nombre *</label>
+            <input type="text" id="fNombre" name="nombre" autocomplete="name" placeholder="Ej.: María Pérez" required>
+          </div>
+
+          <div class="campo">
+            <label for="fCorreo">Tu correo *</label>
+            <input type="email" id="fCorreo" name="correo" autocomplete="email" inputmode="email" placeholder="Ej.: maria@correo.com" required>
+          </div>
+
+          <div class="campo">
+            <label for="fServicio">¿Qué servicio te interesa?</label>
+            <select id="fServicio" name="servicio"></select>
+          </div>
+
+          <div class="campo">
+            <label for="fMensaje">Cuéntanos un poco más</label>
+            <textarea id="fMensaje" name="mensaje" placeholder="Ej.: quiero saber qué plataformas de streaming tienen disponibles."></textarea>
+          </div>
+
+          <p class="form__aviso" id="formAviso" role="alert"></p>
+
+          <button class="btn btn--wa btn--block btn--lg" type="submit">
+            <svg class="ico" aria-hidden="true"><use href="#i-whatsapp"></use></svg>Enviar por WhatsApp
+          </button>
+
+          <p class="form__nota">Se abre WhatsApp con tu mensaje listo. Este sitio no guarda tus datos en ningún servidor.</p>
+        </form>
+      </div>
+
+      <aside aria-label="Datos de contacto">
+        <ul class="info" id="infoLista"></ul>
+      </aside>
+    </div>
+  </section>
+</main>
+
+<!-- ============ Pie ============ -->
+<footer class="pie">
+  <div class="contenedor">
+    <div class="pie__in">
+      <div class="pie__marca">
+        <img src="assets/logo/logo-200.webp" width="200" height="200" alt="" loading="lazy">
+        <div>
+          <strong>Red CaliNet</strong>
+          <span>Calidad de ventas por internet</span>
         </div>
+      </div>
 
-        <div class="px-5 pb-7 pt-2 space-y-4 bg-white rounded-t-3xl">
-            
-            <a href="https://wa.me/573009981576" target="_blank" rel="noopener noreferrer" class="relative flex items-center h-14 rounded-full whatsapp-gradient button-3d group transition">
-                <div class="absolute left-0 top-1/2 -translate-y-1/2 w-14 h-14 rounded-full flex items-center justify-center icon-bg-white shadow-md">
-                    <i class="fab fa-whatsapp text-3xl icon-whatsapp group-hover:scale-110 transition"></i>
-                </div>
-                <span class="w-full pl-12 text-center text-white text-sm sm:text-base font-semibold uppercase tracking-wide text-shadow">Agendar Cita</span>
-            </a>
+      <p class="pie__txt">Streaming, tecnología, seguros y trámites en Bello, Antioquia. Servicio garantizado: lo primordial para nosotros es el cliente.</p>
 
-            <a href="#" id="skinPrepButton" class="relative flex items-center h-14 rounded-full champagne-gradient button-3d group">
-                <div class="absolute left-0 top-1/2 -translate-y-1/2 w-14 h-14 rounded-full flex items-center justify-center icon-bg-white shadow-md">
-                    <i class="fas fa-spa text-2xl icon-spa group-hover:scale-110 transition"></i>
-                </div>
-                <span class="w-full pl-12 text-center text-[#4a3b28] text-sm sm:text-base font-semibold uppercase tracking-wide">Diagnóstico de Piel</span>
-            </a>
-
-            <a href="#" id="visajismoButton" class="relative flex items-center h-14 rounded-full champagne-gradient button-3d group">
-                <div class="absolute left-0 top-1/2 -translate-y-1/2 w-14 h-14 rounded-full flex items-center justify-center icon-bg-white shadow-md">
-                    <i class="fas fa-draw-polygon text-2xl icon-draw group-hover:scale-110 transition"></i>
-                </div>
-                <span class="w-full pl-12 text-center text-[#4a3b28] text-sm sm:text-base font-semibold uppercase tracking-wide">Visajismo y Contouring</span>
-            </a>
-
-            <a href="#" id="colorimetriaButton" class="relative flex items-center h-14 rounded-full champagne-gradient button-3d group">
-                <div class="absolute left-0 top-1/2 -translate-y-1/2 w-14 h-14 rounded-full flex items-center justify-center icon-bg-white shadow-md">
-                    <i class="fas fa-palette text-2xl icon-palette group-hover:scale-110 transition"></i>
-                </div>
-                <span class="w-full pl-12 text-center text-[#4a3b28] text-sm sm:text-base font-semibold uppercase tracking-wide">Colorimetría Aplicada</span>
-            </a>
-
-            <a href="#" id="editorialButton" class="relative flex items-center h-14 rounded-full champagne-gradient button-3d group">
-                <div class="absolute left-0 top-1/2 -translate-y-1/2 w-14 h-14 rounded-full flex items-center justify-center icon-bg-white shadow-md">
-                    <i class="fas fa-camera-retro text-2xl icon-camera group-hover:scale-110 transition"></i>
-                </div>
-                <span class="w-full pl-12 text-center text-[#4a3b28] text-sm sm:text-base font-semibold uppercase tracking-wide">Maquillaje Editorial HD</span>
-            </a>
-
-            <a href="#" id="higieneButton" class="relative flex items-center h-14 rounded-full champagne-gradient button-3d group">
-                <div class="absolute left-0 top-1/2 -translate-y-1/2 w-14 h-14 rounded-full flex items-center justify-center icon-bg-white shadow-md">
-                    <i class="fas fa-hand-holding-heart text-2xl icon-heart group-hover:scale-110 transition"></i>
-                </div>
-                <span class="w-full pl-12 text-center text-[#4a3b28] text-sm sm:text-base font-semibold uppercase tracking-wide">Higiene Profesional</span>
-            </a>
-
-            <a href="#" id="hairstyleButton" class="relative flex items-center h-14 rounded-full champagne-gradient button-3d group">
-                <div class="absolute left-0 top-1/2 -translate-y-1/2 w-14 h-14 rounded-full flex items-center justify-center icon-bg-white shadow-md">
-                    <div class="flex items-center justify-center gap-1 group-hover:scale-110 transition">
-                        <i class="fas fa-cut text-xl icon-hair-comb"></i>
-                        <i class="fas fa-comb text-lg icon-hair-comb"></i>
-                    </div>
-                </div>
-                <span class="w-full pl-12 text-center text-[#4a3b28] text-sm sm:text-base font-semibold uppercase tracking-wide">Peinados y Estilismo</span>
-            </a>
-
-            <a href="https://www.google.com/maps/search/?api=1&query=South+Beach,+Miami" target="_blank" rel="noopener noreferrer" class="relative flex items-center h-14 rounded-full champagne-gradient button-3d group">
-                <div class="absolute left-0 top-1/2 -translate-y-1/2 w-14 h-14 rounded-full flex items-center justify-center icon-bg-white shadow-md">
-                    <i class="fas fa-map-marker-alt text-2xl icon-map group-hover:scale-110 transition"></i>
-                </div>
-                <span class="w-full pl-12 text-center text-[#4a3b28] text-sm sm:text-base font-semibold uppercase tracking-wide">Ubicación del Estudio</span>
-            </a>
-
-            <a href="#" id="qrButton" class="relative flex items-center h-14 rounded-full champagne-gradient button-3d group">
-                <div class="absolute left-0 top-1/2 -translate-y-1/2 w-14 h-14 rounded-full flex items-center justify-center icon-bg-white shadow-md">
-                    <i class="fas fa-qrcode text-2xl icon-qr group-hover:scale-110 transition"></i>
-                </div>
-                <span class="w-full pl-12 text-center text-[#4a3b28] text-sm sm:text-base font-semibold uppercase tracking-wide">Compartir Tarjeta</span>
-            </a>
-
-            <a href="#" id="saveContactButton" class="relative flex items-center h-14 rounded-full champagne-gradient button-3d group">
-                <div class="absolute left-0 top-1/2 -translate-y-1/2 w-14 h-14 rounded-full flex items-center justify-center icon-bg-white shadow-md">
-                    <i class="fas fa-address-card text-2xl icon-contact group-hover:scale-110 transition"></i>
-                </div>
-                <span class="w-full pl-12 text-center text-[#4a3b28] text-sm sm:text-base font-semibold uppercase tracking-wide">Guardar Contacto</span>
-            </a>
-
-            <!-- Footer con redes sociales: Facebook, Instagram y TikTok -->
-            <div class="text-center pt-4 border-t border-gray-100 mt-4">
-                <a href="mailto:nicolemont024@gmail.com" class="text-gray-500 hover:text-[#c2a575] transition inline-flex items-center gap-2 text-sm mb-4">
-                    <i class="fas fa-envelope text-xs"></i>
-                    <span>nicolemont024@gmail.com</span>
-                </a>
-                <div class="mt-3">
-                    <p class="text-[11px] text-gray-400 mb-3 tracking-wider">SÍGUEME EN MIS REDES</p>
-                    <div class="flex justify-center gap-5">
-                        <!-- Facebook -->
-                        <a href="#" target="_blank" class="social-btn btn-facebook w-12 h-12 rounded-full flex items-center justify-center text-white text-xl shadow-lg transition-all duration-300 hover:shadow-xl">
-                            <i class="fab fa-facebook-f"></i>
-                        </a>
-                        <!-- Instagram -->
-                        <a href="#" target="_blank" class="social-btn btn-instagram w-12 h-12 rounded-full flex items-center justify-center text-white text-xl shadow-lg transition-all duration-300 hover:shadow-xl">
-                            <i class="fab fa-instagram"></i>
-                        </a>
-                        <!-- TikTok (reemplazo de WhatsApp) -->
-                        <a href="#" target="_blank" class="social-btn btn-tiktok w-12 h-12 rounded-full flex items-center justify-center text-white text-xl shadow-lg transition-all duration-300 hover:shadow-xl">
-                            <i class="fab fa-tiktok"></i>
-                        </a>
-                    </div>
-                    <p class="text-[10px] text-gray-400 mt-3">¡Conéctate y descubre las últimas tendencias en belleza integral!</p>
-                </div>
-            </div>
-        </div>
+      <div class="pie__redes" id="pieRedes"></div>
     </div>
 
-    <!-- Popup carrusel -->
-    <div id="serviceCarouselPopup" class="fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50 hidden popup-transition">
-        <div class="bg-white rounded-2xl shadow-xl relative max-w-sm w-full max-h-[85vh] overflow-hidden">
-            <button id="closeCarouselPopup" class="absolute top-3 right-3 text-white bg-[#c2a575] rounded-full h-8 w-8 flex items-center justify-center text-xl z-20 hover:bg-[#a8885a] transition">&times;</button>
-            <div class="p-5 pb-3 text-center border-b border-amber-100">
-                <i id="carouselIcon" class="text-4xl text-[#c2a575] mb-2"></i>
-                <h3 id="carouselTitle" class="text-xl font-bold font-playfair text-[#a8885a]">Servicio</h3>
-                <p id="carouselSubtitle" class="text-xs text-gray-500">Inspiración visual</p>
-            </div>
-            <div class="carousel-container relative">
-                <div id="carouselTrack" class="carousel-track"></div>
-                <button id="carouselPrev" class="carousel-btn carousel-prev"><i class="fas fa-chevron-left text-sm"></i></button>
-                <button id="carouselNext" class="carousel-btn carousel-next"><i class="fas fa-chevron-right text-sm"></i></button>
-            </div>
-            <div id="carouselDots" class="carousel-dots pb-2"></div>
-            <div class="p-4 text-center border-t border-amber-100">
-                <a id="carouselWhatsappLink" href="https://wa.me/573009981576" target="_blank" class="inline-block px-6 py-2 rounded-full champagne-gradient text-[#4a3b28] font-semibold text-sm shadow-md transition-all hover:shadow-lg">Agendar Cita</a>
-            </div>
-        </div>
+    <div class="pie__legal">
+      <p>© <span id="anio">2026</span> Red CaliNet · Bello, Antioquia, Colombia</p>
+      <p>Sitio web por <a href="https://konfiozinc.github.io/card/" target="_blank" rel="noopener">KONFÍO ZINC</a></p>
     </div>
+  </div>
+</footer>
 
-    <!-- QR Popup -->
-    <div id="qrPopup" class="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 hidden popup-transition">
-        <div class="bg-white rounded-2xl p-6 pt-5 text-center shadow-xl relative max-w-xs w-full">
-            <button id="closeQrPopup" class="absolute top-2 right-2 text-white bg-[#c2a575] rounded-full h-7 w-7 flex items-center justify-center text-lg hover:bg-[#a8885a]">&times;</button>
-            <h3 class="text-xl font-medium mb-3 font-playfair text-[#a8885a]">Comparte mi tarjeta profesional</h3>
-            <div id="qrcode" class="flex justify-center p-2"></div>
-            <p class="text-xs text-gray-500 mt-4">Escanea para agendar tu cita de belleza integral</p>
-        </div>
-    </div>
+<!-- WhatsApp flotante -->
+<a class="wa-float" id="waFloat" data-wa data-wa-texto="Hola, vi su página web y quiero información." target="_blank" rel="noopener" aria-label="Escribir por WhatsApp">
+  <svg class="ico" aria-hidden="true"><use href="#i-whatsapp"></use></svg>
+</a>
 
-    <!-- Instalación Popup -->
-    <div id="installPopup" class="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 hidden popup-transition">
-        <div class="bg-white rounded-2xl p-5 shadow-xl relative max-w-sm w-full">
-            <button id="closeInstallPopup" class="absolute top-2 right-2 text-white bg-[#c2a575] rounded-full h-7 w-7 flex items-center justify-center text-lg hover:bg-[#a8885a]">&times;</button>
-            <h3 class="text-xl font-medium text-center font-playfair text-[#a8885a]">Instalar en dispositivo</h3>
-            <div class="flex border-b mb-4 mt-3">
-                <button id="iosTab" class="flex-1 py-2 text-sm font-semibold install-tab-active">🍎 iOS</button>
-                <button id="androidTab" class="flex-1 py-2 text-sm font-semibold text-gray-400">🤖 Android</button>
-            </div>
-            <div id="iosInstructions" class="text-sm"><p>1. Abrir en <strong>Safari</strong> → 2. Compartir → 3. "Añadir a pantalla de inicio"</p></div>
-            <div id="androidInstructions" class="text-sm hidden"><p>1. Abrir en <strong>Chrome</strong> → 2. Menú (3 puntos) → 3. "Instalar aplicación"</p></div>
-        </div>
-    </div>
+<!-- ============ JSON-LD ============ -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "LocalBusiness",
+  "name": "Red CaliNet",
+  "legalName": "REDCALINET",
+  "slogan": "Calidad de ventas por internet",
+  "description": "Red CaliNet ofrece streaming, tecnología (iPhone y Honor), seguros y trámites en Bello, Antioquia. Servicio garantizado: lo primordial para nosotros es el cliente.",
+  "url": "https://konfiozinc.github.io/redcalinet/",
+  "image": "https://konfiozinc.github.io/redcalinet/assets/logo/og-image.jpg",
+  "logo": "https://konfiozinc.github.io/redcalinet/assets/logo/logo-500.webp",
+  "telephone": "+573014585658",
+  "email": "redcalinetmono@gmail.com",
+  "address": {
+    "@type": "PostalAddress",
+    "addressLocality": "Bello",
+    "addressRegion": "Antioquia",
+    "addressCountry": "CO"
+  },
+  "areaServed": { "@type": "AdministrativeArea", "name": "Antioquia, Colombia" },
+  "openingHoursSpecification": [
+    {
+      "@type": "OpeningHoursSpecification",
+      "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+      "opens": "09:00",
+      "closes": "21:30"
+    },
+    {
+      "@type": "OpeningHoursSpecification",
+      "dayOfWeek": "Sunday",
+      "opens": "10:00",
+      "closes": "20:00"
+    }
+  ],
+  "sameAs": ["https://www.instagram.com/red_calinet"],
+  "contactPoint": {
+    "@type": "ContactPoint",
+    "contactType": "customer service",
+    "telephone": "+573014585658",
+    "availableLanguage": "es"
+  },
+  "hasOfferCatalog": {
+    "@type": "OfferCatalog",
+    "name": "Servicios Red CaliNet",
+    "itemListElement": [
+      { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Streaming" } },
+      { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Tecnología (iPhone y Honor)" } },
+      { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Seguros" } },
+      { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Trámites" } }
+    ]
+  }
+}
+</script>
 
-    
-<script src="scripts.js"></script>
-
+<script src="script.js" defer></script>
 </body>
 </html>

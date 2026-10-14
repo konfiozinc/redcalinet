@@ -1,0 +1,81 @@
+{
+  "marca": {
+    "nombre": "Red CaliNet",
+    "nombreLegal": "REDCALINET",
+    "eslogan": "Calidad de ventas por internet",
+    "promesa": "Servicio garantizado, lo primordial para nosotros es el cliente.",
+    "categoria": "Producto/servicio · Arte y entretenimiento",
+    "ciudad": "Bello, Antioquia, Colombia"
+  },
+
+  "contacto": {
+    "whatsapp": "573014585658",
+    "whatsappTexto": "Hola, vi su página web y quiero información.",
+    "correo": "redcalinetmono@gmail.com",
+    "puntoFisico": true,
+    "direccion": "Bello, Antioquia, Colombia",
+    "direccionNota": "Atendemos también por WhatsApp"
+  },
+
+  "horarios": [
+    { "dia": "Lunes a sábado", "hora": "09:00 – 21:30" },
+    { "dia": "Domingo", "hora": "10:00 – 20:00" }
+  ],
+
+  "redes": [
+    { "id": "instagram", "nombre": "Instagram", "usuario": "@red_calinet", "url": "https://www.instagram.com/red_calinet" },
+    { "id": "whatsapp", "nombre": "WhatsApp", "usuario": "+57 301 458 5658", "url": "https://wa.me/573014585658" }
+  ],
+
+  "servicios": [
+    {
+      "id": "streaming",
+      "nombre": "Streaming",
+      "icono": "i-streaming",
+      "descripcion": "Suscripciones y cuentas a tu medida.",
+      "detalles": ["Suscripciones y cuentas", "Netflix, Disney+ y más"]
+    },
+    {
+      "id": "tecnologia",
+      "nombre": "Tecnología",
+      "icono": "i-tech",
+      "descripcion": "iPhones, Honor y equipos de calidad.",
+      "detalles": ["iPhone", "Honor"]
+    },
+    {
+      "id": "seguros",
+      "nombre": "Seguros",
+      "icono": "i-seguros",
+      "descripcion": "Protege lo que más quieres.",
+      "detalles": ["Pólizas", "Asesoría"]
+    },
+    {
+      "id": "tramites",
+      "nombre": "Trámites",
+      "icono": "i-tramites",
+      "descripcion": "Gestiones rápidas y seguras.",
+      "detalles": ["Gestiones y diligencias"]
+    }
+  ],
+
+  "beneficios": [
+    {
+      "id": "cliente",
+      "icono": "i-heart",
+      "titulo": "Lo primordial es el cliente",
+      "texto": "Tu satisfacción manda: te acompañamos antes, durante y después de la compra."
+    },
+    {
+      "id": "personalizada",
+      "icono": "i-chat",
+      "titulo": "Atención personalizada",
+      "texto": "Te atendemos uno a uno por WhatsApp y en el punto físico."
+    },
+    {
+      "id": "punto",
+      "icono": "i-pin",
+      "titulo": "Punto físico en Bello",
+      "texto": "Nos puedes encontrar en Bello, Antioquia. No somos solo un chat."
+    }
+  ]
+}
