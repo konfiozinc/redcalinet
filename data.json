@@ -24,7 +24,9 @@
 
   "redes": [
     { "id": "instagram", "nombre": "Instagram", "usuario": "@red_calinet", "url": "https://www.instagram.com/red_calinet" },
-    { "id": "whatsapp", "nombre": "WhatsApp", "usuario": "+57 301 458 5658", "url": "https://wa.me/573014585658" }
+    { "id": "whatsapp", "nombre": "WhatsApp", "usuario": "+57 301 458 5658", "url": "https://wa.me/573014585658" },
+    { "id": "facebook", "nombre": "Facebook", "usuario": "", "url": "" },
+    { "id": "tiktok", "nombre": "TikTok", "usuario": "", "url": "" }
   ],
 
   "servicios": [
