@@ -222,7 +222,7 @@ function pintarRedes() {
     .filter((r) => r.url)
     .map(
       (r) =>
-        '<a href="' + esc(r.url) + '" target="_blank" rel="noopener" aria-label="' + esc(r.nombre) + ' de Red CaliNet">' +
+        '<a class="social-btn ' + esc(r.id) + '" href="' + esc(r.url) + '" target="_blank" rel="noopener" aria-label="' + esc(r.nombre) + ' de Red CaliNet">' +
           svg("i-" + r.id) +
         "</a>"
     )

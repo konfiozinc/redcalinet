@@ -537,6 +537,21 @@ button, input, select, textarea { font: inherit; color: inherit; }
   transition: background .18s ease, transform .18s ease;
 }
 .pie__redes a:hover { background: rgba(255, 255, 255, .18); transform: translateY(-2px); }
+/* ---------- Botones de redes con colores oficiales ---------- */
+.social-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  color: #fff;
+  text-decoration: none;
+  transition: transform .2s ease, box-shadow .2s ease;
+}
+.social-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0, 0, 0, .25); }
+.social-btn.instagram { background: linear-gradient(45deg, #F58529, #DD2A7B, #8134AF, #515BD4); }
+.social-btn.whatsapp { background: #25D366; }
 .pie__legal {
   margin-top: 26px;
   padding-top: 20px;
