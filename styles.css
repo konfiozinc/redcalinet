@@ -537,6 +537,13 @@ button, input, select, textarea { font: inherit; color: inherit; }
   transition: background .18s ease, transform .18s ease;
 }
 .pie__redes a:hover { background: rgba(255, 255, 255, .18); transform: translateY(-2px); }
+/* ---------- Efectos hover (cards, logo e íconos) ---------- */
+.beneficio { transition: transform .3s ease, box-shadow .3s ease; }
+.beneficio:hover { transform: translateY(-6px); box-shadow: 0 12px 24px rgba(10, 30, 63, .15); }
+.marca__logo, .hero__logo img { transition: transform .3s ease; }
+.marca__logo:hover, .hero__logo img:hover { transform: scale(1.05); }
+.social-btn svg { transition: transform .25s ease; }
+.social-btn:hover svg { transform: scale(1.12) rotate(-6deg); }
 /* ---------- Galería de productos ---------- */
 .galeria__grid {
   display: grid;
@@ -700,7 +707,8 @@ button, input, select, textarea { font: inherit; color: inherit; }
     transition-duration: .001ms !important;
   }
   .revelar { opacity: 1; transform: none; }
-  .btn:hover, .servicio:hover, .wa-float:hover, .pie__redes a:hover { transform: none; }
+  .btn:hover, .servicio:hover, .beneficio:hover, .galeria__item:hover, .wa-float:hover, .pie__redes a:hover,
+  .marca__logo:hover, .hero__logo img:hover, .social-btn:hover, .social-btn:hover svg { transform: none; }
 }
 
 @media print {
