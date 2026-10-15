@@ -537,6 +537,42 @@ button, input, select, textarea { font: inherit; color: inherit; }
   transition: background .18s ease, transform .18s ease;
 }
 .pie__redes a:hover { background: rgba(255, 255, 255, .18); transform: translateY(-2px); }
+/* ---------- Galería de productos ---------- */
+.galeria__grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 22px;
+  margin-top: 28px;
+}
+.galeria__item {
+  background: #fff;
+  border: 1px solid #e2ecf7;
+  border-radius: 18px;
+  padding: 14px;
+  box-shadow: var(--sombra-1, 0 4px 12px rgba(10, 30, 63, .08));
+  transition: transform .3s ease, box-shadow .3s ease;
+}
+.galeria__item img {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 12px;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+}
+.galeria__item h3 {
+  margin: 14px 0 4px;
+  font-size: 1.05rem;
+  text-align: center;
+  color: var(--azul-700, #1a3a6b);
+}
+.galeria__item:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 24px rgba(10, 30, 63, .16);
+}
+@media (min-width: 760px) {
+  .galeria__grid { grid-template-columns: repeat(2, 1fr); gap: 26px; }
+}
 /* ---------- Botones de redes con colores oficiales ---------- */
 .social-btn {
   display: inline-flex;
