@@ -219,10 +219,10 @@ function pintarRedes() {
   if (!cont) return;
 
   cont.innerHTML = (DATA.redes || [])
-    .filter((r) => r.url)
+    .filter((r) => r.url !== undefined)
     .map(
       (r) =>
-        '<a class="social-btn ' + esc(r.id) + '" href="' + esc(r.url) + '" target="_blank" rel="noopener" aria-label="' + esc(r.nombre) + ' de Red CaliNet">' +
+        '<a class="social-btn ' + esc(r.id) + '"' + (r.url && r.url !== '#' ? '' : ' hidden data-social="' + esc(r.id) + '"') + ' href="' + esc(r.url && r.url !== '#' ? r.url : '#') + '" target="_blank" rel="noopener" aria-label="' + esc(r.nombre) + ' de Red CaliNet">' +
           svg("i-" + r.id) +
         "</a>"
     )
