@@ -496,8 +496,18 @@ button, input, select, textarea { font: inherit; color: inherit; }
   width: 34px;
   height: 34px;
   flex: none;
-  background: rgba(26, 58, 107, .08);
+  display: grid;
+  place-items: center;
+  background: #E8EFFB;
+  color: #1a3a6b;
   border-radius: 10px;
+}
+.info--compacto .info__ico svg,
+.info--compacto .info__ico .ico {
+  width: 22px;
+  height: 22px;
+  opacity: 1;
+  stroke-width: 2;
 }
 .info--compacto .info__item h3 { display: none; }
 .info--compacto .info__item p,

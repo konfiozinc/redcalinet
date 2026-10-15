@@ -24,7 +24,7 @@ const FALLBACK = {
     whatsappTexto: "Hola, vi su página web y quiero información.",
     correo: "redcalinetmono@gmail.com",
     puntoFisico: true,
-    direccion: "Bello, Antioquia, Colombia",
+    direccion: "Calle 64 AB #105 A 93, Bello, Antioquia, Colombia",
     direccionNota: "Atendemos también por WhatsApp"
   },
   horarios: [
@@ -168,7 +168,7 @@ function pintarInfo() {
     '<li class="info__item">' +
       '<div class="info__ico">' + svg("i-mail") + "</div>" +
       "<div><h3>Correo</h3>" +
-        '<a href="mailto:' + esc(c.correo) + '">' + esc(c.correo) + "</a>" +
+        '<a href="mailto:' + esc(c.correo) + '" aria-label="Enviar correo a Red CaliNet">Enviar correo</a>' +
         "<small>Para solicitudes por escrito</small>" +
       "</div>" +
     "</li>"
