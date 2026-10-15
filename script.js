@@ -152,15 +152,7 @@ function pintarInfo() {
   const waRed = (DATA.redes || []).find((r) => r.id === "whatsapp");
   const waMostrar = (waRed && waRed.usuario) ? waRed.usuario : "+57 301 458 5658";
 
-  items.push(
-    '<li class="info__item">' +
-      '<div class="info__ico">' + svg("i-whatsapp") + "</div>" +
-      "<div><h3>WhatsApp</h3>" +
-        '<a href="' + waLink(c.whatsappTexto) + '" target="_blank" rel="noopener">' + esc(waMostrar) + "</a>" +
-        "<small>La forma más rápida de contactarnos</small>" +
-      "</div>" +
-    "</li>"
-  );
+  /* WhatsApp se quito de aqui: ya esta en el pie y en el CTA del aside */
 
   items.push(
     '<li class="info__item">' +
@@ -182,18 +174,7 @@ function pintarInfo() {
     "</li>"
   );
 
-  const insta = (DATA.redes || []).find((r) => r.id === "instagram");
-  if (insta && insta.url) {
-    items.push(
-      '<li class="info__item">' +
-        '<div class="info__ico">' + svg("i-instagram") + "</div>" +
-        "<div><h3>Instagram</h3>" +
-          '<a href="' + esc(insta.url) + '" target="_blank" rel="noopener">' + esc(insta.usuario || insta.nombre) + "</a>" +
-          "<small>Novedades y disponibilidad</small>" +
-        "</div>" +
-      "</li>"
-    );
-  }
+  /* Instagram se quito de aqui: ya esta en el pie */
 
   const horarios = (DATA.horarios || [])
     .map((h) => "<div><span>" + esc(h.dia) + "</span><span>" + esc(h.hora) + "</span></div>")
