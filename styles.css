@@ -21,7 +21,7 @@
 
   --tinta: #10203a;
   --tinta-2: #46607f;
-  --tinta-3: #7189a6;
+  --tinta-3: #475569;
   --linea: #dbe5f1;
   --fondo: #f5f8fc;
   --blanco: #ffffff;
@@ -71,7 +71,7 @@ a { color: inherit; text-decoration: none; }
 button, input, select, textarea { font: inherit; color: inherit; }
 
 :focus-visible {
-  outline: 3px solid var(--cian-400);
+  outline: 3px solid var(--azul-700);
   outline-offset: 3px;
   border-radius: 6px;
 }
@@ -156,7 +156,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .btn:hover { transform: translateY(-2px); box-shadow: var(--sombra-2); }
 .btn:active { transform: translateY(0); }
 
-.btn--wa { --btn-bg: var(--wa); }
+.btn--wa { --btn-bg: var(--wa); --btn-fg: #0a1e3f; }
 .btn--wa:hover { --btn-bg: var(--wa-700); }
 
 .btn--ghost {
