@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://konfiozinc.github.io/redcalinet/sitemap.xml
