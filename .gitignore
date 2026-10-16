@@ -13,3 +13,6 @@ desktop.ini
 
 # Node (por si se usan herramientas locales de captura/compresión)
 node_modules/
+
+# Originales fuera del sitio desplegado
+tools/

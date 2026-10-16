@@ -16,14 +16,12 @@ const FALLBACK = {
     nombreLegal: "REDCALINET",
     eslogan: "Calidad de ventas por internet",
     promesa: "Servicio garantizado, lo primordial para nosotros es el cliente.",
-    categoria: "Producto/servicio · Arte y entretenimiento",
     ciudad: "Bello, Antioquia, Colombia"
   },
   contacto: {
     whatsapp: "573014585658",
     whatsappTexto: "Hola, vi su página web y quiero información.",
     correo: "redcalinetmono@gmail.com",
-    puntoFisico: true,
     direccion: "Calle 64 AB #105 A 93, Bello, Antioquia, Colombia",
     direccionNota: "Atendemos también por WhatsApp"
   },
