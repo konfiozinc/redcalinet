@@ -1,0 +1,8 @@
+# GitHub Pages usa Jekyll en el flujo documentado de publicación desde main.
+# No publicar plantillas sin resolver ni herramientas como páginas alternativas.
+exclude:
+  - plantillas/
+  - herramientas/
+  - pruebas/
+  - docs/
+  - README.md

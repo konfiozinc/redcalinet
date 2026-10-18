@@ -38,7 +38,7 @@
   --ancho: 1120px;
   --pad: 20px;
 
-  --fuente: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --fuente: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 
   color-scheme: light;
 }
@@ -55,11 +55,10 @@ html {
 body {
   margin: 0;
   font-family: var(--fuente);
-  font-size: 16px;
+  font-size: 1rem;
   line-height: 1.6;
   color: var(--tinta);
   background: var(--fondo);
-  overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -205,8 +204,8 @@ button, input, select, textarea { font: inherit; color: inherit; }
 }
 
 .nav {
-  position: fixed;
-  inset: 64px 0 auto 0;
+  position: absolute;
+  inset: 100% 0 auto 0;
   display: grid;
   gap: 2px;
   padding: 14px var(--pad) 20px;
@@ -450,7 +449,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .campo textarea { min-height: 104px; resize: vertical; }
 .campo input:focus,
 .campo select:focus,
-.campo textarea:focus { border-color: var(--cian-500); background: #fff; outline: none; }
+.campo textarea:focus { border-color: var(--azul-700); background: #fff; outline: 2px solid var(--azul-700); outline-offset: 2px; }
 .campo .error { border-color: #d64545; background: #fff6f6; }
 
 .form__nota { font-size: .8rem; color: var(--tinta-3); text-align: center; }
@@ -538,7 +537,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
   font-size: .92rem;
 }
 .info__horario div:last-child { border-bottom: 0; }
-.info__horario span:last-child { font-weight: 700; white-space: nowrap; }
+.info__horario span:last-child { font-weight: 700; }
 
 /* ---------- Pie ---------- */
 .pie {
@@ -606,7 +605,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
   box-shadow: 0 12px 24px rgba(10, 30, 63, .16);
 }
 @media (min-width: 760px) {
-  .galeria__grid { grid-template-columns: repeat(2, 1fr); gap: 26px; }
+  .galeria__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 26px; }
 }
 /* ---------- Botones de redes con colores oficiales ---------- */
 .social-btn {
@@ -622,7 +621,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
 }
 .social-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0, 0, 0, .25); }
 .social-btn.instagram { background: linear-gradient(45deg, #F58529, #DD2A7B, #8134AF, #515BD4); }
-.social-btn.whatsapp { background: #25D366; }
+.social-btn.whatsapp { background: #25D366; color: var(--azul-950); }
 .social-btn.facebook { background: #1877F2; }
 .social-btn.tiktok {
   background: #000;
@@ -645,20 +644,19 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .wa-float {
   position: fixed;
   right: 16px;
-  bottom: 160px;
+  bottom: 24px;
   z-index: 60;
   display: grid;
   place-items: center;
   width: 58px; height: 58px;
   border-radius: 50%;
   background: var(--wa);
-  color: #fff;
+  color: var(--azul-950);
   box-shadow: 0 12px 28px rgba(29, 168, 81, .42);
   transition: transform .2s ease, opacity .2s ease;
 }
 .wa-float .ico { width: 30px; height: 30px; }
 .wa-float:hover { transform: scale(1.07); }
-.wa-float.oculto { opacity: 0; pointer-events: none; transform: scale(.7); }
 
 /* ---------- Animaciones ---------- */
 @keyframes subir {
@@ -666,27 +664,26 @@ button, input, select, textarea { font: inherit; color: inherit; }
   to { opacity: 1; transform: translateY(0); }
 }
 
-.revelar { opacity: 0; transform: translateY(18px); }
-.revelar.visible { opacity: 1; transform: none; transition: opacity .55s ease, transform .55s ease; }
+.revelar { opacity: 1; transform: none; }
 
 /* ---------- Breakpoints ---------- */
 @media (min-width: 420px) {
-  .hero__cta { grid-template-columns: 1fr 1fr; max-width: 460px; }
+  .hero__cta { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); max-width: 460px; }
 }
 
 @media (min-width: 620px) {
   :root { --pad: 28px; }
   .seccion { padding: 84px 0; }
-  .grid--2 { grid-template-columns: repeat(2, 1fr); }
-  .grid--4 { grid-template-columns: repeat(2, 1fr); }
-  .info { grid-template-columns: repeat(2, 1fr); }
+  .grid--2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .grid--4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .info { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .info__item--ancho { grid-column: 1 / -1; }
   .marca__txt small { display: block; }
   .hero { padding: 64px 0 78px; }
 }
 
 @media (min-width: 760px) {
-  .grid--3 { grid-template-columns: repeat(3, 1fr); }
+  .grid--3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
 
 @media (min-width: 900px) {
@@ -716,14 +713,14 @@ button, input, select, textarea { font: inherit; color: inherit; }
   .chips { justify-content: flex-start; }
   .hero { padding: 92px 0 108px; }
 
-  .grid--4 { grid-template-columns: repeat(4, 1fr); }
-  .grid--2 { grid-template-columns: repeat(2, 1fr); }
+  .grid--4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .grid--2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 
-  .contacto__in { grid-template-columns: 1.05fr .95fr; gap: 32px; align-items: start; }
+  .contacto__in { grid-template-columns: minmax(0, 1.05fr) minmax(0, .95fr); gap: 32px; align-items: start; }
   .form { padding: 30px 28px; }
 
-  .pie__in { grid-template-columns: 1.4fr 1fr auto; align-items: start; gap: 32px; }
-  .pie__legal { grid-template-columns: 1fr auto; align-items: center; }
+  .pie__in { grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) auto; align-items: start; gap: 32px; }
+  .pie__legal { grid-template-columns: minmax(0, 1fr) auto; align-items: center; }
 
   .wa-float { right: 26px; bottom: 26px; width: 62px; height: 62px; }
 }
@@ -750,3 +747,32 @@ button, input, select, textarea { font: inherit; color: inherit; }
   .hero { color: #000; background: none; }
   body { background: #fff; }
 }
+
+/* ---------- Política de privacidad ---------- */
+.privacidad { min-height: 70vh; padding-block: 48px 72px; }
+.privacidad__contenido { max-width: 760px; margin-inline: auto; padding: 28px; background: #fff; border: 1px solid var(--linea); border-radius: var(--r-lg); box-shadow: var(--sombra-1); }
+.privacidad h1 { margin-bottom: 12px; font-size: clamp(1.8rem, 6vw, 2.5rem); line-height: 1.15; }
+.privacidad h2 { margin-top: 28px; margin-bottom: 8px; font-size: 1.2rem; }
+.privacidad p, .privacidad li { color: var(--tinta-2); }
+.privacidad ul { padding-left: 22px; list-style: disc; }
+.privacidad a { color: var(--azul-700); text-decoration: underline; text-underline-offset: 3px; }
+.privacidad__volver { display: inline-flex; margin-bottom: 20px; font-weight: 700; }
+
+/* Garantías de interacción progresiva, reflow y foco. */
+[hidden] { display: none !important; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
+.contenedor > *, .grid > *, .contacto__in > *, .beneficio > *, .info__item > *, .campo > *, .pie__in > * { min-width: 0; }
+.form, .campo, .campo input, .campo select, .campo textarea { min-width: 0; max-width: 100%; }
+.form__campos { display: grid; gap: 14px; border: 0; padding: 0; margin: 0; min-inline-size: 0; }
+.campo__error { color: #9b2323; font-size: .85rem; }
+.campo__error:empty { display: none; }
+.form__alternativa { color: var(--azul-700); text-decoration: underline; text-underline-offset: 3px; }
+.btn { max-width: 100%; overflow-wrap: anywhere; white-space: normal; }
+button:disabled { opacity: .65; cursor: default; }
+.beneficio, .info__item, .sec-head, .hero__sub, .pie__txt, .privacidad__contenido { overflow-wrap: anywhere; }
+.info__horario div { flex-wrap: wrap; }
+.nav { max-height: calc(100dvh - 76px); overflow-y: auto; }
+html:not(.interactivo) .cabecera__in { flex-wrap: wrap; }
+html:not(.interactivo) .nav { position: static; inset: auto; transform: none; visibility: visible; display: flex; flex-wrap: wrap; gap: 2px; width: 100%; padding: 0 0 8px; box-shadow: none; border: 0; order: 2; }
+@media (min-width: 900px) { .cabecera__in { flex-wrap: wrap; } .nav { flex-wrap: wrap; max-height: none; overflow: visible; } }
+@media print { .revelar { opacity: 1 !important; transform: none !important; } .seccion { padding-block: 20px; } .servicio, .beneficio, .galeria__item { break-inside: avoid; } }

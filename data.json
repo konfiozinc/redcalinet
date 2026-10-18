@@ -1,4 +1,6 @@
 {
+  "sitio": { "url": "https://konfiozinc.github.io/redcalinet/", "areaServida": "Antioquia, Colombia" },
+
   "marca": {
     "nombre": "Red CaliNet",
     "nombreLegal": "REDCALINET",
@@ -12,12 +14,18 @@
     "whatsappTexto": "Hola, vi su página web y quiero información.",
     "correo": "redcalinetmono@gmail.com",
     "direccion": "Calle 64 AB #105 A 93, Bello, Antioquia, Colombia",
-    "direccionNota": "Atendemos también por WhatsApp"
+    "direccionNota": "Atendemos también por WhatsApp",
+    "direccionPostal": {
+      "streetAddress": "Calle 64 AB #105 A 93",
+      "addressLocality": "Bello",
+      "addressRegion": "Antioquia",
+      "addressCountry": "CO"
+    }
   },
 
   "horarios": [
-    { "dia": "Lunes a sábado", "hora": "09:00 – 21:30" },
-    { "dia": "Domingo", "hora": "10:00 – 20:00" }
+    { "dia": "Lunes a sábado", "hora": "09:00 – 21:30", "dias": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"] },
+    { "dia": "Domingo", "hora": "10:00 – 20:00", "dias": ["Sunday"] }
   ],
 
   "redes": [
