@@ -151,6 +151,9 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .btn--wa { --btn-bg: var(--wa); --btn-fg: #0a1e3f; }
 .btn--wa:hover { --btn-bg: var(--wa-700); }
 
+.btn--facebook { --btn-bg: #1877F2; --btn-fg: #fff; }
+.btn--facebook:hover { --btn-bg: #1264c7; }
+
 .btn--ghost {
   --btn-bg: rgba(255, 255, 255, .12);
   --btn-fg: #fff;
@@ -749,4 +752,91 @@ button, input, select, textarea { font: inherit; color: inherit; }
   .cabecera, .wa-float, .hero__cta, .form { display: none !important; }
   .hero { color: #000; background: none; }
   body { background: #fff; }
+}
+
+/* ---------- Categorías y fichas (landing por categorías) ---------- */
+.categoria { margin-top: 44px; }
+.categoria:first-child { margin-top: 0; }
+
+.categoria__head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.categoria__ico {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 54px; height: 54px;
+  border-radius: 15px;
+  background: linear-gradient(140deg, var(--azul-700), var(--azul-500));
+  color: #fff;
+  box-shadow: 0 8px 18px rgba(26, 58, 107, .28);
+}
+.categoria__ico .ico { width: 27px; height: 27px; }
+.categoria__head h3 { font-size: 1.3rem; font-weight: 800; letter-spacing: -.01em; }
+.categoria__head p { color: var(--tinta-2); font-size: .94rem; margin-top: 2px; }
+
+.categoria__nota {
+  margin: 12px 0 0;
+  padding: 10px 14px;
+  border-radius: var(--r-sm);
+  background: #eef4fd;
+  border: 1px solid #d7e6f9;
+  color: var(--tinta-2);
+  font-size: .84rem;
+}
+
+.fichas { display: grid; gap: 16px; margin-top: 18px; }
+
+.ficha {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 22px 20px;
+  background: var(--blanco);
+  border: 1px solid var(--linea);
+  border-radius: var(--r-md);
+  box-shadow: var(--sombra-1);
+  transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+}
+.ficha:hover { transform: translateY(-4px); box-shadow: var(--sombra-2); border-color: #c6dcf5; }
+.ficha h4 { font-size: 1.05rem; font-weight: 700; letter-spacing: -.01em; }
+.ficha > p { color: var(--tinta-2); font-size: .92rem; }
+
+.ficha__precio { font-weight: 700; color: var(--azul-700); font-size: .95rem; }
+.ficha__precio--consultar { color: var(--tinta-3); font-weight: 600; }
+
+.ficha__lista { display: grid; gap: 6px; }
+.ficha__lista li {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  font-size: .86rem;
+  color: var(--tinta-3);
+}
+.ficha__lista .ico { width: 15px; height: 15px; margin-top: 3px; color: var(--cian-500); }
+
+.ficha__cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: auto;
+  padding-top: 12px;
+  border-top: 1px dashed var(--linea);
+  color: var(--azul-600);
+  font-weight: 700;
+  font-size: .9rem;
+}
+.ficha__cta .ico { width: 17px; height: 17px; transition: transform .18s ease; }
+.ficha__cta:hover .ico { transform: translateX(3px); }
+
+/* chips del hero como enlaces a cada categoría */
+.chips li a { display: inline-flex; align-items: center; gap: 7px; color: inherit; }
+
+@media (min-width: 620px) {
+  .fichas { grid-template-columns: repeat(2, 1fr); }
+}
+@media (min-width: 900px) {
+  .fichas { grid-template-columns: repeat(3, 1fr); }
 }

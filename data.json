@@ -2,12 +2,15 @@
   "marca": {
     "nombre": "Red CaliNet",
     "nombreLegal": "REDCALINET",
-    "eslogan": "Calidad de ventas por internet",
+    "eslogan": "Tu conexión con servicios y soluciones digitales",
+    "esloganHistorico": "Calidad de ventas por internet",
     "promesa": "Servicio garantizado, lo primordial para nosotros es el cliente.",
     "ciudad": "Bello, Antioquia, Colombia"
   },
 
   "contacto": {
+    "telefono": "573014585658",
+    "telefonoTexto": "+57 301 458 5658",
     "whatsapp": "573014585658",
     "whatsappTexto": "Hola, vi su página web y quiero información.",
     "correo": "redcalinetmono@gmail.com",
@@ -23,38 +26,94 @@
   "redes": [
     { "id": "instagram", "nombre": "Instagram", "usuario": "@red_calinet", "url": "https://www.instagram.com/red_calinet" },
     { "id": "whatsapp", "nombre": "WhatsApp", "usuario": "+57 301 458 5658", "url": "https://wa.me/573014585658" },
-    { "id": "facebook", "nombre": "Facebook", "usuario": "", "url": "" },
+    { "id": "facebook", "nombre": "Facebook", "usuario": "Red CaliNet", "url": "https://www.facebook.com/share/1DfEomgbbL/?mibextid=wwXIfr" },
     { "id": "tiktok", "nombre": "TikTok", "usuario": "", "url": "" }
   ],
 
-  "servicios": [
+  "categorias": [
     {
       "id": "streaming",
       "nombre": "Streaming",
       "icono": "i-streaming",
-      "descripcion": "Suscripciones y cuentas a tu medida.",
-      "detalles": ["Suscripciones y cuentas", "Netflix, Disney+ y más"]
-    },
-    {
-      "id": "tecnologia",
-      "nombre": "Tecnología",
-      "icono": "i-tech",
-      "descripcion": "iPhones, Honor y equipos de calidad.",
-      "detalles": ["iPhone", "Honor"]
-    },
-    {
-      "id": "seguros",
-      "nombre": "Seguros",
-      "icono": "i-seguros",
-      "descripcion": "Protege lo que más quieres.",
-      "detalles": ["Pólizas", "Asesoría"]
+      "descripcion": "Suscripciones, planes y servicios digitales.",
+      "nota": "Referencias históricas en Facebook: Netflix, Amazon Prime, Fox, IPTV, Claro Video y HBO Go. No se publican como oferta vigente: confirmar plataformas, precios y autorización de comercialización.",
+      "fichas": [
+        {
+          "nombre": "Plataformas de streaming",
+          "descripcion": "Planes de suscripción a las plataformas digitales que ofrecemos actualmente.",
+          "precio": null,
+          "detalles": ["Planes y suscripciones", "Activación y soporte"]
+        }
+      ]
     },
     {
       "id": "tramites",
       "nombre": "Trámites",
       "icono": "i-tramites",
-      "descripcion": "Gestiones rápidas y seguras.",
-      "detalles": ["Gestiones y diligencias"]
+      "descripcion": "Asesoría y acompañamiento en gestiones y citas.",
+      "nota": "Servicio de asesoría o acompañamiento: no somos una entidad oficial.",
+      "fichas": [
+        {
+          "nombre": "Pasaportes",
+          "descripcion": "Asesoría y acompañamiento para tu trámite de pasaporte.",
+          "precio": null,
+          "detalles": ["Acompañamiento en el proceso", "Asesoría en requisitos"]
+        },
+        {
+          "nombre": "Citas RUNT",
+          "descripcion": "Gestión y acompañamiento para tus citas RUNT.",
+          "precio": null,
+          "detalles": ["Acompañamiento", "Asesoría en requisitos"]
+        },
+        {
+          "nombre": "Trámites de salud",
+          "descripcion": "Asesoría en citas y trámites de salud (EPS, autorizaciones).",
+          "precio": null,
+          "detalles": ["Asesoría"]
+        }
+      ]
+    },
+    {
+      "id": "tv-app",
+      "nombre": "TV por App",
+      "icono": "i-streaming",
+      "descripcion": "Televisión mediante aplicaciones y dispositivos compatibles.",
+      "nota": "Servicios sujetos a disponibilidad y autorización del proveedor.",
+      "fichas": [
+        {
+          "nombre": "Planes de TV por aplicación",
+          "descripcion": "Planes de televisión para Smart TV, celular y más.",
+          "precio": null,
+          "detalles": ["Planes por duración", "Dispositivos compatibles"]
+        }
+      ]
+    },
+    {
+      "id": "tecnologia",
+      "nombre": "Tecnología",
+      "icono": "i-tech",
+      "descripcion": "Equipos y accesorios de calidad.",
+      "nota": "Referencia histórica en Facebook: celulares y accesorios (marcas como Redmi). Equipos, existencias y disponibilidad por confirmar.",
+      "fichas": [
+        {
+          "nombre": "iPhone",
+          "descripcion": "Equipos iPhone con garantía.",
+          "precio": null,
+          "detalles": ["Garantía"]
+        },
+        {
+          "nombre": "Honor",
+          "descripcion": "Equipos Honor con garantía.",
+          "precio": null,
+          "detalles": ["Garantía"]
+        },
+        {
+          "nombre": "Accesorios",
+          "descripcion": "Audífonos, cargadores, cables y más.",
+          "precio": null,
+          "detalles": ["Audífonos", "Cargadores", "Cables"]
+        }
+      ]
     }
   ],
 

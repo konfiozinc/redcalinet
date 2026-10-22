@@ -2,23 +2,25 @@
 
 Sitio web de **Red CaliNet** (REDCALINET) · Bello, Antioquia, Colombia.
 
-> **Calidad de ventas por internet** — Servicio garantizado, lo primordial para nosotros es el cliente.
+> **Tu conexión con servicios y soluciones digitales** — Servicio garantizado, lo primordial para nosotros es el cliente.
 
 - **En vivo:** https://konfiozinc.github.io/redcalinet/
 - **WhatsApp:** [+57 301 458 5658](https://wa.me/573014585658)
 - **Correo:** [redcalinetmono@gmail.com](mailto:redcalinetmono@gmail.com)
 - **Instagram:** [@red_calinet](https://www.instagram.com/red_calinet)
 
-## Servicios
+## Categorías
 
-| Servicio | Detalle |
+| Categoría | Fichas |
 |---|---|
-| Streaming | Suscripciones y cuentas (Netflix, Disney+ y más) |
-| Tecnología | Venta de equipos: iPhone, Honor |
-| Seguros | Pólizas y asesoría |
-| Trámites | Gestiones y diligencias |
+| Streaming | Plataformas y planes (sujeto a autorización del proveedor) |
+| Trámites | Pasaportes, citas RUNT, trámites de salud (asesoría/acompañamiento) |
+| TV por App | Planes de televisión por aplicación |
+| Tecnología | iPhone, Honor y accesorios |
 
-Los precios se manejan **solo por WhatsApp** ("Consultar por WhatsApp"). El sitio no muestra precios ni fotos de productos (decisión del cliente).
+Cada categoría se organiza en **fichas** por servicio/producto. Los precios se muestran
+como **"Precio: consultar por WhatsApp"** hasta que el cliente entregue los valores
+reales (`precio: null` en `data.json`). No se publican precios inventados.
 
 ## Estructura
 
@@ -33,7 +35,11 @@ tools/originales/redcalinet.jpg   Logo original tal como lo entregó el cliente
 
 ## Cómo editar contenido
 
-Edita `data.json` (nombre, eslogan, promesa, contacto, horarios, redes, servicios y beneficios). Si cambias los datos ahí, **replica el cambio en el objeto `FALLBACK`** de `script.js`, que es el respaldo que se usa cuando `data.json` no se puede leer (p. ej. abriendo el HTML con `file://`).
+Edita `data.json` (marca, contacto, horarios, redes, `categorias` → `fichas`, y beneficios).
+Cada ficha admite `nombre`, `descripcion`, `precio` (`null` = "consultar por WhatsApp"),
+`detalles` (lista). Si cambias los datos ahí, **replica el cambio en el objeto `FALLBACK`**
+de `script.js`, que es el respaldo que se usa cuando `data.json` no se puede leer
+(p. ej. abriendo el HTML con `file://`).
 
 El formulario de contacto **no guarda datos en ningún servidor**: al enviarlo se abre WhatsApp con un mensaje pre-armado. Solo se conserva nombre y correo en `localStorage` (el dispositivo del visitante) para prellenar la próxima visita.
 

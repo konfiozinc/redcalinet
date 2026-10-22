@@ -16,3 +16,7 @@ node_modules/
 
 # Originales fuera del sitio desplegado
 tools/
+
+# Documentos internos y capturas (no se publican en el sitio)
+MENSAJE-PARA-EL-CLIENTE.md
+capturas/

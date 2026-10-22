@@ -14,11 +14,14 @@ const FALLBACK = {
   marca: {
     nombre: "Red CaliNet",
     nombreLegal: "REDCALINET",
-    eslogan: "Calidad de ventas por internet",
+    eslogan: "Tu conexión con servicios y soluciones digitales",
+    esloganHistorico: "Calidad de ventas por internet",
     promesa: "Servicio garantizado, lo primordial para nosotros es el cliente.",
     ciudad: "Bello, Antioquia, Colombia"
   },
   contacto: {
+    telefono: "573014585658",
+    telefonoTexto: "+57 301 458 5658",
     whatsapp: "573014585658",
     whatsappTexto: "Hola, vi su página web y quiero información.",
     correo: "redcalinetmono@gmail.com",
@@ -31,13 +34,46 @@ const FALLBACK = {
   ],
   redes: [
     { id: "instagram", nombre: "Instagram", usuario: "@red_calinet", url: "https://www.instagram.com/red_calinet" },
-    { id: "whatsapp", nombre: "WhatsApp", usuario: "+57 301 458 5658", url: "https://wa.me/573014585658" }
+    { id: "whatsapp", nombre: "WhatsApp", usuario: "+57 301 458 5658", url: "https://wa.me/573014585658" },
+    { id: "facebook", nombre: "Facebook", usuario: "Red CaliNet", url: "https://www.facebook.com/share/1DfEomgbbL/?mibextid=wwXIfr" }
   ],
-  servicios: [
-    { id: "streaming", nombre: "Streaming", icono: "i-streaming", descripcion: "Suscripciones y cuentas a tu medida.", detalles: ["Suscripciones y cuentas", "Netflix, Disney+ y más"] },
-    { id: "tecnologia", nombre: "Tecnología", icono: "i-tech", descripcion: "iPhones, Honor y equipos de calidad.", detalles: ["iPhone", "Honor"] },
-    { id: "seguros", nombre: "Seguros", icono: "i-seguros", descripcion: "Protege lo que más quieres.", detalles: ["Pólizas", "Asesoría"] },
-    { id: "tramites", nombre: "Trámites", icono: "i-tramites", descripcion: "Gestiones rápidas y seguras.", detalles: ["Gestiones y diligencias"] }
+  categorias: [
+    {
+      id: "streaming", nombre: "Streaming", icono: "i-streaming",
+      descripcion: "Suscripciones, planes y servicios digitales.",
+      nota: "Referencias históricas en Facebook: Netflix, Amazon Prime, Fox, IPTV, Claro Video y HBO Go. No se publican como oferta vigente: confirmar plataformas, precios y autorización de comercialización.",
+      fichas: [
+        { nombre: "Plataformas de streaming", descripcion: "Planes de suscripción a las plataformas digitales que ofrecemos actualmente.", precio: null, detalles: ["Planes y suscripciones", "Activación y soporte"] }
+      ]
+    },
+    {
+      id: "tramites", nombre: "Trámites", icono: "i-tramites",
+      descripcion: "Asesoría y acompañamiento en gestiones y citas.",
+      nota: "Servicio de asesoría o acompañamiento: no somos una entidad oficial.",
+      fichas: [
+        { nombre: "Pasaportes", descripcion: "Asesoría y acompañamiento para tu trámite de pasaporte.", precio: null, detalles: ["Acompañamiento en el proceso", "Asesoría en requisitos"] },
+        { nombre: "Citas RUNT", descripcion: "Gestión y acompañamiento para tus citas RUNT.", precio: null, detalles: ["Acompañamiento", "Asesoría en requisitos"] },
+        { nombre: "Trámites de salud", descripcion: "Asesoría en citas y trámites de salud (EPS, autorizaciones).", precio: null, detalles: ["Asesoría"] }
+      ]
+    },
+    {
+      id: "tv-app", nombre: "TV por App", icono: "i-streaming",
+      descripcion: "Televisión mediante aplicaciones y dispositivos compatibles.",
+      nota: "Servicios sujetos a disponibilidad y autorización del proveedor.",
+      fichas: [
+        { nombre: "Planes de TV por aplicación", descripcion: "Planes de televisión para Smart TV, celular y más.", precio: null, detalles: ["Planes por duración", "Dispositivos compatibles"] }
+      ]
+    },
+    {
+      id: "tecnologia", nombre: "Tecnología", icono: "i-tech",
+      descripcion: "Equipos y accesorios de calidad.",
+      nota: "Referencia histórica en Facebook: celulares y accesorios (marcas como Redmi). Equipos, existencias y disponibilidad por confirmar.",
+      fichas: [
+        { nombre: "iPhone", descripcion: "Equipos iPhone con garantía.", precio: null, detalles: ["Garantía"] },
+        { nombre: "Honor", descripcion: "Equipos Honor con garantía.", precio: null, detalles: ["Garantía"] },
+        { nombre: "Accesorios", descripcion: "Audífonos, cargadores, cables y más.", precio: null, detalles: ["Audífonos", "Cargadores", "Cables"] }
+      ]
+    }
   ],
   beneficios: [
     { id: "cliente", icono: "i-heart", titulo: "Lo primordial es el cliente", texto: "Tu satisfacción manda: te acompañamos antes, durante y después de la compra." },
@@ -72,6 +108,18 @@ function pintarEnlacesWa() {
   });
 }
 
+/* Enlace de Facebook (URL desde data.json). Oculta el botón si no hay URL. */
+function pintarFacebookCta() {
+  const fb = (DATA.redes || []).find((r) => r.id === "facebook");
+  const el = $("#facebookCta");
+  if (!el) return;
+  if (fb && fb.url) {
+    el.href = fb.url;
+  } else {
+    el.hidden = true;
+  }
+}
+
 /* ---------- Render ---------- */
 function pintarMarca() {
   document.title = DATA.marca.nombre + " — " + DATA.marca.eslogan + " | Bello, Antioquia";
@@ -84,7 +132,7 @@ function pintarMarca() {
 
   const sub = $("#heroSub");
   if (sub) {
-    const lista = DATA.servicios.map((s) => s.nombre.toLowerCase()).join(", ");
+    const lista = DATA.categorias.map((c) => c.nombre.toLowerCase()).join(", ");
     sub.textContent = lista.charAt(0).toUpperCase() + lista.slice(1) + ". " + DATA.marca.promesa;
   }
 
@@ -95,31 +143,49 @@ function pintarMarca() {
 function pintarChips() {
   const ul = $("#chips");
   if (!ul) return;
-  ul.innerHTML = DATA.servicios
-    .map((s) => "<li>" + svg(s.icono) + esc(s.nombre) + "</li>")
+  ul.innerHTML = DATA.categorias
+    .map((c) => '<li><a href="#cat-' + esc(c.id) + '">' + svg(c.icono) + esc(c.nombre) + "</a></li>")
     .join("");
 }
 
-function pintarServicios() {
-  const cont = $("#serviciosGrid");
+function pintarCategorias() {
+  const cont = $("#categorias");
   if (!cont) return;
 
-  cont.innerHTML = DATA.servicios
-    .map((s) => {
-      const detalles = (s.detalles || [])
-        .map((d) => "<li>" + svg("i-check") + "<span>" + esc(d) + "</span></li>")
+  cont.innerHTML = (DATA.categorias || [])
+    .map((cat) => {
+      const fichas = (cat.fichas || [])
+        .map((f) => {
+          const detalles = (f.detalles || [])
+            .map((d) => "<li>" + svg("i-check") + "<span>" + esc(d) + "</span></li>")
+            .join("");
+          const precio = f.precio
+            ? '<p class="ficha__precio">' + esc(f.precio) + "</p>"
+            : '<p class="ficha__precio ficha__precio--consultar">Precio: consultar por WhatsApp</p>';
+
+          return (
+            '<article class="ficha revelar">' +
+              "<h4>" + esc(f.nombre) + "</h4>" +
+              "<p>" + esc(f.descripcion) + "</p>" +
+              precio +
+              (detalles ? '<ul class="ficha__lista">' + detalles + "</ul>" : "") +
+              '<a class="ficha__cta" data-wa data-wa-texto="Hola, quiero información sobre ' + esc(f.nombre) + ' (Red CaliNet)." target="_blank" rel="noopener">' +
+                "Consultar por WhatsApp" + svg("i-arrow") +
+              "</a>" +
+            "</article>"
+          );
+        })
         .join("");
 
       return (
-        '<article class="servicio revelar">' +
-          '<div class="servicio__ico">' + svg(s.icono) + "</div>" +
-          "<h3>" + esc(s.nombre) + "</h3>" +
-          "<p>" + esc(s.descripcion) + "</p>" +
-          (detalles ? '<ul class="servicio__lista">' + detalles + "</ul>" : "") +
-          '<a class="servicio__cta" data-wa data-wa-texto="Hola, quiero información sobre ' + esc(s.nombre) + '." target="_blank" rel="noopener">' +
-            "Consultar por WhatsApp" + svg("i-arrow") +
-          "</a>" +
-        "</article>"
+        '<section class="categoria" id="cat-' + esc(cat.id) + '">' +
+          '<header class="categoria__head">' +
+            '<div class="categoria__ico">' + svg(cat.icono) + "</div>" +
+            "<div><h3>" + esc(cat.nombre) + "</h3><p>" + esc(cat.descripcion) + "</p></div>" +
+          "</header>" +
+          (cat.nota ? '<p class="categoria__nota">' + esc(cat.nota) + "</p>" : "") +
+          '<div class="fichas">' + fichas + "</div>" +
+        "</section>"
       );
     })
     .join("");
@@ -151,6 +217,16 @@ function pintarInfo() {
   const waMostrar = (waRed && waRed.usuario) ? waRed.usuario : "+57 301 458 5658";
 
   /* WhatsApp se quito de aqui: ya esta en el pie y en el CTA del aside */
+
+  items.push(
+    '<li class="info__item">' +
+      '<div class="info__ico">' + svg("i-phone") + "</div>" +
+      "<div><h3>Teléfono y WhatsApp</h3>" +
+        '<a href="tel:+' + esc(c.telefono) + '" aria-label="Llamar a Red CaliNet">' + esc(c.telefonoTexto || c.telefono) + "</a>" +
+        "<small>Llamadas y mensajes</small>" +
+      "</div>" +
+    "</li>"
+  );
 
   items.push(
     '<li class="info__item">' +
@@ -214,7 +290,7 @@ function pintarSelect() {
 
   sel.innerHTML =
     '<option value="">Aún no lo sé / quiero asesoría</option>' +
-    DATA.servicios.map((s) => '<option value="' + esc(s.id) + '">' + esc(s.nombre) + "</option>").join("") +
+    DATA.categorias.map((c) => '<option value="' + esc(c.id) + '">' + esc(c.nombre) + "</option>").join("") +
     '<option value="otro">Otro (te cuento en el mensaje)</option>';
 }
 
@@ -255,7 +331,7 @@ function enviarFormulario(ev) {
   const correo = correoEl.value.trim();
   const mensaje = msgEl.value.trim();
   const servicioId = servEl.value;
-  const servicio = DATA.servicios.find((s) => s.id === servicioId);
+  const categoria = DATA.categorias.find((c) => c.id === servicioId);
 
   nombreEl.classList.remove("error");
   correoEl.classList.remove("error");
@@ -278,7 +354,7 @@ function enviarFormulario(ev) {
   aviso("");
 
   const lineas = ["Hola, soy " + nombre + "."];
-  if (servicio) lineas.push("Servicio de interés: " + servicio.nombre + ".");
+  if (categoria) lineas.push("Servicio de interés: " + categoria.nombre + ".");
   else if (servicioId === "otro") lineas.push("Quiero asesoría sobre otro servicio.");
   else lineas.push("Quiero asesoría sobre sus servicios.");
   lineas.push("Correo: " + correo);
@@ -382,12 +458,13 @@ function prepararFlotante() {
 function pintar() {
   pintarMarca();
   pintarChips();
-  pintarServicios();
+  pintarCategorias();
   pintarBeneficios();
   pintarInfo();
   pintarRedes();
   pintarSelect();
   pintarEnlacesWa();
+  pintarFacebookCta();
   restaurarFormulario();
 }
 
