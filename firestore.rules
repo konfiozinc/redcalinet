@@ -1,0 +1,62 @@
+rules_version = '2';
+
+// ============================================================
+// Red CaliNet — Firestore Security Rules
+// ------------------------------------------------------------
+// - Lectura pública de configuración y catálogo publicado.
+// - Los SERVICIOS solo se leen en público si están PUBLICADO;
+//   los borradores/ocultos solo los ven los roles autorizados.
+// - El rol se lee SIEMPRE del servidor (usuarios/{uid}.rol).
+// - Escrituras restringidas a PROPIETARIO / SUPERADMIN.
+// ============================================================
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function usuarioActual() {
+      return isSignedIn()
+        ? get(/databases/$(database)/documents/usuarios/$(request.auth.uid)).data
+        : null;
+    }
+
+    function rol() {
+      return usuarioActual() != null ? usuarioActual().rol : '';
+    }
+
+    function esPropietario() {
+      return rol() == 'PROPIETARIO' || rol() == 'SUPERADMIN';
+    }
+
+    function esSuperAdmin() {
+      return rol() == 'SUPERADMIN';
+    }
+
+    // Configuración de la empresa (pública, editable por el propietario).
+    match /configuracion/{id} {
+      allow read: if true;
+      allow write: if esPropietario();
+    }
+
+    // Categorías (públicas; el flag `visible` se filtra en la landing).
+    match /categorias/{id} {
+      allow read: if true;
+      allow write: if esPropietario();
+    }
+
+    // Servicios: público solo los PUBLICADO; escritura por rol.
+    match /servicios/{id} {
+      allow read: if resource.data.estado == 'PUBLICADO' || esPropietario();
+      allow write: if esPropietario();
+    }
+
+    // Usuarios y roles: cada uno lee lo suyo; solo SUPERADMIN administra.
+    match /usuarios/{uid} {
+      allow read: if isSignedIn() && (request.auth.uid == uid || esSuperAdmin());
+      allow write: if esSuperAdmin();
+    }
+  }
+}

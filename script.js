@@ -468,12 +468,94 @@ function pintar() {
   restaurarFormulario();
 }
 
-async function iniciar() {
+function formatearTel(n) {
+  const s = String(n || "").replace(/\D/g, "");
+  if (s.startsWith("57") && s.length === 12) return "+57 " + s.slice(2, 5) + " " + s.slice(5, 8) + " " + s.slice(8);
+  return s;
+}
+
+/* Lee el catálogo desde Firestore (si hay datos publicados) y lo mapea a la
+   estructura de DATA. Devuelve null si no hay datos o Firestore no está
+   disponible, para usar data.json como respaldo. */
+async function cargarDesdeFirestore() {
+  if (!window.firebaseConfig || !window.firebaseConfig.projectId) return null;
   try {
-    const res = await fetch("data.json", { cache: "no-cache" });
-    if (res.ok) DATA = await res.json();
+    const { initializeApp } = await import("firebase/app");
+    const { getFirestore, collection, getDocs, query, orderBy, doc, getDoc } = await import("firebase/firestore");
+    const app = initializeApp(window.firebaseConfig);
+    const db = getFirestore(app);
+
+    const [empresaSnap, contactoSnap, catsSnap, servsSnap] = await Promise.all([
+      getDoc(doc(db, "configuracion", "empresa")),
+      getDoc(doc(db, "configuracion", "contacto")),
+      getDocs(query(collection(db, "categorias"), orderBy("orden"))),
+      getDocs(query(collection(db, "servicios"), orderBy("orden")))
+    ]);
+
+    const empresa = empresaSnap.exists ? empresaSnap.data() : {};
+    const contacto = contactoSnap.exists ? contactoSnap.data() : {};
+    const categorias = catsSnap.docs
+      .filter((d) => d.data().visible !== false)
+      .map((d) => ({ id: d.id, ...d.data(), fichas: [] }));
+    const servicios = servsSnap.docs
+      .filter((d) => d.data().estado === "PUBLICADO")
+      .map((d) => ({ id: d.id, ...d.data() }));
+
+    if (!categorias.length) return null; // sin datos: usar data.json
+
+    categorias.forEach((cat) => {
+      cat.fichas = servicios
+        .filter((s) => s.categoriaId === cat.id)
+        .map((s) => ({ nombre: s.nombre, descripcion: s.descripcion || "", precio: s.precio != null ? s.precio : null, detalles: s.detalles || [] }));
+    });
+
+    const redes = [];
+    if (contacto.whatsapp) redes.push({ id: "whatsapp", nombre: "WhatsApp", usuario: formatearTel(contacto.whatsapp), url: "https://wa.me/" + String(contacto.whatsapp).replace(/\D/g, "") });
+    if (contacto.facebook) redes.push({ id: "facebook", nombre: "Facebook", usuario: "Red CaliNet", url: contacto.facebook });
+    if (contacto.instagram) redes.push({ id: "instagram", nombre: "Instagram", usuario: "", url: contacto.instagram });
+    if (contacto.tiktok) redes.push({ id: "tiktok", nombre: "TikTok", usuario: "", url: contacto.tiktok });
+
+    return {
+      marca: {
+        nombre: empresa.nombre || "Red CaliNet",
+        eslogan: empresa.eslogan || "Tu conexión con servicios y soluciones digitales",
+        esloganHistorico: empresa.esloganHistorico || "",
+        promesa: empresa.promesa || "Servicio garantizado, lo primordial para nosotros es el cliente.",
+        ciudad: empresa.ciudad || "Bello, Antioquia, Colombia"
+      },
+      contacto: {
+        telefono: String(contacto.telefono || "").replace(/\D/g, ""),
+        telefonoTexto: formatearTel(contacto.telefono),
+        whatsapp: String(contacto.whatsapp || "").replace(/\D/g, ""),
+        whatsappTexto: "Hola, vi su página web y quiero información.",
+        correo: contacto.correo || "",
+        direccion: empresa.direccion || "",
+        direccionNota: empresa.direccionNota || ""
+      },
+      horarios: Array.isArray(contacto.horarios) ? contacto.horarios : [],
+      redes: redes,
+      categorias: categorias,
+      beneficios: DATA.beneficios
+    };
   } catch (e) {
-    console.warn("Red CaliNet: data.json no disponible, uso el respaldo embebido.", e);
+    console.warn("Red CaliNet: Firestore no disponible, uso data.json.", e);
+    return null;
+  }
+}
+
+async function iniciar() {
+  // 1) Catálogo en Firestore (fuente viva editada desde el panel).
+  const desdeFirestore = await cargarDesdeFirestore();
+  if (desdeFirestore) {
+    DATA = desdeFirestore;
+  } else {
+    // 2) Respaldo: data.json (o el objeto embebido si falla la petición).
+    try {
+      const res = await fetch("data.json", { cache: "no-cache" });
+      if (res.ok) DATA = await res.json();
+    } catch (e) {
+      console.warn("Red CaliNet: data.json no disponible, uso el respaldo embebido.", e);
+    }
   }
 
   pintar();

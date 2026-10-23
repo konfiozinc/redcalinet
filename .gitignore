@@ -14,9 +14,12 @@ desktop.ini
 # Node (por si se usan herramientas locales de captura/compresión)
 node_modules/
 
-# Originales fuera del sitio desplegado
-tools/
+# Originales fuera del sitio desplegado (los scripts de tools/ sí se versionan)
+tools/originales/
 
 # Documentos internos y capturas (no se publican en el sitio)
 MENSAJE-PARA-EL-CLIENTE.md
+PLAN-PLATAFORMA.md
+ARQUITECTURA-PLATAFORMA.md
+SETUP.md
 capturas/
