@@ -481,15 +481,21 @@ async function cargarDesdeFirestore() {
   if (!window.firebaseConfig || !window.firebaseConfig.projectId) return null;
   try {
     const { initializeApp } = await import("firebase/app");
-    const { getFirestore, collection, getDocs, query, orderBy, doc, getDoc } = await import("firebase/firestore");
+    const { getFirestore, connectFirestoreEmulator, collection, getDocs, query, orderBy, where, doc, getDoc } = await import("firebase/firestore");
     const app = initializeApp(window.firebaseConfig);
     const db = getFirestore(app);
+    // Modo de pruebas: ?emulador=1 conecta la landing al emulador local.
+    if (new URLSearchParams(window.location.search).get("emulador") === "1") {
+      connectFirestoreEmulator(db, "127.0.0.1", 8080);
+    }
 
     const [empresaSnap, contactoSnap, catsSnap, servsSnap] = await Promise.all([
       getDoc(doc(db, "configuracion", "empresa")),
       getDoc(doc(db, "configuracion", "contacto")),
       getDocs(query(collection(db, "categorias"), orderBy("orden"))),
-      getDocs(query(collection(db, "servicios"), orderBy("orden")))
+      // Filtra por estado en la consulta para que la regla de lectura pública
+      // (solo PUBLICADO) sea satisfacible sin exponer borradores/ocultos.
+      getDocs(query(collection(db, "servicios"), where("estado", "==", "PUBLICADO")))
     ]);
 
     const empresa = empresaSnap.exists ? empresaSnap.data() : {};
@@ -498,8 +504,8 @@ async function cargarDesdeFirestore() {
       .filter((d) => d.data().visible !== false)
       .map((d) => ({ id: d.id, ...d.data(), fichas: [] }));
     const servicios = servsSnap.docs
-      .filter((d) => d.data().estado === "PUBLICADO")
-      .map((d) => ({ id: d.id, ...d.data() }));
+      .map((d) => ({ id: d.id, ...d.data() }))
+      .sort((a, b) => (a.orden ?? 0) - (b.orden ?? 0));
 
     if (!categorias.length) return null; // sin datos: usar data.json
 

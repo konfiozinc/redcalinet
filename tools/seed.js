@@ -1,59 +1,86 @@
 #!/usr/bin/env node
 /* ============================================================
- * Red CaliNet — Seed inicial (una sola vez)
+ * Red CaliNet — Seed inicial (IDEMPOTENTE y NO destructivo)
  * ------------------------------------------------------------
- * Crea los usuarios con rol (PROPIETARIO + SUPERADMIN) y siembra
- * en Firestore: configuracion/empresa, configuracion/contacto,
- * categorías y servicios (a partir de data.json).
+ * - NO sobrescribe documentos existentes (solo crea lo que falta).
+ * - NO usa contraseñas incrustadas: se leen de variables de entorno
+ *   o se generan al azar y se imprimen UNA sola vez.
+ * - IDs fijos para categorías y servicios (no duplica al re-ejecutar).
  *
- * Producción:
- *   GOOGLE_APPLICATION_CREDENTIALS=clave.json node tools/seed.js
- *   (clave.json = Service Account de Firebase, Project settings → Service accounts)
+ * Producción (clave de servicio LOCAL, nunca en el repo):
+ *   GOOGLE_APPLICATION_CREDENTIALS=clave.json \
+ *   PROPIETARIO_EMAIL=... PROPIETARIO_PASS=... \
+ *   SUPERADMIN_EMAIL=... SUPERADMIN_PASS=... \
+ *   node tools/seed.js
  *
- * Emulador (pruebas):
+ * Emulador:
  *   FIRESTORE_EMULATOR_HOST=127.0.0.1:8080 FIREBASE_AUTH_EMULATOR_HOST=127.0.0.1:9199 node tools/seed.js
- *
- * Credenciales de acceso (se pueden sobrescribir con variables de entorno):
- *   PROPIETARIO_EMAIL / PROPIETARIO_PASS
- *   SUPERADMIN_EMAIL / SUPERADMIN_PASS
  * ============================================================ */
 "use strict";
 
+const crypto = require("crypto");
 const admin = require("firebase-admin");
 const data = require("../data.json");
 
 const PROYECTO = process.env.PROYECTO || "red-calinet";
-const EMAIL_PROP = process.env.PROPIETARIO_EMAIL || "redcalinetmono@gmail.com";
-const PASS_PROP = process.env.PROPIETARIO_PASS || "RedCaliNet#2026";
-const EMAIL_SUP = process.env.SUPERADMIN_EMAIL || "admin@konfiozinc.com";
-const PASS_SUP = process.env.SUPERADMIN_PASS || "RedCaliNet#2026";
+
+function claveAleatoria() {
+  return "Rc-" + crypto.randomBytes(9).toString("base64url") + "-" + crypto.randomInt(10, 99);
+}
 
 async function main() {
   admin.initializeApp({ projectId: PROYECTO });
   const db = admin.firestore();
   const auth = admin.auth();
 
-  async function crearUsuario(email, pass, rol, nombre) {
+  /* ---------- Usuarios (roles) ---------- */
+  async function asegurarUsuario(email, passEnv, rol, nombre) {
+    const pass = passEnv || claveAleatoria();
     let uid;
     try {
       uid = (await auth.createUser({ email, password: pass, displayName: nombre })).uid;
+      console.log("  · usuario creado:", email, "— contraseña:", pass);
     } catch (e) {
       if (e.code === "auth/email-already-exists") {
         uid = (await auth.getUserByEmail(email)).uid;
-        await auth.updateUser(uid, { password: pass });
+        console.log("  · usuario ya existía (no se tocó su contraseña):", email);
       } else {
         throw e;
       }
     }
-    await db.collection("usuarios").doc(uid).set({ email, rol, activo: true, nombre });
-    return uid;
+    // Solo se crea el documento si falta: nunca se pisa un rol existente.
+    const ref = db.collection("usuarios").doc(uid);
+    const snap = await ref.get();
+    if (!snap.exists) {
+      await ref.set({ email, rol, activo: true, nombre });
+      console.log("  · rol asignado:", rol, "→", uid);
+    } else {
+      console.log("  · usuarios/{uid} ya existe (rol intacto):", rol, "→", uid);
+    }
   }
 
-  await crearUsuario(EMAIL_PROP, PASS_PROP, "PROPIETARIO", "Red CaliNet");
-  await crearUsuario(EMAIL_SUP, PASS_SUP, "SUPERADMIN", "KONFÍO ZINC");
+  console.log("== Usuarios ==");
+  await asegurarUsuario(
+    process.env.PROPIETARIO_EMAIL || "redcalinetmono@gmail.com",
+    process.env.PROPIETARIO_PASS || "",
+    "PROPIETARIO", "Red CaliNet"
+  );
+  await asegurarUsuario(
+    process.env.SUPERADMIN_EMAIL || "admin@konfiozinc.com",
+    process.env.SUPERADMIN_PASS || "",
+    "SUPERADMIN", "KONFÍO ZINC"
+  );
 
-  // Configuración de empresa
-  await db.collection("configuracion").doc("empresa").set({
+  /* ---------- Configuración (solo si falta) ---------- */
+  console.log("== Configuración ==");
+  async function crearSiFalta(coll, id, campos) {
+    const ref = db.collection(coll).doc(id);
+    if ((await ref.get()).exists) { console.log("  · ya existe:", coll + "/" + id); return; }
+    await ref.set(campos);
+    console.log("  · creado:", coll + "/" + id);
+  }
+
+  await crearSiFalta("configuracion", "empresa", {
     nombre: data.marca.nombre,
     eslogan: data.marca.eslogan,
     esloganHistorico: data.marca.esloganHistorico,
@@ -63,9 +90,8 @@ async function main() {
     direccionNota: data.contacto.direccionNota
   });
 
-  // Configuración de contacto y redes
   const redes = data.redes || [];
-  await db.collection("configuracion").doc("contacto").set({
+  await crearSiFalta("configuracion", "contacto", {
     whatsapp: data.contacto.whatsapp,
     telefono: data.contacto.telefono,
     correo: data.contacto.correo,
@@ -75,34 +101,44 @@ async function main() {
     horarios: data.horarios || []
   });
 
-  // Categorías y servicios (desde data.json)
-  let orden = 0;
+  /* ---------- Categorías y servicios (IDs fijos, sin duplicar) ---------- */
+  console.log("== Catálogo ==");
+  const idsCategoria = ["cat-streaming", "cat-tramites", "cat-tv-app", "cat-tecnologia"];
+  let ci = 0;
   for (const cat of (data.categorias || [])) {
-    const catRef = await db.collection("categorias").add({
-      nombre: cat.nombre,
-      icono: cat.icono,
-      descripcion: cat.descripcion || "",
-      nota: cat.nota || "",
-      orden: orden++,
-      visible: true
-    });
-    for (const f of (cat.fichas || [])) {
-      await db.collection("servicios").add({
-        categoriaId: catRef.id,
-        nombre: f.nombre,
-        descripcion: f.descripcion || "",
-        precio: f.precio != null ? f.precio : null,
-        detalles: f.detalles || [],
-        imagen: null,
-        estado: "PUBLICADO",
-        orden: 0
+    const catId = idsCategoria[ci] || ("cat-" + cat.id);
+    const catRef = db.collection("categorias").doc(catId);
+    if (!(await catRef.get()).exists) {
+      await catRef.set({
+        nombre: cat.nombre, icono: cat.icono, descripcion: cat.descripcion || "", nota: cat.nota || "",
+        orden: ci, visible: true
       });
+      console.log("  · categoría creada:", cat.nombre, "(" + catId + ")");
+    } else {
+      console.log("  · categoría ya existía:", cat.nombre, "(" + catId + ")");
     }
+
+    let fi = 0;
+    for (const f of (cat.fichas || [])) {
+      const svcId = catId.replace(/^cat-/, "svc-") + "-" + fi;
+      const svcRef = db.collection("servicios").doc(svcId);
+      if (!(await svcRef.get()).exists) {
+        await svcRef.set({
+          categoriaId: catId, nombre: f.nombre, descripcion: f.descripcion || "",
+          precio: f.precio != null ? f.precio : null, detalles: f.detalles || [],
+          imagen: null, estado: "PUBLICADO", orden: fi
+        });
+        console.log("  · servicio creado:", f.nombre, "(" + svcId + ")");
+      } else {
+        console.log("  · servicio ya existía:", f.nombre, "(" + svcId + ")");
+      }
+      fi++;
+    }
+    ci++;
   }
 
-  console.log("✓ Seed completo.");
-  console.log("  PROPIETARIO:", EMAIL_PROP);
-  console.log("  SUPERADMIN: ", EMAIL_SUP);
+  console.log("\n✓ Seed idempotente completado (nada se sobrescribió).");
+  console.log("  Guarda las contraseñas impresas arriba en un gestor seguro.");
   process.exit(0);
 }
 
