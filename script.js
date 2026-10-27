@@ -145,15 +145,29 @@ function normalizarTexto(valor) {
     .trim();
 }
 
+const TIPO_PRODUCTO = "producto";
+const TIPO_SERVICIO = "servicio";
+
+/* Un producto físico se compra y se entrega; un servicio se presta.
+   `tipo` es opcional en los datos: si falta (Firestore antiguo o el respaldo
+   embebido) se infiere del icono de la categoría, sin inventar nada. */
+function normalizarTipo(valor, icono) {
+  const t = String(valor || "").trim().toLowerCase();
+  if (t === TIPO_PRODUCTO || t === TIPO_SERVICIO) return t;
+  return icono === "i-tech" ? TIPO_PRODUCTO : TIPO_SERVICIO;
+}
+
 function normalizarCategoria(cat, indice) {
   if (!cat || typeof cat !== "object") return null;
   const nombre = String(cat.nombre || "").trim();
   if (!nombre) return null;
   const orden = Number(cat.orden);
+  const iconoCat = cat.icono || "i-check";
   return {
     id: String(cat.id || "categoria-" + indice),
     nombre: nombre,
-    icono: cat.icono || "i-check",
+    icono: iconoCat,
+    tipo: normalizarTipo(cat.tipo, iconoCat),
     descripcion: String(cat.descripcion || "").trim(),
     nota: String(cat.nota || "").trim(),
     orden: Number.isFinite(orden) ? orden : indice,
@@ -180,6 +194,10 @@ function normalizarProducto(doc, indice) {
     agotado: doc.agotado === true,
     orden: Number.isFinite(orden) ? orden : indice,
     categoriaId: String(doc.categoriaId || ""),
+    /* Se resuelve en mapearCatalogo con el tipo de su categoría. */
+    tipo: String(doc.tipo || "").trim().toLowerCase(),
+    tipoTexto: "",
+    esFisico: false,
     categoriaNombre: "",
     iconoCategoria: "i-check"
   };
@@ -235,6 +253,12 @@ function mapearCatalogo(negocio) {
     const cat = categorias.find((c) => c.id === p.categoriaId);
     p.categoriaNombre = cat ? cat.nombre : "";
     p.iconoCategoria = cat ? cat.icono : "i-check";
+    /* El producto puede forzar su tipo; si no, manda su categoría. */
+    p.tipo = p.tipo === TIPO_PRODUCTO || p.tipo === TIPO_SERVICIO
+      ? p.tipo
+      : (cat ? cat.tipo : TIPO_SERVICIO);
+    p.esFisico = p.tipo === TIPO_PRODUCTO;
+    p.tipoTexto = p.esFisico ? "Producto" : "Servicio";
     porCategoria.get(p.categoriaId).push(p);
   });
 
@@ -338,6 +362,30 @@ function pintarChips() {
     .join("");
 }
 
+/* El hero dice, en tres golpes, por qué comprar aquí. Todo sale de los datos
+   reales (promesa de marca, ciudad y WhatsApp): no hay promesas inventadas. */
+function pintarHero() {
+  const ul = $("#heroValores");
+  if (ul) {
+    const ciudadCorta = String(DATA.marca.ciudad || "").split(",")[0].trim() || "Bello";
+    const valores = [
+      { icono: "i-shield", texto: "Servicio garantizado" },
+      { icono: "i-pin", texto: "Punto físico en " + ciudadCorta },
+      { icono: "i-whatsapp", texto: "Atención por WhatsApp" }
+    ];
+    ul.innerHTML = valores
+      .map((v) => "<li>" + svg(v.icono) + "<span>" + esc(v.texto) + "</span></li>")
+      .join("");
+  }
+
+  const fb = $("#heroFacebook");
+  if (fb) {
+    const red = (DATA.redes || []).find((r) => r.id === "facebook");
+    if (red && red.url) fb.href = red.url;
+    else fb.hidden = true;
+  }
+}
+
 /* Categorías: cabecera, nota y cuántos productos tiene.
    La lista de productos vive en el catálogo (#catalogo), no se duplica aquí. */
 function pintarCategorias() {
@@ -392,10 +440,53 @@ function pintarFiltros() {
     .join("");
 }
 
+/* ---------- Portada gráfica de lo que no tiene fotografía ----------
+   No se inventan fotos de inventario: se compone una portada de marca con el
+   azul de Red CaliNet, una trama de puntos y el icono de la categoría. Es un
+   recurso gráfico declarado, no una foto de producto. */
+const PORTADAS = {
+  "i-streaming": { fondo: "#123a6b", brillo: "#2f6fb5" },
+  "i-tramites": { fondo: "#0f3a63", brillo: "#1d6ba6" },
+  "i-tech": { fondo: "#16335e", brillo: "#2c6aa0" },
+  "i-check": { fondo: "#173a68", brillo: "#24548c" }
+};
+
+function idSeguro(texto) {
+  const s = String(texto || "").replace(/[^A-Za-z0-9_-]/g, "").slice(0, 24);
+  return s || "p";
+}
+
+function portada(prod, contexto) {
+  const clave = icono(prod.iconoCategoria);
+  const tono = PORTADAS[clave] || PORTADAS["i-check"];
+  const id = "pt-" + (contexto || "c") + "-" + idSeguro(prod.id);
+
+  return (
+    '<svg class="ficha__portada" viewBox="0 0 400 300" aria-hidden="true" focusable="false">' +
+      '<defs><pattern id="' + esc(id) + '" width="26" height="26" patternUnits="userSpaceOnUse">' +
+        '<circle cx="5" cy="5" r="2.1" fill="#ffffff" opacity=".09"/>' +
+      "</pattern></defs>" +
+      '<rect width="400" height="300" fill="' + tono.fondo + '"/>' +
+      '<ellipse cx="330" cy="30" rx="190" ry="128" fill="' + tono.brillo + '" opacity=".5"/>' +
+      '<rect width="400" height="300" fill="url(#' + esc(id) + ')"/>' +
+    "</svg>" +
+    '<span class="ficha__sinfoto" aria-hidden="true">' + svg(clave) + "</span>"
+  );
+}
+
+/* Imagen real si la hay; si no, portada gráfica. */
+function mediaProducto(prod, contexto, lado) {
+  if (prod.imagen) {
+    return (
+      '<img src="' + esc(prod.imagen) + '" alt="' + esc(prod.nombre) + '" width="' + lado + '" height="' + lado +
+      '" loading="lazy" decoding="async">'
+    );
+  }
+  return portada(prod, contexto);
+}
+
 function tarjetaProducto(prod) {
-  const media = prod.imagen
-    ? '<img src="' + esc(prod.imagen) + '" alt="' + esc(prod.nombre) + '" width="600" height="600" loading="lazy" decoding="async">'
-    : '<span class="ficha__sinfoto" aria-hidden="true">' + svg(prod.iconoCategoria) + "</span>";
+  const media = mediaProducto(prod, "c", 600);
 
   const etiquetas = [];
   if (prod.destacado) etiquetas.push('<span class="ficha__etiqueta ficha__etiqueta--destacado">Destacado</span>');
@@ -409,10 +500,19 @@ function tarjetaProducto(prod) {
     .map((d) => "<li>" + svg("i-check") + "<span>" + esc(d) + "</span></li>")
     .join("");
 
+  /* La clase se arma aparte para no dejar un token a medias en el marcado. */
+  const claseTipo = prod.esFisico ? " ficha--fisico" : " ficha--servicio";
+  const clases = "ficha ficha--producto" + claseTipo + (prod.agotado ? " ficha--agotado" : "");
+
   return (
-    '<article class="ficha ficha--producto' + (prod.agotado ? " ficha--agotado" : "") + '" data-producto="' + esc(prod.id) + '">' +
+    '<article class="' + clases + '" data-producto="' + esc(prod.id) + '">' +
       '<div class="ficha__media">' + media + etiquetas.join("") + "</div>" +
-      '<p class="ficha__cat">' + esc(prod.categoriaNombre) + "</p>" +
+      '<div class="ficha__meta">' +
+        '<span class="ficha__cat">' + esc(prod.categoriaNombre) + "</span>" +
+        '<span class="ficha__tipo ' + (prod.esFisico ? "ficha__tipo--producto" : "ficha__tipo--servicio") + '">' +
+          esc(prod.tipoTexto) +
+        "</span>" +
+      "</div>" +
       "<h4>" + esc(prod.nombre) + "</h4>" +
       (prod.descripcion ? "<p>" + esc(prod.descripcion) + "</p>" : "") +
       precio +
@@ -584,14 +684,16 @@ function abrirFicha(id) {
   FICHA.focoPrevio = document.activeElement;
 
   const media = $("#fichaMedia");
-  if (media) {
-    media.innerHTML = prod.imagen
-      ? '<img src="' + esc(prod.imagen) + '" alt="' + esc(prod.nombre) + '" width="720" height="720" loading="lazy" decoding="async">'
-      : '<span class="ficha__sinfoto" aria-hidden="true">' + svg(prod.iconoCategoria) + "</span>";
-  }
+  if (media) media.innerHTML = mediaProducto(prod, "m", 720);
 
   const cat = $("#fichaCat");
   if (cat) cat.textContent = prod.categoriaNombre;
+
+  const tipo = $("#fichaTipo");
+  if (tipo) {
+    tipo.textContent = prod.tipoTexto;
+    tipo.className = "ficha__tipo " + (prod.esFisico ? "ficha__tipo--producto" : "ficha__tipo--servicio");
+  }
 
   const titulo = $("#fichaTitulo");
   if (titulo) titulo.textContent = prod.nombre;
@@ -906,6 +1008,7 @@ function prepararFlotante() {
 /* ---------- Arranque ---------- */
 function pintar() {
   pintarMarca();
+  pintarHero();
   pintarChips();
   pintarCategorias();
   pintarCatalogo();
@@ -1093,6 +1196,9 @@ if (typeof module !== "undefined" && module.exports) {
     mapearCatalogo,
     filtrarCatalogo,
     contarProductos,
+    normalizarTipo,
+    portada,
+    mediaProducto,
     negocioDesdeFirestore,
     formatearTel,
     mensajeProducto,

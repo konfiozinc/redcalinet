@@ -1,0 +1,146 @@
+============================================================
+ AUDITORÍA VISUAL ESTÁTICA · ESTÁTICA · ANTES (commit 01fe213)
+ árbol: C:\Users\USUARI~1\AppData\Local\Temp\kz-antes-tree
+============================================================
+
+-- Rejilla del catálogo por resolución --
+ancho   columnas   gap      margen-sup
+320     1          18px     22px
+360     1          18px     22px
+375     1          18px     22px
+390     1          18px     22px
+768     2          22px     22px
+1024    3          22px     22px
+1440    3          22px     22px
+
+-- Tipografía de la tarjeta (a 375px y a 1440px) --
+elemento              propiedad       375         1440
+título                font-size       1.06rem     1.06rem
+  interlineado        line-height     -           -
+descripción           font-size       -           -
+  interlineado        line-height     -           -
+precio                font-size       -           -
+  peso                font-weight     -           -
+categoría             font-size       -           -
+detalles              font-size       -           -
+
+-- Hero --
+padding          375: 44px 0 56px   1440: 92px 0 108px
+h1 font-size     375: clamp(2rem, 8.6vw, 3.2rem)   1440: clamp(2rem, 8.6vw, 3.2rem)
+valores hero:     no
+fila de contacto: no
+
+-- Contraste WCAG AA (texto sobre blanco) --
+categoría de la tarjeta no medible
+precio                  no medible
+precio "consultar"      no medible
+descripción             no medible
+botón ver detalle       7.72    AA
+pastilla servicio       no medible
+pastilla producto       no medible
+
+-- Portadas y tipo --
+fichas totales:            8
+con foto real:             2
+sin foto:                  6
+portada gráfica de marca:  no
+distintivo producto/servicio: no
+categorías por tipo:       {"inferido":4}
+
+-- Estructura conservada --
+sección #catalogo:         sí
+buscador #catBuscar:       sí
+filtros #catFiltros:       sí
+modal #fichaModal:         sí
+WhatsApp en hero:          sí
+Facebook en hero:          no
+============================================================
+ AUDITORÍA VISUAL ESTÁTICA · ESTÁTICA · DESPUÉS (árbol actual)
+ árbol: C:\Users\usuario29\Documents\KONFIO_ZINC\6-LANDING-PAGES\RedCaliNet
+============================================================
+
+-- Rejilla del catálogo por resolución --
+ancho   columnas   gap      margen-sup
+320     1          18px     26px
+360     1          18px     26px
+375     1          18px     26px
+390     1          18px     26px
+768     2          22px     30px
+1024    3          24px     30px
+1440    3          24px     30px
+
+-- Tipografía de la tarjeta (a 375px y a 1440px) --
+elemento              propiedad       375         1440
+título                font-size       1.14rem     1.18rem
+  interlineado        line-height     1.25        1.25
+descripción           font-size       .9rem       .9rem
+  interlineado        line-height     1.55        1.55
+precio                font-size       1.02rem     1.02rem
+  peso                font-weight     800         800
+categoría             font-size       .72rem      .72rem
+detalles              font-size       .84rem      .84rem
+
+-- Hero --
+padding          375: 32px 0 38px   1440: 76px 0 88px
+h1 font-size     375: clamp(2rem, 8.6vw, 3.2rem)   1440: clamp(2rem, 8.6vw, 3.2rem)
+valores hero:     sí
+fila de contacto: sí
+
+-- Contraste WCAG AA (texto sobre blanco) --
+categoría de la tarjeta 4.58    AA
+precio                  11.28   AA
+precio "consultar"      7.58    AA
+descripción             6.48    AA
+botón ver detalle       7.72    AA
+pastilla servicio       5.92    AA
+pastilla producto       11.28   AA
+
+-- Portadas y tipo --
+fichas totales:            8
+con foto real:             2
+sin foto:                  6
+portada gráfica de marca:  sí
+distintivo producto/servicio: sí
+categorías por tipo:       {"servicio":3,"producto":1}
+
+-- Estructura conservada --
+sección #catalogo:         sí
+buscador #catBuscar:       sí
+filtros #catFiltros:       sí
+modal #fichaModal:         sí
+WhatsApp en hero:          sí
+Facebook en hero:          sí
+============================================================
+ COMPARATIVA VISUAL · NAVEGADOR · ANTES (01fe213)
+ árbol: C:\Users\USUARI~1\AppData\Local\Temp\kz-antes-tree
+============================================================
+
+resolución  cols  tarjeta  título  precio             portadas (foto/graf/icono)  hero   tipos
+---------------------------------------------------------------------------------------------------
+320x640     1     280px    16.96px 14.72px rgb(70, 96, 127)2/0/6                      849px  0
+360x640     1     320px    16.96px 14.72px rgb(70, 96, 127)2/0/6                      800px  0
+375x667     1     335px    16.96px 14.72px rgb(70, 96, 127)2/0/6                      803px  0
+390x844     1     350px    16.96px 14.72px rgb(70, 96, 127)2/0/6                      807px  0
+768x1024    2     338px    16.96px 14.72px rgb(70, 96, 127)2/0/6                      778px  0
+1024x768    3     300px    16.96px 14.72px rgb(70, 96, 127)2/0/6                      860px  0
+1440x900    3     337px    16.96px 14.72px rgb(70, 96, 127)2/0/6                      860px  0
+
+capturas: C:\Users\usuario29\Documents\KONFIO_ZINC\6-LANDING-PAGES\RedCaliNet\capturas\comparativa\antes
+
+============================================================
+ COMPARATIVA VISUAL · NAVEGADOR · DESPUÉS (árbol actual)
+ árbol: C:\Users\usuario29\Documents\KONFIO_ZINC\6-LANDING-PAGES\RedCaliNet
+============================================================
+
+resolución  cols  tarjeta  título  precio             portadas (foto/graf/icono)  hero   tipos
+---------------------------------------------------------------------------------------------------
+320x640     1     280px    18.24px 15.2px rgb(71, 85, 105)2/6/0                      878px  8
+360x640     1     320px    18.24px 15.2px rgb(71, 85, 105)2/6/0                      798px  8
+375x667     1     335px    18.24px 15.2px rgb(71, 85, 105)2/6/0                      805px  8
+390x844     1     350px    18.24px 15.2px rgb(71, 85, 105)2/6/0                      809px  8
+768x1024    2     338px    18.24px 15.2px rgb(71, 85, 105)2/6/0                      788px  8
+1024x768    3     299px    18.88px 15.2px rgb(71, 85, 105)2/6/0                      864px  8
+1440x900    3     336px    18.88px 15.2px rgb(71, 85, 105)2/6/0                      864px  8
+
+capturas: C:\Users\usuario29\Documents\KONFIO_ZINC\6-LANDING-PAGES\RedCaliNet\capturas\comparativa\despues
+

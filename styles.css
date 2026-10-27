@@ -1126,3 +1126,199 @@ button, input, select, textarea { font: inherit; color: inherit; }
   .ficha-modal__media { aspect-ratio: auto; height: 100%; }
   .ficha-modal__txt { padding: 28px 26px; }
 }
+
+/* ============================================================
+   KZ-REDCALINET-007 — Refinamiento visual y comercial
+   Identidad azul intacta; se ajusta jerarquía, portadas y aire.
+   ============================================================ */
+
+/* ---------- Hero: propuesta comercial en tres golpes ----------
+   El hero debe caber casi en una pantalla de móvil: en 375×667 el botón de
+   WhatsApp tiene que verse sin desplazarse. Por eso el logo, los márgenes y
+   la fila de contacto están medidos, no elegidos a ojo. */
+.hero { padding: 32px 0 38px; }
+.hero__logo { margin-bottom: 14px; }
+.hero__logo img { width: min(40vw, 150px); }
+.hero__eyebrow { margin-bottom: 8px; }
+.hero__sub { margin-top: 12px; }
+
+.hero__valores {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px 14px;
+  margin-top: 12px;
+  max-width: 46ch;
+}
+.hero__valores li {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: .78rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, .92);
+}
+.hero__valores .ico { width: 15px; height: 15px; color: var(--cian-400); }
+
+/* Contacto a mano: WhatsApp y Facebook, en una sola línea. */
+.hero__contacto {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 10px;
+}
+.hero__contacto a {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .1);
+  border: 1px solid rgba(255, 255, 255, .22);
+  color: #fff;
+  font-size: .78rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background .18s ease, border-color .18s ease, transform .18s ease;
+}
+.hero__contacto a:hover {
+  background: rgba(255, 255, 255, .18);
+  border-color: rgba(255, 255, 255, .38);
+  transform: translateY(-1px);
+}
+.hero__contacto .ico { width: 15px; height: 15px; }
+.hero__contacto a[hidden] { display: none; }
+
+.hero__cta { margin-top: 18px; gap: 10px; }
+.chips { margin-top: 20px; }
+
+/* ---------- Tarjeta: metadatos y tipo ---------- */
+.ficha__cat {
+  color: var(--cian-600);
+  font-size: .72rem;
+  font-weight: 800;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+}
+
+.ficha__meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+}
+.ficha--producto .ficha__cat { margin-top: 0; }
+.ficha-modal__txt .ficha__meta { margin-top: 0; }
+
+.ficha__tipo {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-size: .66rem;
+  font-weight: 800;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  border: 1px solid transparent;
+}
+.ficha__tipo--servicio {
+  background: #e8f4ff;
+  color: #0b5ea8;
+  border-color: #b9dcf7;
+}
+.ficha__tipo--producto {
+  background: var(--azul-700);
+  color: #fff;
+}
+
+/* ---------- Jerarquía y legibilidad del texto de la tarjeta ---------- */
+.ficha--producto h4 {
+  font-size: 1.14rem;
+  line-height: 1.25;
+  letter-spacing: -.012em;
+}
+/* Solo la descripción (el <p> sin clase); el precio va aparte. */
+.ficha--producto > p:not([class]) {
+  font-size: .9rem;
+  line-height: 1.55;
+  color: var(--tinta-2);
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.ficha--producto .ficha__precio {
+  font-size: 1.02rem;
+  font-weight: 800;
+  letter-spacing: -.01em;
+  color: var(--azul-700);
+}
+.ficha--producto .ficha__precio--consultar {
+  color: var(--tinta-3);
+  font-weight: 700;
+  font-size: .95rem;
+}
+.ficha--producto .ficha__lista li {
+  font-size: .84rem;
+  line-height: 1.45;
+}
+
+/* ---------- Portadas gráficas: servicios y productos sin foto ----------
+   Recurso de marca (azul + trama + icono). No simula una fotografía. */
+.ficha--producto .ficha__media { overflow: hidden; }
+.ficha--servicio .ficha__media { background: var(--azul-800); }
+.ficha--fisico .ficha__media { background: #e9f0fa; }
+
+.ficha__portada {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.ficha__media .ficha__sinfoto,
+.ficha-modal__media .ficha__sinfoto {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  opacity: 1;
+}
+.ficha__media .ficha__sinfoto .ico,
+.ficha-modal__media .ficha__sinfoto .ico {
+  width: 46px;
+  height: 46px;
+  padding: 15px;
+  box-sizing: content-box;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, .14);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .3);
+  opacity: .95;
+}
+.ficha-modal__media { position: relative; overflow: hidden; }
+
+/* ---------- Aire y proporciones ---------- */
+.catalogo__grid { margin-top: 26px; }
+
+@media (min-width: 620px) {
+  .hero { padding: 46px 0 56px; }
+  .hero__valores { gap: 6px 20px; margin-top: 14px; }
+  .hero__logo img { width: 165px; }
+  .catalogo__grid { gap: 22px; margin-top: 30px; }
+}
+
+@media (min-width: 900px) {
+  .hero { padding: 76px 0 88px; }
+  .hero__logo { margin-bottom: 18px; }
+  .hero__logo img { width: 175px; }
+  .hero__valores { justify-content: flex-start; }
+  .hero__contacto { justify-content: flex-start; }
+  .catalogo__grid { gap: 24px; }
+  .ficha--producto h4 { font-size: 1.18rem; }
+  .ficha--producto > p:not([class]) { min-height: 4.2em; }
+}

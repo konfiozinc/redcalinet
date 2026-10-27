@@ -80,17 +80,22 @@ const REQUERIDAS = [
   'ficha__acciones', 'ficha__ver', 'ficha__cta', 'ficha__etiqueta', 'ficha__sinfoto',
   'ficha-modal', 'ficha-modal__fondo', 'ficha-modal__caja', 'ficha-modal__cerrar',
   'ficha-modal__in', 'ficha-modal__media', 'ficha-modal__txt', 'ficha-modal__estado',
-  'categoria__pie', 'categoria__nota', 'sin-scroll', 'sr-only', 'revelar'
+  'categoria__pie', 'categoria__nota', 'sin-scroll', 'sr-only', 'revelar',
+  /* KZ-REDCALINET-007: se arman en variables, el escáner no las ve literales. */
+  'ficha__meta', 'ficha__tipo', 'ficha__tipo--servicio', 'ficha__tipo--producto',
+  'ficha__portada', 'ficha--fisico', 'ficha--servicio', 'hero__valores', 'hero__contacto'
 ];
 
 const sinEstilo = REQUERIDAS.filter((c) => !clasesCss.has(c));
 chk('toda clase del catálogo está estilizada', sinEstilo.length === 0,
   sinEstilo.length ? 'sin CSS: ' + sinEstilo.join(', ') : REQUERIDAS.length + ' clases');
 
-/* Cada clase que aparece en el marcado que genera el JS debe existir en el CSS.
-   Solo cuentan los tokens limpios: el JS arma clases con concatenaciones. */
-const clasesEnJs = unicos(Array.from(js.matchAll(/class="([^"]+)"/g))
-  .flatMap((m) => m[1].split(/\s+/))
+/* Cada lista de clases escrita literalmente en el JS debe existir en el CSS.
+   Las que se arman concatenando se cubren con REQUERIDAS. */
+const clasesEnJs = unicos(Array.from(js.matchAll(/class="([^"]*)"/g))
+  .map((m) => m[1])
+  .filter((v) => v && !/[+'"`]/.test(v))
+  .flatMap((v) => v.split(/\s+/))
   .filter((c) => /^[A-Za-z][A-Za-z0-9_-]*$/.test(c))
   .filter((c) => !/^i-/.test(c)));
 const clasesJsSinCss = clasesEnJs.filter((c) => !clasesCss.has(c) && c !== 'ico');

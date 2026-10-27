@@ -410,7 +410,23 @@ const CONTRASTE = `(() => {
   /* ============ 2. Imágenes ============ */
   console.log('\n== 2. Imágenes ==========================');
   await irAlCatalogo();
-  await dormir(900);
+  /* Son loading="lazy" y algunas están muy abajo: se lleva cada una a la vista
+     y se espera su carga antes de medir. */
+  await js(`(async () => {
+    const lista = Array.from(document.querySelectorAll('#catGrid .ficha__media img'));
+    for (const img of lista) {
+      img.scrollIntoView({ block: 'center' });
+      if (img.complete && img.naturalWidth > 0) continue;
+      await new Promise((res) => {
+        img.addEventListener('load', res, { once: true });
+        img.addEventListener('error', res, { once: true });
+        setTimeout(res, 4000);
+      });
+    }
+    return true;
+  })()`);
+  await irAlCatalogo();
+  await dormir(400);
   const imgs = await js(`(() => {
     const lista = Array.from(document.querySelectorAll('#catGrid .ficha__media img'));
     return {

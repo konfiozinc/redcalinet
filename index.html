@@ -174,16 +174,31 @@
       <h1 id="heroTitulo">Tu conexión con servicios y soluciones digitales</h1>
       <p class="hero__sub" id="heroSub">Streaming, trámites, TV por app y tecnología. Servicio garantizado, lo primordial para nosotros es el cliente.</p>
 
+      <ul class="hero__valores" id="heroValores" aria-label="Por qué elegir Red CaliNet"></ul>
+
       <div class="hero__cta">
         <a class="btn btn--wa btn--lg" data-wa data-wa-texto="Hola, vi su página web y quiero información." target="_blank" rel="noopener">
-          <svg class="ico" aria-hidden="true"><use href="#i-whatsapp"></use></svg>Contáctanos por WhatsApp
+          <svg class="ico" aria-hidden="true"><use href="#i-whatsapp"></use></svg>Escríbenos por WhatsApp
         </a>
-        <a class="btn btn--ghost btn--lg" href="#servicios">
-          Ver servicios<svg class="ico" aria-hidden="true"><use href="#i-arrow"></use></svg>
+        <a class="btn btn--ghost btn--lg" href="#catalogo" id="heroVerCatalogo">
+          Ver catálogo<svg class="ico" aria-hidden="true"><use href="#i-arrow"></use></svg>
         </a>
       </div>
 
-      <ul class="chips" id="chips" aria-label="Servicios disponibles"></ul>
+      <ul class="hero__contacto" aria-label="Otras formas de contacto">
+        <li>
+          <a data-wa data-wa-texto="Hola, quiero información de Red CaliNet." target="_blank" rel="noopener">
+            <svg class="ico" aria-hidden="true"><use href="#i-whatsapp"></use></svg><span>WhatsApp</span>
+          </a>
+        </li>
+        <li>
+          <a id="heroFacebook" target="_blank" rel="noopener noreferrer">
+            <svg class="ico" aria-hidden="true"><use href="#i-facebook"></use></svg><span>Facebook</span>
+          </a>
+        </li>
+      </ul>
+
+      <ul class="chips" id="chips" aria-label="Categorías del catálogo"></ul>
     </div>
   </section>
 
@@ -218,7 +233,7 @@
       <header class="sec-head revelar">
         <p class="eyebrow">Catálogo</p>
         <h2>Catálogo de productos y servicios</h2>
-        <p class="sec-sub">Busca por nombre o filtra por categoría. Abre un producto para ver el detalle y pedirlo por WhatsApp.</p>
+        <p class="sec-sub">Productos físicos y servicios, cada uno marcado con su tipo. Busca, filtra y abre la ficha para pedir por WhatsApp.</p>
       </header>
 
       <div class="catalogo__barra">
@@ -312,7 +327,10 @@
       <div class="ficha-modal__media" id="fichaMedia"></div>
 
       <div class="ficha-modal__txt">
-        <p class="ficha__cat" id="fichaCat"></p>
+        <div class="ficha__meta">
+          <span class="ficha__cat" id="fichaCat"></span>
+          <span class="ficha__tipo" id="fichaTipo"></span>
+        </div>
         <h2 id="fichaTitulo"></h2>
         <p class="ficha__precio" id="fichaPrecio"></p>
         <p class="ficha-modal__estado" id="fichaEstado" hidden></p>

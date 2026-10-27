@@ -35,6 +35,7 @@
       "id": "streaming",
       "nombre": "Streaming",
       "icono": "i-streaming",
+      "tipo": "servicio",
       "descripcion": "Suscripciones, planes y servicios digitales.",
       "nota": "Referencias históricas en Facebook: Netflix, Amazon Prime, Fox, IPTV, Claro Video y HBO Go. No se publican como oferta vigente: confirmar plataformas, precios y autorización de comercialización.",
       "fichas": [
@@ -51,6 +52,7 @@
       "id": "tramites",
       "nombre": "Trámites",
       "icono": "i-tramites",
+      "tipo": "servicio",
       "descripcion": "Asesoría y acompañamiento en gestiones y citas.",
       "nota": "Servicio de asesoría o acompañamiento: no somos una entidad oficial.",
       "fichas": [
@@ -81,6 +83,7 @@
       "id": "tv-app",
       "nombre": "TV por App",
       "icono": "i-streaming",
+      "tipo": "servicio",
       "descripcion": "Televisión mediante aplicaciones y dispositivos compatibles.",
       "nota": "Servicios sujetos a disponibilidad y autorización del proveedor.",
       "fichas": [
@@ -97,6 +100,7 @@
       "id": "tecnologia",
       "nombre": "Tecnología",
       "icono": "i-tech",
+      "tipo": "producto",
       "descripcion": "Equipos y accesorios de calidad.",
       "nota": "Referencia histórica en Facebook: celulares y accesorios (marcas como Redmi). Equipos, existencias y disponibilidad por confirmar.",
       "fichas": [
