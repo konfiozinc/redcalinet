@@ -42,7 +42,8 @@
           "nombre": "Plataformas de streaming",
           "descripcion": "Planes de suscripción a las plataformas digitales que ofrecemos actualmente.",
           "precio": null,
-          "detalles": ["Planes y suscripciones", "Activación y soporte"]
+          "detalles": ["Planes y suscripciones", "Activación y soporte"],
+          "imagen": null
         }
       ]
     },
@@ -57,19 +58,22 @@
           "nombre": "Pasaportes",
           "descripcion": "Asesoría y acompañamiento para tu trámite de pasaporte.",
           "precio": null,
-          "detalles": ["Acompañamiento en el proceso", "Asesoría en requisitos"]
+          "detalles": ["Acompañamiento en el proceso", "Asesoría en requisitos"],
+          "imagen": null
         },
         {
           "nombre": "Citas RUNT",
           "descripcion": "Gestión y acompañamiento para tus citas RUNT.",
           "precio": null,
-          "detalles": ["Acompañamiento", "Asesoría en requisitos"]
+          "detalles": ["Acompañamiento", "Asesoría en requisitos"],
+          "imagen": null
         },
         {
           "nombre": "Trámites de salud",
           "descripcion": "Asesoría en citas y trámites de salud (EPS, autorizaciones).",
           "precio": null,
-          "detalles": ["Asesoría"]
+          "detalles": ["Asesoría"],
+          "imagen": null
         }
       ]
     },
@@ -84,7 +88,8 @@
           "nombre": "Planes de TV por aplicación",
           "descripcion": "Planes de televisión para Smart TV, celular y más.",
           "precio": null,
-          "detalles": ["Planes por duración", "Dispositivos compatibles"]
+          "detalles": ["Planes por duración", "Dispositivos compatibles"],
+          "imagen": null
         }
       ]
     },
@@ -99,19 +104,22 @@
           "nombre": "iPhone",
           "descripcion": "Equipos iPhone con garantía.",
           "precio": null,
-          "detalles": ["Garantía"]
+          "detalles": ["Garantía"],
+          "imagen": "assets/img/galeria/iphone.webp"
         },
         {
-          "nombre": "Honor",
+          "nombre": "Honor Magic 8 Lite",
           "descripcion": "Equipos Honor con garantía.",
           "precio": null,
-          "detalles": ["Garantía"]
+          "detalles": ["Garantía"],
+          "imagen": "assets/img/galeria/honor-magic.webp"
         },
         {
           "nombre": "Accesorios",
           "descripcion": "Audífonos, cargadores, cables y más.",
           "precio": null,
-          "detalles": ["Audífonos", "Cargadores", "Cables"]
+          "detalles": ["Audífonos", "Cargadores", "Cables"],
+          "imagen": null
         }
       ]
     }

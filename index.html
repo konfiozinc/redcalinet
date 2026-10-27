@@ -123,6 +123,14 @@
   <symbol id="i-store" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
     <path d="M3.6 9.4 5.4 4h13.2l1.8 5.4"/><path d="M4.6 9.4v9.2a1 1 0 0 0 1 1h12.8a1 1 0 0 0 1-1V9.4"/><path d="M3.6 9.4a2.6 2.6 0 0 0 5.2 0 2.6 2.6 0 0 0 5.2 0 2.6 2.6 0 0 0 5.2 0"/>
   </symbol>
+
+  <symbol id="i-buscar" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="11" cy="11" r="6.6"/><path d="m16 16 4.4 4.4"/>
+  </symbol>
+
+  <symbol id="i-cerrar" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="m6.4 6.4 11.2 11.2"/><path d="m17.6 6.4-11.2 11.2"/>
+  </symbol>
 </svg>
 
 <!-- ============ Cabecera ============ -->
@@ -139,6 +147,7 @@
     <nav class="nav" id="nav" aria-label="Navegación principal">
       <a href="#inicio">Inicio</a>
       <a href="#servicios">Servicios</a>
+      <a href="#catalogo">Catálogo</a>
       <a href="#nosotros">Nosotros</a>
       <a href="#contacto">Contacto</a>
     </nav>
@@ -184,7 +193,7 @@
       <header class="sec-head revelar">
         <p class="eyebrow">Servicios</p>
         <h2>¿En qué te podemos ayudar?</h2>
-        <p class="sec-sub">Organizado por categorías. Escríbenos por WhatsApp y te confirmamos disponibilidad y precio, sin compromiso.</p>
+        <p class="sec-sub">Organizado por categorías. Abre el catálogo para ver los productos de cada una y pedir por WhatsApp.</p>
       </header>
       <div id="categorias"></div>
     </div>
@@ -203,28 +212,40 @@
     </div>
   </section>
 
-  <!-- ============ Contacto ============ -->
-  <!-- ============ GALERÍA DE PRODUCTOS ============ -->
-<section class="seccion seccion--alt" id="galeria">
-  <div class="contenedor">
-    <header class="sec-head revelar">
-      <p class="eyebrow">Productos</p>
-      <h2>Productos disponibles</h2>
-      <p class="sec-sub">Equipos de las mejores marcas con garantía.</p>
-    </header>
+  <!-- ============ Catálogo ============ -->
+  <section class="seccion seccion--alt" id="catalogo">
+    <div class="contenedor">
+      <header class="sec-head revelar">
+        <p class="eyebrow">Catálogo</p>
+        <h2>Catálogo de productos y servicios</h2>
+        <p class="sec-sub">Busca por nombre o filtra por categoría. Abre un producto para ver el detalle y pedirlo por WhatsApp.</p>
+      </header>
 
-    <div class="galeria__grid">
-      <article class="galeria__item revelar">
-        <img src="assets/img/galeria/iphone.webp" alt="iPhone disponible en Red CaliNet" width="1200" height="1200" loading="lazy">
-        <h3>iPhone</h3>
-      </article>
-      <article class="galeria__item revelar">
-        <img src="assets/img/galeria/honor-magic.webp" alt="Honor Magic disponible en Red CaliNet" width="1200" height="1200" loading="lazy">
-        <h3>Honor Magic</h3>
-      </article>
+      <div class="catalogo__barra">
+        <div class="catalogo__buscador">
+          <svg class="ico" aria-hidden="true"><use href="#i-buscar"></use></svg>
+          <label class="sr-only" for="catBuscar">Buscar en el catálogo</label>
+          <input type="search" id="catBuscar" name="buscar" placeholder="Buscar producto o servicio…" autocomplete="off" enterkeyhint="search">
+          <button type="button" class="catalogo__limpiar" id="catLimpiar" aria-label="Limpiar la búsqueda" hidden>
+            <svg class="ico" aria-hidden="true"><use href="#i-cerrar"></use></svg>
+          </button>
+        </div>
+
+        <div class="catalogo__filtros" id="catFiltros" role="group" aria-label="Filtrar por categoría"></div>
+      </div>
+
+      <p class="catalogo__cuenta" id="catCuenta" role="status" aria-live="polite">Cargando catálogo…</p>
+
+      <div class="catalogo__grid" id="catGrid" aria-busy="true"></div>
+
+      <p class="catalogo__vacio" id="catVacio" hidden>
+        No encontramos productos con esos filtros.
+        <a href="#contacto">Cuéntanos qué necesitas</a> y lo buscamos por ti.
+      </p>
     </div>
-  </div>
-</section>
+  </section>
+
+  <!-- ============ Contacto ============ -->
 <section class="seccion" id="contacto">
     <div class="contenedor contacto__in">
       <div>
@@ -277,6 +298,34 @@
     </div>
   </section>
 </main>
+
+<!-- ============ Ficha de producto (modal) ============ -->
+<div class="ficha-modal" id="fichaModal" hidden>
+  <div class="ficha-modal__fondo" data-cerrar-ficha></div>
+
+  <div class="ficha-modal__caja" role="dialog" aria-modal="true" aria-labelledby="fichaTitulo">
+    <button type="button" class="ficha-modal__cerrar" id="fichaCerrar" aria-label="Cerrar la ficha del producto">
+      <svg class="ico" aria-hidden="true"><use href="#i-cerrar"></use></svg>
+    </button>
+
+    <div class="ficha-modal__in">
+      <div class="ficha-modal__media" id="fichaMedia"></div>
+
+      <div class="ficha-modal__txt">
+        <p class="ficha__cat" id="fichaCat"></p>
+        <h2 id="fichaTitulo"></h2>
+        <p class="ficha__precio" id="fichaPrecio"></p>
+        <p class="ficha-modal__estado" id="fichaEstado" hidden></p>
+        <p id="fichaDesc"></p>
+        <ul class="ficha__lista" id="fichaLista"></ul>
+
+        <a class="btn btn--wa btn--lg btn--block" id="fichaWa" target="_blank" rel="noopener">
+          <svg class="ico" aria-hidden="true"><use href="#i-whatsapp"></use></svg>Pedir por WhatsApp
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- ============ Pie ============ -->
 <footer class="pie">
