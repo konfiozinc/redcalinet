@@ -354,6 +354,61 @@ const CONTRASTE = `(() => {
   });
 })()`;
 
+/* Estado del botón flotante de WhatsApp y su choque con controles reales.
+   El icono solo cuenta como «visible» si además no está en modo oculto. */
+const FAB = `(() => {
+  const fab = document.querySelector('#waFloat');
+  if (!fab) return { existe: false, visible: false };
+  const oculto = fab.classList.contains('oculto');
+  const r = fab.getBoundingClientRect();
+  const visible = !oculto && getComputedStyle(fab).opacity !== '0' && r.width > 0;
+  if (!visible) {
+    return {
+      existe: true, visible: false,
+      aria: fab.getAttribute('aria-hidden'),
+      tabindex: fab.tabIndex,
+      pointer: getComputedStyle(fab).pointerEvents
+    };
+  }
+  const controles = Array.from(document.querySelectorAll(
+    '#catFiltros .filtro, #catBuscar, #catLimpiar, #catGrid .ficha__ver, #catGrid .ficha__cta, ' +
+    '.hero__cta a, .cabecera a, .cabecera button, .catalogo__limpiar'
+  ));
+  const choques = [];
+  controles.forEach((el) => {
+    const c = el.getBoundingClientRect();
+    if (c.width === 0 || c.height === 0) return;
+    if (c.bottom < 0 || c.top > window.innerHeight) return;
+    if (r.right > c.left + 1 && c.right > r.left + 1 && r.bottom > c.top + 1 && c.bottom > r.top + 1) {
+      choques.push(String(el.id || el.className || el.tagName).slice(0, 40));
+    }
+  });
+  return {
+    existe: true, visible: true, choques: choques,
+    rect: { top: Math.round(r.top), right: Math.round(r.right), bottom: Math.round(r.bottom), left: Math.round(r.left) },
+    anchoVista: window.innerWidth, altoVista: window.innerHeight
+  };
+})()`;
+
+/* Diagnóstico: dónde queda cada sección respecto a la pantalla. */
+const SECCIONES = `(() => {
+  const leer = (sel) => {
+    const el = document.querySelector(sel);
+    if (!el) return null;
+    const r = el.getBoundingClientRect();
+    return { top: Math.round(r.top), bottom: Math.round(r.bottom) };
+  };
+  return {
+    scrollY: Math.round(window.scrollY),
+    alto: window.innerHeight,
+    hero: leer('#inicio'),
+    servicios: leer('#servicios'),
+    catalogo: leer('#catalogo'),
+    contacto: leer('#contacto'),
+    clase: (document.querySelector('#waFloat') || {}).className || ''
+  };
+})()`;
+
 /* ---------- Certificación ---------- */
 (async () => {
   const bruto = JSON.parse(fs.readFileSync(path.join(ROOT, 'data.json'), 'utf8'));
@@ -609,6 +664,123 @@ const CONTRASTE = `(() => {
     chk('contraste ≥ 4.5 en ' + c.caso, c.razon >= 4.5, 'ratio ' + c.razon);
   });
 
+  /* ============ 9b. Hero, WhatsApp flotante y contador ============ */
+  console.log('\n== 9b. Hero y botón flotante ============');
+
+  /* Contador neutral y reactivo: cuenta resultados, no disponibilidad. */
+  await escribir('#catBuscar', 'iphone');
+  const cuentaFiltrada = await js("(document.querySelector('#catCuenta') || {}).textContent || ''");
+  chk('el contador se actualiza al buscar',
+    /^Mostrando 1 de \d+ resultados$/.test(cuentaFiltrada.trim()), cuentaFiltrada.trim());
+  await clic('#catLimpiar');
+  const cuentaPlural = await js("(document.querySelector('#catCuenta') || {}).textContent || ''");
+  chk('el contador usa "resultados" en plural',
+    new RegExp('^' + totalEsperado + ' resultados$').test(cuentaPlural.trim()), cuentaPlural.trim());
+  chk('el contador no afirma disponibilidad comercial',
+    !/disponible/i.test(cuentaPlural) && !/disponible/i.test(cuentaFiltrada),
+    cuentaPlural.trim() + ' · ' + cuentaFiltrada.trim());
+
+  /* Un solo acceso a WhatsApp en el hero: sin redundancias. */
+  const waEnHero = await js("document.querySelectorAll('.hero [data-wa]').length");
+  chk('el hero tiene un único acceso a WhatsApp', waEnHero === 1, waEnHero);
+  const ctasHero = await js(
+    "Array.from(document.querySelectorAll('.hero__cta a')).map((a) => (a.textContent || '').trim().replace(/\\s+/g, ' '))"
+  );
+  chk('el hero mantiene dos CTA principales', ctasHero.length === 2, ctasHero.join(' | '));
+  chk('uno de los CTA es "Explorar catálogo"',
+    ctasHero.some((t) => t.indexOf('Explorar catálogo') !== -1), ctasHero.join(' | '));
+  chk('uno de los CTA es "Consultar por WhatsApp"',
+    ctasHero.some((t) => t.indexOf('Consultar por WhatsApp') !== -1), ctasHero.join(' | '));
+
+  /* Móvil: sin composición visual (no alarga la página) y CTA a la vista. */
+  await metricas(375, 667);
+  await js('window.scrollTo(0, 0)');
+  await dormir(300);
+  const heroMovil = await js(`(() => {
+    const visual = document.querySelector('.hero__visual');
+    const cta = document.querySelector('.hero__cta');
+    const logo = document.querySelector('.hero__logo');
+    return {
+      visual: visual ? getComputedStyle(visual).display : 'sin elemento',
+      ctaAbajo: cta ? Math.round(cta.getBoundingClientRect().bottom) : null,
+      altoVista: window.innerHeight,
+      logoAncho: logo ? Math.round(logo.getBoundingClientRect().width) : 0,
+      altoHero: Math.round(document.querySelector('.hero').getBoundingClientRect().height)
+    };
+  })()`);
+  chk('en móvil no se muestra la composición visual', heroMovil.visual === 'none', heroMovil.visual);
+  chk('en 375×667 el CTA cabe en la primera pantalla',
+    heroMovil.ctaAbajo !== null && heroMovil.ctaAbajo <= heroMovil.altoVista,
+    heroMovil.ctaAbajo + 'px de ' + heroMovil.altoVista + 'px');
+  chk('el logotipo del hero está contenido (≤ 110px)', heroMovil.logoAncho <= 110, heroMovil.logoAncho + 'px');
+
+  /* Botón flotante: oculto mientras el hero está en pantalla. */
+  const fabEnHero = await js(FAB);
+  chk('el WhatsApp flotante está oculto sobre el hero', fabEnHero.visible === false);
+  chk('oculto también queda fuera del foco',
+    fabEnHero.aria === 'true' && fabEnHero.tabindex === -1, 'aria=' + fabEnHero.aria + ' tabindex=' + fabEnHero.tabindex);
+  chk('oculto no intercepta el puntero', fabEnHero.pointer === 'none', fabEnHero.pointer);
+
+  /* Aparece al desplazarse a una sección sin accesos redundantes. */
+  await js("document.querySelector('#servicios').scrollIntoView({ behavior: 'instant', block: 'start' })");
+  await dormir(500);
+  const fabServicios = await js(FAB);
+  chk('el WhatsApp flotante aparece al desplazarse', fabServicios.visible === true,
+    JSON.stringify(await js(SECCIONES)));
+  if (fabServicios.visible) {
+    chk('aparece sin tapar controles', fabServicios.choques.length === 0, fabServicios.choques.join(', ') || 'limpio');
+    chk('respeta márgenes y áreas seguras',
+      fabServicios.rect.right <= fabServicios.anchoVista + 1 && fabServicios.rect.bottom <= fabServicios.altoVista + 1 &&
+      fabServicios.rect.left > 0 && fabServicios.rect.top > 0,
+      JSON.stringify(fabServicios.rect));
+  }
+
+  /* Vuelve a ocultarse donde ya hay acceso propio. */
+  await js("document.querySelector('#catalogo').scrollIntoView({ behavior: 'instant', block: 'center' })");
+  await dormir(500);
+  chk('se oculta en el catálogo (cada ficha tiene su Consultar)',
+    (await js(FAB)).visible === false);
+  await js("document.querySelector('#contacto').scrollIntoView({ behavior: 'instant', block: 'center' })");
+  await dormir(500);
+  chk('se oculta en la sección de contacto', (await js(FAB)).visible === false);
+
+  /* Escritorio: dos columnas y mitad derecha ocupada. */
+  await metricas(1440, 900);
+  await js('window.scrollTo(0, 0)');
+  await dormir(400);
+  const heroEscritorio = await js(`(() => {
+    const en = document.querySelector('.hero__in');
+    const visual = document.querySelector('.hero__visual');
+    const txt = document.querySelector('.hero__txt');
+    const fotos = Array.from(document.querySelectorAll('.hero__visual img'));
+    const sello = document.querySelector('.hero__sello');
+    const rEn = en.getBoundingClientRect();
+    const rVis = visual ? visual.getBoundingClientRect() : null;
+    return {
+      columnas: getComputedStyle(en).gridTemplateColumns.split(' ').filter(Boolean).length,
+      visualVisible: visual ? getComputedStyle(visual).display !== 'none' : false,
+      fotos: fotos.length,
+      fotosCargadas: fotos.filter((i) => i.complete && i.naturalWidth > 0).length,
+      sello: sello ? (sello.textContent || '').trim() : '',
+      anchoVisual: rVis ? Math.round(rVis.width) : 0,
+      anchoHero: Math.round(rEn.width),
+      txtAncho: Math.round(txt.getBoundingClientRect().width),
+      desbordeHero: Math.round(rEn.right - (rEn.left + rEn.width))
+    };
+  })()`);
+  chk('el hero se compone en dos columnas', heroEscritorio.columnas === 2, heroEscritorio.columnas + ' columnas');
+  chk('la composición visual es visible', heroEscritorio.visualVisible === true);
+  chk('la mitad derecha no está vacía', heroEscritorio.anchoVisual > heroEscritorio.anchoHero * 0.35,
+    heroEscritorio.anchoVisual + 'px de ' + heroEscritorio.anchoHero + 'px');
+  chk('la composición usa las fotos reales del catálogo',
+    heroEscritorio.fotos === 2 && heroEscritorio.fotosCargadas === 2,
+    heroEscritorio.fotosCargadas + '/' + heroEscritorio.fotos);
+  chk('la composición declara los servicios con texto',
+    heroEscritorio.sello.indexOf('Streaming') !== -1, heroEscritorio.sello);
+  chk('las dos columnas quedan equilibradas',
+    Math.abs(heroEscritorio.txtAncho - heroEscritorio.anchoVisual) < heroEscritorio.anchoHero * 0.25,
+    'texto ' + heroEscritorio.txtAncho + 'px · visual ' + heroEscritorio.anchoVisual + 'px');
+
   /* ============ 10. Siete resoluciones oficiales ============ */
   console.log('\n== 10. Siete resoluciones oficiales =====');
   const medidas = [];
@@ -629,6 +801,24 @@ const CONTRASTE = `(() => {
     const destino = path.join(ROOT, 'capturas', 'responsive', r.nombre + '.png');
     const bytes = await captura(destino);
     chk(r.nombre + ': captura generada', bytes > 5000, (bytes / 1024).toFixed(0) + ' KB');
+
+    /* El flotante se comprueba en dos puntos deterministas: donde debe verse
+       (Servicios) y donde debe esconderse (catálogo, para no tapar fichas). */
+    await js("document.querySelector('#servicios').scrollIntoView({ behavior: 'instant', block: 'start' })");
+    await dormir(420);
+    const fabServ = await js(FAB);
+    chk(r.nombre + ': el flotante aparece fuera del catálogo y no tapa controles',
+      fabServ.visible === true && fabServ.choques.length === 0,
+      fabServ.visible ? (fabServ.choques.join(', ') || 'sin solapes') : 'no apareció');
+    chk(r.nombre + ': el flotante respeta márgenes y áreas seguras',
+      fabServ.visible === true && fabServ.rect.left > 0 && fabServ.rect.top > 0 &&
+      fabServ.rect.right <= fabServ.anchoVista + 1 && fabServ.rect.bottom <= fabServ.altoVista + 1,
+      fabServ.visible ? JSON.stringify(fabServ.rect) : 'no apareció');
+
+    await js("document.querySelector('#catalogo').scrollIntoView({ behavior: 'instant', block: 'start' })");
+    await dormir(420);
+    chk(r.nombre + ': el flotante no se superpone al catálogo',
+      (await js(FAB)).visible === false);
 
     medidas.push({ resolucion: r.nombre, ...m, captura: 'capturas/responsive/' + r.nombre + '.png' });
   }

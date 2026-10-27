@@ -1,0 +1,58 @@
+============================================================
+ COMPARATIVA VISUAL · ANTES (a5b90ed)
+ árbol: C:\Users\USUARI~1\AppData\Local\Temp\kz-antes-008
+============================================================
+
+PORTADA (arriba de la página)
+resolución  alto hero  columnas  logo   composición  WhatsApp  flotante  contador
+---------------------------------------------------------------------------------------
+320x640     878px      1         128px  no           2         visible   8 productos disponibles
+360x640     798px      1         144px  no           2         visible   8 productos disponibles
+375x667     805px      1         150px  no           2         visible   8 productos disponibles
+390x844     809px      1         150px  no           2         visible   8 productos disponibles
+768x1024    788px      1         165px  no           2         visible   8 productos disponibles
+1024x768    864px      1         175px  no           2         visible   8 productos disponibles
+1440x900    864px      1         175px  no           2         visible   8 productos disponibles
+
+CATÁLOGO (con la sección en pantalla)
+resolución  cols  tarjeta  1ª tarjeta  título  precio               portadas (foto/graf/icono)  tipos
+--------------------------------------------------------------------------------------------------
+320x640     1     280px    664px       18.24px 15.2px rgb(71, 85, 105)2/6/0                      8
+360x640     1     320px    638px       18.24px 15.2px rgb(71, 85, 105)2/6/0                      8
+375x667     1     335px    638px       18.24px 15.2px rgb(71, 85, 105)2/6/0                      8
+390x844     1     350px    638px       18.24px 15.2px rgb(71, 85, 105)2/6/0                      8
+768x1024    2     338px    518px       18.24px 15.2px rgb(71, 85, 105)2/6/0                      8
+1024x768    3     299px    538px       18.88px 15.2px rgb(71, 85, 105)2/6/0                      8
+1440x900    3     336px    540px       18.88px 15.2px rgb(71, 85, 105)2/6/0                      8
+
+capturas: C:\Users\usuario29\Documents\KONFIO_ZINC\6-LANDING-PAGES\RedCaliNet\capturas\comparativa-008\antes
+
+============================================================
+ COMPARATIVA VISUAL · DESPUÉS (árbol actual)
+ árbol: C:\Users\usuario29\Documents\KONFIO_ZINC\6-LANDING-PAGES\RedCaliNet
+============================================================
+
+PORTADA (arriba de la página)
+resolución  alto hero  columnas  logo   composición  WhatsApp  flotante  contador
+---------------------------------------------------------------------------------------
+320x640     634px      1         88px   no           1         oculto    8 resultados
+360x640     548px      1         88px   no           1         oculto    8 resultados
+375x667     549px      1         88px   no           1         oculto    8 resultados
+390x844     553px      1         88px   no           1         oculto    8 resultados
+768x1024    567px      1         88px   no           1         oculto    8 resultados
+1024x768    676px      2         104px  sí           1         oculto    8 resultados
+1440x900    621px      2         104px  sí           1         oculto    8 resultados
+
+CATÁLOGO (con la sección en pantalla)
+resolución  cols  tarjeta  1ª tarjeta  título  precio               portadas (foto/graf/icono)  tipos
+--------------------------------------------------------------------------------------------------
+320x640     1     280px    608px       18.24px 15.2px rgb(71, 85, 105)2/6/0                      8
+360x640     1     320px    582px       18.24px 15.2px rgb(71, 85, 105)2/6/0                      8
+375x667     1     335px    582px       18.24px 15.2px rgb(71, 85, 105)2/6/0                      8
+390x844     1     350px    582px       18.24px 15.2px rgb(71, 85, 105)2/6/0                      8
+768x1024    2     338px    518px       18.24px 15.2px rgb(71, 85, 105)2/6/0                      8
+1024x768    3     299px    538px       18.88px 15.2px rgb(71, 85, 105)2/6/0                      8
+1440x900    3     336px    540px       18.88px 15.2px rgb(71, 85, 105)2/6/0                      8
+
+capturas: C:\Users\usuario29\Documents\KONFIO_ZINC\6-LANDING-PAGES\RedCaliNet\capturas\comparativa-008\despues
+

@@ -81,9 +81,11 @@ const REQUERIDAS = [
   'ficha-modal', 'ficha-modal__fondo', 'ficha-modal__caja', 'ficha-modal__cerrar',
   'ficha-modal__in', 'ficha-modal__media', 'ficha-modal__txt', 'ficha-modal__estado',
   'categoria__pie', 'categoria__nota', 'sin-scroll', 'sr-only', 'revelar',
-  /* KZ-REDCALINET-007: se arman en variables, el escáner no las ve literales. */
+  /* KZ-REDCALINET-007 y 008: se arman en variables o viven en el HTML. */
   'ficha__meta', 'ficha__tipo', 'ficha__tipo--servicio', 'ficha__tipo--producto',
-  'ficha__portada', 'ficha--fisico', 'ficha--servicio', 'hero__valores', 'hero__contacto'
+  'ficha__portada', 'ficha--fisico', 'ficha--servicio',
+  'hero__txt', 'hero__marca', 'hero__valores', 'hero__visual',
+  'hero__foto', 'hero__foto--a', 'hero__foto--b', 'hero__sello'
 ];
 
 const sinEstilo = REQUERIDAS.filter((c) => !clasesCss.has(c));

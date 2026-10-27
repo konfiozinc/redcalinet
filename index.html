@@ -166,39 +166,45 @@
   <!-- ============ Hero ============ -->
   <section class="hero" id="inicio">
     <div class="contenedor hero__in">
-      <div class="hero__logo">
-        <img src="assets/logo/logo-500.webp" width="500" height="500" alt="Logo de Red CaliNet" fetchpriority="high">
+
+      <!-- Columna izquierda: mensaje comercial y llamadas a la acción -->
+      <div class="hero__txt">
+        <div class="hero__marca">
+          <img class="hero__logo" src="assets/logo/logo-200.webp" width="200" height="200" alt="Logo de Red CaliNet" fetchpriority="high">
+          <p class="hero__eyebrow" id="heroEyebrow">Bello, Antioquia</p>
+        </div>
+
+        <h1 id="heroTitulo">Tu conexión con servicios y soluciones digitales</h1>
+        <p class="hero__sub" id="heroSub">Streaming, trámites, TV por app y tecnología. Servicio garantizado, lo primordial para nosotros es el cliente.</p>
+
+        <ul class="hero__valores" id="heroValores" aria-label="Por qué elegir Red CaliNet"></ul>
+
+        <div class="hero__cta">
+          <a class="btn btn--ghost btn--lg" href="#catalogo" id="heroExplorar">
+            Explorar catálogo<svg class="ico" aria-hidden="true"><use href="#i-arrow"></use></svg>
+          </a>
+          <a class="btn btn--wa btn--lg" data-wa data-wa-texto="Hola, vi su página web y quiero información." target="_blank" rel="noopener">
+            <svg class="ico" aria-hidden="true"><use href="#i-whatsapp"></use></svg>Consultar por WhatsApp
+          </a>
+        </div>
       </div>
 
-      <p class="hero__eyebrow" id="heroEyebrow">Bello, Antioquia</p>
-      <h1 id="heroTitulo">Tu conexión con servicios y soluciones digitales</h1>
-      <p class="hero__sub" id="heroSub">Streaming, trámites, TV por app y tecnología. Servicio garantizado, lo primordial para nosotros es el cliente.</p>
-
-      <ul class="hero__valores" id="heroValores" aria-label="Por qué elegir Red CaliNet"></ul>
-
-      <div class="hero__cta">
-        <a class="btn btn--wa btn--lg" data-wa data-wa-texto="Hola, vi su página web y quiero información." target="_blank" rel="noopener">
-          <svg class="ico" aria-hidden="true"><use href="#i-whatsapp"></use></svg>Escríbenos por WhatsApp
-        </a>
-        <a class="btn btn--ghost btn--lg" href="#catalogo" id="heroVerCatalogo">
-          Ver catálogo<svg class="ico" aria-hidden="true"><use href="#i-arrow"></use></svg>
-        </a>
+      <!-- Columna derecha: composición con recursos reales del propio sitio.
+           Las fotos son las mismas que ya usa el catálogo (autorizadas por el
+           cliente); no hay montajes de productos que no existan. -->
+      <div class="hero__visual" aria-hidden="true">
+        <figure class="hero__foto hero__foto--a">
+          <img src="assets/img/galeria/iphone.webp" alt="" width="600" height="600">
+        </figure>
+        <figure class="hero__foto hero__foto--b">
+          <img src="assets/img/galeria/honor-magic.webp" alt="" width="600" height="600">
+        </figure>
+        <p class="hero__sello">
+          <svg class="ico" aria-hidden="true"><use href="#i-streaming"></use></svg>
+          <span>Streaming · Trámites · TV por app</span>
+        </p>
       </div>
 
-      <ul class="hero__contacto" aria-label="Otras formas de contacto">
-        <li>
-          <a data-wa data-wa-texto="Hola, quiero información de Red CaliNet." target="_blank" rel="noopener">
-            <svg class="ico" aria-hidden="true"><use href="#i-whatsapp"></use></svg><span>WhatsApp</span>
-          </a>
-        </li>
-        <li>
-          <a id="heroFacebook" target="_blank" rel="noopener noreferrer">
-            <svg class="ico" aria-hidden="true"><use href="#i-facebook"></use></svg><span>Facebook</span>
-          </a>
-        </li>
-      </ul>
-
-      <ul class="chips" id="chips" aria-label="Categorías del catálogo"></ul>
     </div>
   </section>
 
@@ -371,7 +377,7 @@
 </footer>
 
 <!-- WhatsApp flotante -->
-<a class="wa-float" id="waFloat" data-wa data-wa-texto="Hola, vi su página web y quiero información." target="_blank" rel="noopener" aria-label="Escribir por WhatsApp">
+<a class="wa-float oculto" id="waFloat" data-wa data-wa-texto="Hola, vi su página web y quiero información." target="_blank" rel="noopener" aria-label="Escribir por WhatsApp" aria-hidden="true" tabindex="-1">
   <svg class="ico" aria-hidden="true"><use href="#i-whatsapp"></use></svg>
 </a>
 

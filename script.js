@@ -354,14 +354,6 @@ function pintarMarca() {
   if (anio) anio.textContent = String(new Date().getFullYear());
 }
 
-function pintarChips() {
-  const ul = $("#chips");
-  if (!ul) return;
-  ul.innerHTML = DATA.categorias
-    .map((c) => '<li><a href="#cat-' + esc(c.id) + '">' + svg(c.icono) + esc(c.nombre) + "</a></li>")
-    .join("");
-}
-
 /* El hero dice, en tres golpes, por qué comprar aquí. Todo sale de los datos
    reales (promesa de marca, ciudad y WhatsApp): no hay promesas inventadas. */
 function pintarHero() {
@@ -377,13 +369,6 @@ function pintarHero() {
       .map((v) => "<li>" + svg(v.icono) + "<span>" + esc(v.texto) + "</span></li>")
       .join("");
   }
-
-  const fb = $("#heroFacebook");
-  if (fb) {
-    const red = (DATA.redes || []).find((r) => r.id === "facebook");
-    if (red && red.url) fb.href = red.url;
-    else fb.hidden = true;
-  }
 }
 
 /* Categorías: cabecera, nota y cuántos productos tiene.
@@ -395,7 +380,7 @@ function pintarCategorias() {
   cont.innerHTML = (DATA.categorias || [])
     .map((cat) => {
       const n = (cat.productos || []).length;
-      const cuenta = n === 1 ? "1 producto" : n + " productos";
+      const cuenta = n === 1 ? "1 resultado" : n + " resultados";
       return (
         '<section class="categoria" id="cat-' + esc(cat.id) + '">' +
           '<header class="categoria__head">' +
@@ -407,7 +392,7 @@ function pintarCategorias() {
             ? '<p class="categoria__pie"><a href="#catalogo" data-filtro-cat="' + esc(cat.id) + '">' +
                 "Ver " + esc(cuenta) + " en el catálogo" + svg("i-arrow") +
               "</a></p>"
-            : '<p class="categoria__pie"><span>Sin productos publicados por ahora.</span></p>') +
+            : '<p class="categoria__pie"><span>Sin resultados por ahora.</span></p>') +
         "</section>"
       );
     })
@@ -546,8 +531,8 @@ function pintarCatalogo() {
     grid.setAttribute("aria-busy", "false");
     if (vacio) vacio.hidden = false;
     if (cuenta) cuenta.textContent = total
-      ? "Ningún producto coincide con tu búsqueda. Prueba con otra palabra."
-      : "El catálogo se está actualizando. Escríbenos por WhatsApp y te contamos qué hay disponible.";
+      ? "Ningún resultado coincide con tu búsqueda. Prueba con otra palabra."
+      : "El catálogo se está actualizando. Escríbenos por WhatsApp y te contamos qué hay.";
     return;
   }
 
@@ -556,9 +541,10 @@ function pintarCatalogo() {
   if (vacio) vacio.hidden = true;
   if (cuenta) {
     const mostrados = lista.length;
+    /* Texto neutral: cuenta resultados, no afirma disponibilidad comercial. */
     cuenta.textContent = mostrados === total
-      ? total + (total === 1 ? " producto disponible" : " productos disponibles")
-      : "Mostrando " + mostrados + " de " + total + " productos";
+      ? total + (total === 1 ? " resultado" : " resultados")
+      : "Mostrando " + mostrados + " de " + total + " resultados";
   }
 
   pintarEnlacesWa();
@@ -990,26 +976,67 @@ function prepararRevelado() {
   revelar(document);
 }
 
+/* El botón flotante de WhatsApp no debe tapar nada ni competir con otro acceso
+   de la misma sección. Reglas:
+   - oculto mientras el hero está en pantalla (allí está el CTA principal);
+   - oculto en el catálogo (cada ficha tiene su propio «Consultar»);
+   - oculto en contacto (allí está el bloque de contacto completo);
+   - visible al desplazarse, con transición de opacidad y sin mover nada,
+     porque el botón es `position: fixed`.
+
+   Se resuelve leyendo la posición real de las secciones y no con un
+   IntersectionObserver: una sección más alta que la pantalla nunca alcanza un
+   umbral de intersección alto, y el botón se quedaba visible sobre el catálogo. */
 function prepararFlotante() {
   const flotante = $("#waFloat");
-  const seccion = $("#contacto");
-  if (!flotante || !seccion || !("IntersectionObserver" in window)) return;
+  if (!flotante) return;
 
-  const obs = new IntersectionObserver(
-    (entradas) => {
-      entradas.forEach((en) => flotante.classList.toggle("oculto", en.isIntersecting));
-    },
-    { threshold: 0.18 }
-  );
+  const secciones = [$("#inicio"), $("#catalogo"), $("#contacto")];
+  const cabecera = $("#cabecera");
 
-  obs.observe(seccion);
+  /* Una sección «está en pantalla» cuando asoma de verdad bajo la cabecera.
+     Contar los píxeles que quedan escondidos detrás de ella hacía que el hero
+     siguiera contando por un borde de 11 px y el botón no apareciera nunca. */
+  const VISIBLE_MINIMO = 80;
+
+  const aplicar = () => {
+    const alto = window.innerHeight;
+    const desde = cabecera ? Math.max(0, Math.round(cabecera.getBoundingClientRect().bottom)) : 0;
+
+    const ocultar = secciones.some((el) => {
+      if (!el) return false;
+      const r = el.getBoundingClientRect();
+      const visible = Math.min(r.bottom, alto) - Math.max(r.top, desde);
+      return visible > VISIBLE_MINIMO;
+    });
+
+    flotante.classList.toggle("oculto", ocultar);
+    /* Fuera de tabulación mientras no se ve: nada de focos invisibles. */
+    flotante.setAttribute("aria-hidden", ocultar ? "true" : "false");
+    flotante.tabIndex = ocultar ? -1 : 0;
+  };
+
+  let pendiente = false;
+  const programar = () => {
+    if (pendiente) return;
+    pendiente = true;
+    if (typeof requestAnimationFrame === "function") {
+      requestAnimationFrame(() => { pendiente = false; aplicar(); });
+    } else {
+      pendiente = false;
+      aplicar();
+    }
+  };
+
+  window.addEventListener("scroll", programar, { passive: true });
+  window.addEventListener("resize", programar);
+  aplicar();
 }
 
 /* ---------- Arranque ---------- */
 function pintar() {
   pintarMarca();
   pintarHero();
-  pintarChips();
   pintarCategorias();
   pintarCatalogo();
   pintarBeneficios();

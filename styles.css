@@ -281,14 +281,20 @@ button, input, select, textarea { font: inherit; color: inherit; }
 
 .hero__in { display: grid; justify-items: center; text-align: center; }
 
-.hero__logo {
-  margin-bottom: 22px;
-  animation: subir .6s ease both;
+.hero__marca {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
 }
-.hero__logo img {
-  width: min(52vw, 190px);
-  border-radius: 26px;
-  box-shadow: 0 0 0 1px rgba(255, 255, 255, .4), var(--sombra-3);
+
+/* Logotipo contenido: identidad intacta, presencia discreta. */
+.hero__logo {
+  width: 88px;
+  height: 88px;
+  border-radius: 20px;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, .35), 0 10px 24px rgba(4, 18, 38, .35);
+  animation: subir .6s ease both;
 }
 
 .hero__eyebrow {
@@ -326,26 +332,6 @@ button, input, select, textarea { font: inherit; color: inherit; }
   max-width: 360px;
   margin-top: 26px;
 }
-
-.chips {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 8px;
-  margin-top: 30px;
-}
-.chips li {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  padding: 8px 14px;
-  background: rgba(255, 255, 255, .12);
-  border: 1px solid rgba(255, 255, 255, .2);
-  border-radius: 999px;
-  font-size: .84rem;
-  font-weight: 600;
-}
-.chips .ico { width: 16px; height: 16px; color: var(--cian-400); }
 
 /* ---------- Grids ---------- */
 .grid { display: grid; gap: 16px; }
@@ -571,8 +557,8 @@ button, input, select, textarea { font: inherit; color: inherit; }
 /* ---------- Efectos hover (cards, logo e íconos) ---------- */
 .beneficio { transition: transform .3s ease, box-shadow .3s ease; }
 .beneficio:hover { transform: translateY(-6px); box-shadow: 0 12px 24px rgba(10, 30, 63, .15); }
-.marca__logo, .hero__logo img { transition: transform .3s ease; }
-.marca__logo:hover, .hero__logo img:hover { transform: scale(1.05); }
+.marca__logo, .hero__logo { transition: transform .3s ease; }
+.marca__logo:hover, .hero__logo:hover { transform: scale(1.05); }
 .social-btn svg { transition: transform .25s ease; }
 .social-btn:hover svg { transform: scale(1.12) rotate(-6deg); }
 /* ---------- Catálogo público (rejilla de productos) ---------- */
@@ -621,22 +607,25 @@ button, input, select, textarea { font: inherit; color: inherit; }
 }
 .pie__legal a { color: var(--cian-400); }
 
-/* ---------- WhatsApp flotante ---------- */
+/* ---------- WhatsApp flotante ----------
+   Pegado al borde con un margen fijo y respetando las áreas seguras del
+   dispositivo. Es `position: fixed`, así que aparecer o desaparecer no mueve
+   nada de la página: solo cambia su opacidad. */
 .wa-float {
   position: fixed;
-  right: 16px;
-  bottom: 160px;
+  right: calc(14px + env(safe-area-inset-right, 0px));
+  bottom: calc(16px + env(safe-area-inset-bottom, 0px));
   z-index: 60;
   display: grid;
   place-items: center;
-  width: 58px; height: 58px;
+  width: 54px; height: 54px;
   border-radius: 50%;
   background: var(--wa);
   color: #fff;
   box-shadow: 0 12px 28px rgba(29, 168, 81, .42);
-  transition: transform .2s ease, opacity .2s ease;
+  transition: transform .22s ease, opacity .22s ease;
 }
-.wa-float .ico { width: 30px; height: 30px; }
+.wa-float .ico { width: 28px; height: 28px; }
 .wa-float:hover { transform: scale(1.07); }
 .wa-float.oculto { opacity: 0; pointer-events: none; transform: scale(.7); }
 
@@ -690,10 +679,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
   .cabecera__in { min-height: 76px; }
 
   .hero__in { justify-items: start; text-align: left; }
-  .hero__logo { margin-bottom: 26px; }
-  .hero__logo img { width: 210px; }
   .hero__cta { justify-items: start; }
-  .chips { justify-content: flex-start; }
   .hero { padding: 92px 0 108px; }
 
   .grid--4 { grid-template-columns: repeat(4, 1fr); }
@@ -705,7 +691,11 @@ button, input, select, textarea { font: inherit; color: inherit; }
   .pie__in { grid-template-columns: 1.4fr 1fr auto; align-items: start; gap: 32px; }
   .pie__legal { grid-template-columns: 1fr auto; align-items: center; }
 
-  .wa-float { right: 26px; bottom: 26px; width: 62px; height: 62px; }
+  .wa-float {
+    right: calc(26px + env(safe-area-inset-right, 0px));
+    bottom: calc(26px + env(safe-area-inset-bottom, 0px));
+    width: 60px; height: 60px;
+  }
 }
 
 @media (min-width: 1100px) {
@@ -722,7 +712,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
   }
   .revelar { opacity: 1; transform: none; }
   .btn:hover, .servicio:hover, .beneficio:hover, .ficha--producto:hover, .wa-float:hover, .pie__redes a:hover,
-  .marca__logo:hover, .hero__logo img:hover, .social-btn:hover, .social-btn:hover svg { transform: none; }
+  .marca__logo:hover, .hero__logo:hover, .social-btn:hover, .social-btn:hover svg { transform: none; }
 }
 
 @media print {
@@ -807,9 +797,6 @@ button, input, select, textarea { font: inherit; color: inherit; }
 }
 .ficha__cta .ico { width: 17px; height: 17px; transition: transform .18s ease; }
 .ficha__cta:hover .ico { transform: translateX(3px); }
-
-/* chips del hero como enlaces a cada categoría */
-.chips li a { display: inline-flex; align-items: center; gap: 7px; color: inherit; }
 
 @media (min-width: 620px) {
   .fichas { grid-template-columns: repeat(2, 1fr); }
@@ -1132,14 +1119,20 @@ button, input, select, textarea { font: inherit; color: inherit; }
    Identidad azul intacta; se ajusta jerarquía, portadas y aire.
    ============================================================ */
 
-/* ---------- Hero: propuesta comercial en tres golpes ----------
-   El hero debe caber casi en una pantalla de móvil: en 375×667 el botón de
-   WhatsApp tiene que verse sin desplazarse. Por eso el logo, los márgenes y
-   la fila de contacto están medidos, no elegidos a ojo. */
-.hero { padding: 32px 0 38px; }
-.hero__logo { margin-bottom: 14px; }
-.hero__logo img { width: min(40vw, 150px); }
-.hero__eyebrow { margin-bottom: 8px; }
+/* ---------- Hero: portada comercial en dos columnas ----------
+   Móvil: una columna compacta, para que los CTA se vean pronto.
+   Escritorio: mensaje a la izquierda y composición visual a la derecha, de
+   modo que la mitad derecha no quede vacía. */
+.hero { padding: 28px 0 34px; }
+.hero__in { gap: 22px; }
+
+.hero__txt {
+  display: grid;
+  justify-items: center;
+  text-align: center;
+}
+
+.hero__eyebrow { margin-bottom: 0; }
 .hero__sub { margin-top: 12px; }
 
 .hero__valores {
@@ -1160,38 +1153,59 @@ button, input, select, textarea { font: inherit; color: inherit; }
 }
 .hero__valores .ico { width: 15px; height: 15px; color: var(--cian-400); }
 
-/* Contacto a mano: WhatsApp y Facebook, en una sola línea. */
-.hero__contacto {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 8px;
-  margin-top: 10px;
-}
-.hero__contacto a {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  padding: 8px 12px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, .1);
-  border: 1px solid rgba(255, 255, 255, .22);
-  color: #fff;
-  font-size: .78rem;
-  font-weight: 600;
-  text-decoration: none;
-  transition: background .18s ease, border-color .18s ease, transform .18s ease;
-}
-.hero__contacto a:hover {
-  background: rgba(255, 255, 255, .18);
-  border-color: rgba(255, 255, 255, .38);
-  transform: translateY(-1px);
-}
-.hero__contacto .ico { width: 15px; height: 15px; }
-.hero__contacto a[hidden] { display: none; }
-
 .hero__cta { margin-top: 18px; gap: 10px; }
-.chips { margin-top: 20px; }
+
+/* La composición visual solo aparece cuando hay sitio: en móvil se oculta
+   para no alargar la página ni empujar los CTA fuera de pantalla. */
+.hero__visual { display: none; }
+
+@media (min-width: 900px) {
+  .hero__in {
+    grid-template-columns: 1.02fr .98fr;
+    align-items: center;
+    justify-items: stretch;
+    gap: 54px;
+    text-align: left;
+  }
+  .hero__txt { justify-items: start; text-align: left; }
+  .hero__marca { gap: 14px; margin-bottom: 18px; }
+  .hero__logo { width: 104px; height: 104px; }
+
+  .hero__visual {
+    display: grid;
+    grid-template-columns: 1.05fr .95fr;
+    gap: 14px;
+    align-content: center;
+  }
+  .hero__foto {
+    margin: 0;
+    border-radius: 18px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, .22);
+    background: #e9f0fa;
+    box-shadow: 0 20px 44px rgba(4, 18, 38, .4);
+  }
+  .hero__foto img { display: block; width: 100%; height: 100%; object-fit: cover; }
+  .hero__foto--a { aspect-ratio: 4 / 5; }
+  .hero__foto--b { aspect-ratio: 4 / 4.3; align-self: end; }
+
+  .hero__sello {
+    grid-column: 1 / -1;
+    justify-self: start;
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    padding: 9px 15px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, .96);
+    color: var(--azul-800);
+    font-size: .8rem;
+    font-weight: 700;
+    white-space: nowrap;
+    box-shadow: 0 12px 26px rgba(4, 18, 38, .32);
+  }
+  .hero__sello .ico { width: 17px; height: 17px; color: var(--cian-600); }
+}
 
 /* ---------- Tarjeta: metadatos y tipo ---------- */
 .ficha__cat {
@@ -1305,19 +1319,25 @@ button, input, select, textarea { font: inherit; color: inherit; }
 /* ---------- Aire y proporciones ---------- */
 .catalogo__grid { margin-top: 26px; }
 
+/* Móvil estrecho: el catálogo empieza antes para que la primera tarjeta asome.
+   Solo por debajo de 401px: tableta y escritorio no se tocan. */
+@media (max-width: 400px) {
+  #catalogo.seccion { padding-top: 42px; }
+  #catalogo .sec-head { margin-bottom: 20px; }
+  #catalogo .catalogo__barra { margin-top: 16px; }
+  #catalogo .catalogo__cuenta { margin-top: 12px; }
+  #catalogo .catalogo__grid { margin-top: 14px; }
+}
+
 @media (min-width: 620px) {
-  .hero { padding: 46px 0 56px; }
+  .hero { padding: 44px 0 52px; }
   .hero__valores { gap: 6px 20px; margin-top: 14px; }
-  .hero__logo img { width: 165px; }
   .catalogo__grid { gap: 22px; margin-top: 30px; }
 }
 
 @media (min-width: 900px) {
-  .hero { padding: 76px 0 88px; }
-  .hero__logo { margin-bottom: 18px; }
-  .hero__logo img { width: 175px; }
+  .hero { padding: 60px 0 68px; }
   .hero__valores { justify-content: flex-start; }
-  .hero__contacto { justify-content: flex-start; }
   .catalogo__grid { gap: 24px; }
   .ficha--producto h4 { font-size: 1.18rem; }
   .ficha--producto > p:not([class]) { min-height: 4.2em; }

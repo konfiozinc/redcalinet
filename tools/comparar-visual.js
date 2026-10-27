@@ -129,6 +129,25 @@ async function abrirNavegador() {
   throw new Error('El navegador no abrió CDP en ' + base);
 }
 
+/* Medición de la portada (arriba de la página): hero y botón flotante. */
+const MEDIR_ARRIBA = `(() => {
+  const fab = document.querySelector('#waFloat');
+  const logo = document.querySelector('.hero__logo');
+  const visual = document.querySelector('.hero__visual');
+  const en = document.querySelector('.hero__in');
+  const hero = document.querySelector('.hero');
+  return {
+    heroAlto: hero ? Math.round(hero.getBoundingClientRect().height) : 0,
+    heroColumnas: en ? getComputedStyle(en).gridTemplateColumns.split(' ').filter(Boolean).length : 0,
+    logoAncho: logo ? Math.round(logo.getBoundingClientRect().width) : 0,
+    visualVisible: visual ? getComputedStyle(visual).display !== 'none' : false,
+    waEnHero: document.querySelectorAll('.hero [data-wa]').length,
+    fabOculto: fab ? fab.classList.contains('oculto') : null,
+    cuenta: ((document.querySelector('#catCuenta') || {}).textContent || '').trim(),
+    desborde: document.documentElement.scrollWidth
+  };
+})()`;
+
 const MEDIR = `(() => {
   const grid = document.querySelector('#catGrid');
   const tarjetas = Array.from(document.querySelectorAll('#catGrid .ficha--producto'));
@@ -154,6 +173,10 @@ const MEDIR = `(() => {
     precioPx: precio ? getComputedStyle(precio).fontSize : null,
     precioColor: precio ? getComputedStyle(precio).color : null,
     portadas: portadas,
+    primeraTop: (() => {
+      const t = document.querySelector('#catGrid .ficha--producto');
+      return t ? Math.round(t.getBoundingClientRect().top) : null;
+    })(),
     heroAlto: hero ? Math.round(hero.getBoundingClientRect().height) : 0,
     heroContacto: Boolean(document.querySelector('.hero__contacto')),
     tipos: document.querySelectorAll('#catGrid .ficha__tipo').length
@@ -202,35 +225,65 @@ const MEDIR = `(() => {
   decir(' árbol: ' + RAIZ);
   decir('============================================================');
   decir('');
-  decir('resolución  cols  tarjeta  título  precio             portadas (foto/graf/icono)  hero   tipos');
-  decir('---------------------------------------------------------------------------------------------------');
-
   const filas = [];
+
   for (const r of RESOLUCIONES) {
     await cdp.enviar('Emulation.setDeviceMetricsOverride', {
       width: r.ancho, height: r.alto, deviceScaleFactor: 1, mobile: r.ancho < 768
     });
     await dormir(420);
+
+    /* ---- 1) Portada: arriba de la página ---- */
+    await js('window.scrollTo(0, 0)');
+    await dormir(420);
+    const portada = await js(MEDIR_ARRIBA);
+    const capPortada = await cdp.enviar('Page.captureScreenshot', { format: 'png' });
+    fs.writeFileSync(path.join(CAPTURAS, 'hero-' + r.nombre + '.png'), Buffer.from(capPortada.data, 'base64'));
+
+    /* ---- 2) Catálogo ---- */
     await js("document.querySelector('#catalogo').scrollIntoView({ behavior: 'instant', block: 'start' })");
-    await dormir(260);
-
+    await dormir(300);
     const m = await js(MEDIR);
-    filas.push(Object.assign({ resolucion: r.nombre }, m));
 
+    const capCatalogo = await cdp.enviar('Page.captureScreenshot', { format: 'png' });
+    fs.writeFileSync(path.join(CAPTURAS, 'catalogo-' + r.nombre + '.png'), Buffer.from(capCatalogo.data, 'base64'));
+
+    filas.push(Object.assign({ resolucion: r.nombre }, m, { portada: portada }));
+  }
+
+  decir('PORTADA (arriba de la página)');
+  decir('resolución  alto hero  columnas  logo   composición  WhatsApp  flotante  contador');
+  decir('---------------------------------------------------------------------------------------');
+  filas.forEach((f) => {
+    const p = f.portada;
     decir(
-      r.nombre.padEnd(12) +
+      f.resolucion.padEnd(12) +
+      (p.heroAlto + 'px').padEnd(11) +
+      String(p.heroColumnas).padEnd(10) +
+      (p.logoAncho + 'px').padEnd(7) +
+      (p.visualVisible ? 'sí' : 'no').padEnd(13) +
+      String(p.waEnHero).padEnd(10) +
+      (p.fabOculto === null ? '-' : (p.fabOculto ? 'oculto' : 'visible')).padEnd(10) +
+      p.cuenta
+    );
+  });
+
+  decir('');
+  decir('CATÁLOGO (con la sección en pantalla)');
+  decir('resolución  cols  tarjeta  1ª tarjeta  título  precio               portadas (foto/graf/icono)  tipos');
+  decir('--------------------------------------------------------------------------------------------------');
+  filas.forEach((m) => {
+    decir(
+      m.resolucion.padEnd(12) +
       String(m.columnas).padEnd(6) +
       (m.anchoTarjeta + 'px').padEnd(9) +
+      ((m.primeraTop === null ? '-' : m.primeraTop + 'px')).padEnd(12) +
       String(m.tituloPx).padEnd(8) +
-      (String(m.precioPx) + ' ' + String(m.precioColor)).padEnd(19) +
+      (String(m.precioPx) + ' ' + String(m.precioColor)).padEnd(21) +
       (m.portadas.foto + '/' + m.portadas.grafica + '/' + m.portadas.icono).padEnd(27) +
-      (m.heroAlto + 'px').padEnd(7) +
       m.tipos
     );
-
-    const captura = await cdp.enviar('Page.captureScreenshot', { format: 'png' });
-    fs.writeFileSync(path.join(CAPTURAS, r.nombre + '.png'), Buffer.from(captura.data, 'base64'));
-  }
+  });
 
   decir('');
   decir('capturas: ' + CAPTURAS);
