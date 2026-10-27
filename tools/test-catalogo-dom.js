@@ -697,7 +697,8 @@ const SECCIONES = `(() => {
     titulo: (document.querySelector('#heroTitulo') || {}).textContent || '',
     sub: (document.querySelector('#heroSub') || {}).textContent || '',
     valores: Array.from(document.querySelectorAll('#heroValores li')).map((li) => (li.textContent || '').trim()),
-    sello: document.querySelectorAll('.hero__sello, .hero__visual p').length
+    imagenes: Array.from(document.querySelectorAll('.hero img')).map((i) => i.getAttribute('src') || ''),
+    composicion: document.querySelectorAll('.hero__visual, .hero__foto, .hero__sello').length
   }))()`);
   chk('el título comercial se mantiene',
     heroTexto.titulo.indexOf('Tu conexión con servicios') === 0, heroTexto.titulo);
@@ -709,25 +710,25 @@ const SECCIONES = `(() => {
     heroTexto.valores.join(' | '));
   chk('los beneficios del hero son datos comprobables', heroTexto.valores.length === 3,
     heroTexto.valores.join(' | '));
-  chk('la composición no lleva sello bajo las fotos', heroTexto.sello === 0, heroTexto.sello + ' elementos');
+  chk('el hero no tiene composición de fotografías', heroTexto.composicion === 0,
+    heroTexto.composicion + ' elementos');
+  chk('el hero no muestra imágenes de productos',
+    heroTexto.imagenes.every((src) => src.indexOf('assets/logo/') === 0), heroTexto.imagenes.join(', '));
 
-  /* Móvil: sin composición visual (no alarga la página) y CTA a la vista. */
+  /* Móvil: una sola columna, CTA a la vista. */
   await metricas(375, 667);
   await js('window.scrollTo(0, 0)');
   await dormir(300);
   const heroMovil = await js(`(() => {
-    const visual = document.querySelector('.hero__visual');
     const cta = document.querySelector('.hero__cta');
     const logo = document.querySelector('.hero__logo');
     return {
-      visual: visual ? getComputedStyle(visual).display : 'sin elemento',
       ctaAbajo: cta ? Math.round(cta.getBoundingClientRect().bottom) : null,
       altoVista: window.innerHeight,
       logoAncho: logo ? Math.round(logo.getBoundingClientRect().width) : 0,
       altoHero: Math.round(document.querySelector('.hero').getBoundingClientRect().height)
     };
   })()`);
-  chk('en móvil no se muestra la composición visual', heroMovil.visual === 'none', heroMovil.visual);
   chk('en 375×667 el CTA cabe en la primera pantalla',
     heroMovil.ctaAbajo !== null && heroMovil.ctaAbajo <= heroMovil.altoVista,
     heroMovil.ctaAbajo + 'px de ' + heroMovil.altoVista + 'px');
@@ -791,42 +792,51 @@ const SECCIONES = `(() => {
   chk('a 320×640 el CTA queda cerca del mensaje',
     cta320.hueco <= 120, cta320.hueco + 'px de separación');
 
-  /* Escritorio: dos columnas y mitad derecha ocupada. */
+  /* Escritorio: hero institucional en una columna, centrado y sin huecos. */
   await metricas(1440, 900);
   await js('window.scrollTo(0, 0)');
   await dormir(400);
   const heroEscritorio = await js(`(() => {
     const en = document.querySelector('.hero__in');
-    const visual = document.querySelector('.hero__visual');
     const txt = document.querySelector('.hero__txt');
-    const fotos = Array.from(document.querySelectorAll('.hero__visual img'));
-    const sello = document.querySelector('.hero__sello');
+    const h1 = document.querySelector('#heroTitulo');
+    const sub = document.querySelector('#heroSub');
+    const logo = document.querySelector('.hero__logo');
     const rEn = en.getBoundingClientRect();
-    const rVis = visual ? visual.getBoundingClientRect() : null;
+    const rTxt = txt.getBoundingClientRect();
+    const rH1 = h1.getBoundingClientRect();
     return {
       columnas: getComputedStyle(en).gridTemplateColumns.split(' ').filter(Boolean).length,
-      visualVisible: visual ? getComputedStyle(visual).display !== 'none' : false,
-      fotos: fotos.length,
-      fotosCargadas: fotos.filter((i) => i.complete && i.naturalWidth > 0).length,
-      sello: sello ? (sello.textContent || '').trim() : '',
-      anchoVisual: rVis ? Math.round(rVis.width) : 0,
+      alineacion: getComputedStyle(txt).textAlign,
       anchoHero: Math.round(rEn.width),
-      txtAncho: Math.round(txt.getBoundingClientRect().width),
-      desbordeHero: Math.round(rEn.right - (rEn.left + rEn.width))
+      anchoTexto: Math.round(rTxt.width),
+      anchoTitulo: Math.round(rH1.width),
+      altoTitulo: Math.round(rH1.height),
+      lineasTitulo: Math.round(rH1.height / parseFloat(getComputedStyle(h1).lineHeight)),
+      centrado: (() => {
+        const centroContenedor = rEn.left + rEn.width / 2;
+        const centroTexto = rTxt.left + rTxt.width / 2;
+        return Math.abs(centroContenedor - centroTexto) <= 2;
+      })(),
+      subDentro: Math.round(sub.getBoundingClientRect().right) <= Math.round(rEn.right) + 1,
+      imagenesProducto: Array.from(document.querySelectorAll('.hero img'))
+        .filter((i) => (i.getAttribute('src') || '').indexOf('assets/logo/') !== 0).length,
+      logoAncho: Math.round(logo.getBoundingClientRect().width)
     };
   })()`);
-  chk('el hero se compone en dos columnas', heroEscritorio.columnas === 2, heroEscritorio.columnas + ' columnas');
-  chk('la composición visual es visible', heroEscritorio.visualVisible === true);
-  chk('la mitad derecha no está vacía', heroEscritorio.anchoVisual > heroEscritorio.anchoHero * 0.35,
-    heroEscritorio.anchoVisual + 'px de ' + heroEscritorio.anchoHero + 'px');
-  chk('la composición usa las fotos reales del catálogo',
-    heroEscritorio.fotos === 2 && heroEscritorio.fotosCargadas === 2,
-    heroEscritorio.fotosCargadas + '/' + heroEscritorio.fotos);
-  chk('la composición no lleva sello bajo las fotos',
-    heroEscritorio.sello === '', heroEscritorio.sello || 'sin sello');
-  chk('las dos columnas quedan equilibradas',
-    Math.abs(heroEscritorio.txtAncho - heroEscritorio.anchoVisual) < heroEscritorio.anchoHero * 0.25,
-    'texto ' + heroEscritorio.txtAncho + 'px · visual ' + heroEscritorio.anchoVisual + 'px');
+  chk('el hero es de una sola columna', heroEscritorio.columnas === 1, heroEscritorio.columnas + ' columnas');
+  chk('el contenido del hero está centrado', heroEscritorio.centrado === true, heroEscritorio.alineacion);
+  chk('no hay imágenes de producto en el hero', heroEscritorio.imagenesProducto === 0,
+    heroEscritorio.imagenesProducto + ' imágenes');
+  chk('el bloque de texto ocupa un ancho de lectura razonable',
+    heroEscritorio.anchoTexto >= heroEscritorio.anchoHero * 0.5 && heroEscritorio.anchoTexto <= heroEscritorio.anchoHero * 0.95,
+    heroEscritorio.anchoTexto + 'px de ' + heroEscritorio.anchoHero + 'px');
+  chk('el título se distribuye en varias líneas, no en una tira',
+    heroEscritorio.lineasTitulo >= 2 && heroEscritorio.lineasTitulo <= 4,
+    heroEscritorio.lineasTitulo + ' líneas · ' + heroEscritorio.anchoTitulo + 'px');
+  chk('el título y el texto caben dentro del contenedor', heroEscritorio.subDentro === true);
+  chk('el logotipo se mantiene contenido en escritorio', heroEscritorio.logoAncho <= 110,
+    heroEscritorio.logoAncho + 'px');
 
   /* ============ 10. Siete resoluciones oficiales ============ */
   console.log('\n== 10. Siete resoluciones oficiales =====');

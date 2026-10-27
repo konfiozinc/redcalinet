@@ -1119,17 +1119,20 @@ button, input, select, textarea { font: inherit; color: inherit; }
    Identidad azul intacta; se ajusta jerarquía, portadas y aire.
    ============================================================ */
 
-/* ---------- Hero: portada comercial en dos columnas ----------
-   Móvil: una columna compacta, para que los CTA se vean pronto.
-   Escritorio: mensaje a la izquierda y composición visual a la derecha, de
-   modo que la mitad derecha no quede vacía. */
+/* ---------- Hero: portada institucional en una columna ----------
+   Sin fotografías de producto: el hero presenta la empresa de servicios y
+   soluciones digitales. Todo el contenido va en un bloque centrado con ancho
+   de lectura cómodo, así que no quedan columnas vacías ni huecos
+   desproporcionados en pantallas anchas. */
 .hero { padding: 28px 0 34px; }
-.hero__in { gap: 22px; }
+.hero__in { gap: 22px; justify-items: center; text-align: center; }
 
 .hero__txt {
   display: grid;
   justify-items: center;
   text-align: center;
+  width: 100%;
+  max-width: 44rem;
 }
 
 .hero__eyebrow { margin-bottom: 0; }
@@ -1155,39 +1158,12 @@ button, input, select, textarea { font: inherit; color: inherit; }
 
 .hero__cta { margin-top: 18px; gap: 10px; }
 
-/* La composición visual solo aparece cuando hay sitio: en móvil se oculta
-   para no alargar la página ni empujar los CTA fuera de pantalla. */
-.hero__visual { display: none; }
-
 @media (min-width: 900px) {
-  .hero__in {
-    grid-template-columns: 1.02fr .98fr;
-    align-items: center;
-    justify-items: stretch;
-    gap: 54px;
-    text-align: left;
-  }
-  .hero__txt { justify-items: start; text-align: left; }
   .hero__marca { gap: 14px; margin-bottom: 18px; }
   .hero__logo { width: 104px; height: 104px; }
-
-  .hero__visual {
-    display: grid;
-    grid-template-columns: 1.05fr .95fr;
-    gap: 14px;
-    align-content: center;
-  }
-  .hero__foto {
-    margin: 0;
-    border-radius: 18px;
-    overflow: hidden;
-    border: 1px solid rgba(255, 255, 255, .22);
-    background: #e9f0fa;
-    box-shadow: 0 20px 44px rgba(4, 18, 38, .4);
-  }
-  .hero__foto img { display: block; width: 100%; height: 100%; object-fit: cover; }
-  .hero__foto--a { aspect-ratio: 4 / 5; }
-  .hero__foto--b { aspect-ratio: 4 / 4.3; align-self: end; }
+  /* Con una sola columna, 16ch dejaba el título demasiado estrecho en el
+     centro: a 22ch ocupa dos líneas y mantiene el aire a los lados. */
+  .hero h1 { max-width: 22ch; }
 }
 
 /* ---------- Tarjeta: metadatos y tipo ---------- */
@@ -1320,7 +1296,6 @@ button, input, select, textarea { font: inherit; color: inherit; }
 
 @media (min-width: 900px) {
   .hero { padding: 60px 0 68px; }
-  .hero__valores { justify-content: flex-start; }
   .catalogo__grid { gap: 24px; }
   .ficha--producto h4 { font-size: 1.18rem; }
   .ficha--producto > p:not([class]) { min-height: 4.2em; }

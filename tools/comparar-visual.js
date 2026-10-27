@@ -133,14 +133,15 @@ async function abrirNavegador() {
 const MEDIR_ARRIBA = `(() => {
   const fab = document.querySelector('#waFloat');
   const logo = document.querySelector('.hero__logo');
-  const visual = document.querySelector('.hero__visual');
   const en = document.querySelector('.hero__in');
   const hero = document.querySelector('.hero');
   return {
     heroAlto: hero ? Math.round(hero.getBoundingClientRect().height) : 0,
     heroColumnas: en ? getComputedStyle(en).gridTemplateColumns.split(' ').filter(Boolean).length : 0,
     logoAncho: logo ? Math.round(logo.getBoundingClientRect().width) : 0,
-    visualVisible: visual ? getComputedStyle(visual).display !== 'none' : false,
+    /* Imágenes que no son el logotipo: en el hero institucional deben ser 0. */
+    imgsProducto: Array.from(document.querySelectorAll('.hero img'))
+      .filter((i) => (i.getAttribute('src') || '').indexOf('assets/logo/') !== 0).length,
     waEnHero: document.querySelectorAll('.hero [data-wa]').length,
     fabOculto: fab ? fab.classList.contains('oculto') : null,
     ctaAbajo: (() => {
@@ -151,7 +152,6 @@ const MEDIR_ARRIBA = `(() => {
       const w = document.querySelector('.hero__cta .btn--wa');
       return w ? Math.round(w.getBoundingClientRect().bottom) : null;
     })(),
-    sello: document.querySelectorAll('.hero__sello').length,
     descripcion: ((document.querySelector('#heroSub') || {}).textContent || '').trim(),
     cuenta: ((document.querySelector('#catCuenta') || {}).textContent || '').trim(),
     desborde: document.documentElement.scrollWidth
@@ -293,8 +293,8 @@ const MEDIR = `(() => {
   }
 
   decir('PORTADA (arriba de la página)');
-  decir('resolución  alto hero  columnas  logo   composición  WhatsApp  flotante  CTA↓   sello');
-  decir('-------------------------------------------------------------------------------------------');
+  decir('resolución  alto hero  columnas  logo   imgs prod  WhatsApp  flotante  CTA↓');
+  decir('---------------------------------------------------------------------------------------');
   filas.forEach((f) => {
     const p = f.portada;
     decir(
@@ -302,11 +302,10 @@ const MEDIR = `(() => {
       (p.heroAlto + 'px').padEnd(11) +
       String(p.heroColumnas).padEnd(10) +
       (p.logoAncho + 'px').padEnd(7) +
-      (p.visualVisible ? 'sí' : 'no').padEnd(13) +
+      String(p.imgsProducto).padEnd(11) +
       String(p.waEnHero).padEnd(10) +
       (p.fabOculto === null ? '-' : (p.fabOculto ? 'oculto' : 'visible')).padEnd(10) +
-      ((p.ctaAbajo === null ? '-' : p.ctaAbajo + 'px')).padEnd(7) +
-      p.sello
+      ((p.ctaAbajo === null ? '-' : p.ctaAbajo + 'px'))
     );
   });
 

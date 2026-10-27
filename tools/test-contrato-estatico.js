@@ -84,8 +84,7 @@ const REQUERIDAS = [
   /* KZ-REDCALINET-007 y 008: se arman en variables o viven en el HTML. */
   'ficha__meta', 'ficha__tipo', 'ficha__tipo--servicio', 'ficha__tipo--producto',
   'ficha__portada', 'ficha--fisico', 'ficha--servicio',
-  'hero__txt', 'hero__marca', 'hero__valores', 'hero__visual',
-  'hero__foto', 'hero__foto--a', 'hero__foto--b'
+  'hero__txt', 'hero__marca', 'hero__valores'
 ];
 
 const sinEstilo = REQUERIDAS.filter((c) => !clasesCss.has(c));
