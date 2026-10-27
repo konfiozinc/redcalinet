@@ -1188,23 +1188,6 @@ button, input, select, textarea { font: inherit; color: inherit; }
   .hero__foto img { display: block; width: 100%; height: 100%; object-fit: cover; }
   .hero__foto--a { aspect-ratio: 4 / 5; }
   .hero__foto--b { aspect-ratio: 4 / 4.3; align-self: end; }
-
-  .hero__sello {
-    grid-column: 1 / -1;
-    justify-self: start;
-    display: inline-flex;
-    align-items: center;
-    gap: 9px;
-    padding: 9px 15px;
-    border-radius: 999px;
-    background: rgba(255, 255, 255, .96);
-    color: var(--azul-800);
-    font-size: .8rem;
-    font-weight: 700;
-    white-space: nowrap;
-    box-shadow: 0 12px 26px rgba(4, 18, 38, .32);
-  }
-  .hero__sello .ico { width: 17px; height: 17px; color: var(--cian-600); }
 }
 
 /* ---------- Tarjeta: metadatos y tipo ---------- */
@@ -1341,4 +1324,20 @@ button, input, select, textarea { font: inherit; color: inherit; }
   .catalogo__grid { gap: 24px; }
   .ficha--producto h4 { font-size: 1.18rem; }
   .ficha--producto > p:not([class]) { min-height: 4.2em; }
+}
+
+/* ============================================================
+   KZ-REDCALINET-009 — Cierre de revisión visual
+   ============================================================ */
+
+/* En pantallas de 320–360 px de ancho los dos CTA quedaban por debajo del
+   borde (a 320×640 el grupo acababa en 665 px). Se ajusta SOLO el espaciado:
+   ni tipografía ni estructura. Medido: el botón de WhatsApp termina dentro de
+   la primera pantalla con aire suficiente. */
+@media (max-width: 360px) {
+  .hero { padding: 20px 0 26px; }
+  .hero__logo { width: 76px; height: 76px; }
+  .hero__marca { margin-bottom: 8px; }
+  .hero__valores { gap: 4px 12px; margin-top: 8px; }
+  .hero__cta { margin-top: 12px; gap: 8px; }
 }

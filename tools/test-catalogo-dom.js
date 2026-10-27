@@ -692,6 +692,25 @@ const SECCIONES = `(() => {
   chk('uno de los CTA es "Consultar por WhatsApp"',
     ctasHero.some((t) => t.indexOf('Consultar por WhatsApp') !== -1), ctasHero.join(' | '));
 
+  /* Redacción comercial: mensaje profesional y sin garantías no documentadas. */
+  const heroTexto = await js(`(() => ({
+    titulo: (document.querySelector('#heroTitulo') || {}).textContent || '',
+    sub: (document.querySelector('#heroSub') || {}).textContent || '',
+    valores: Array.from(document.querySelectorAll('#heroValores li')).map((li) => (li.textContent || '').trim()),
+    sello: document.querySelectorAll('.hero__sello, .hero__visual p').length
+  }))()`);
+  chk('el título comercial se mantiene',
+    heroTexto.titulo.indexOf('Tu conexión con servicios') === 0, heroTexto.titulo);
+  chk('la descripción del hero es la profesional',
+    heroTexto.sub.indexOf('Tecnología, entretenimiento digital y asesoría en trámites') === 0,
+    heroTexto.sub.slice(0, 58) + '…');
+  chk('el hero no promete garantías no documentadas',
+    !/garantiz/i.test(heroTexto.sub) && heroTexto.valores.every((v) => !/garantiz/i.test(v)),
+    heroTexto.valores.join(' | '));
+  chk('los beneficios del hero son datos comprobables', heroTexto.valores.length === 3,
+    heroTexto.valores.join(' | '));
+  chk('la composición no lleva sello bajo las fotos', heroTexto.sello === 0, heroTexto.sello + ' elementos');
+
   /* Móvil: sin composición visual (no alarga la página) y CTA a la vista. */
   await metricas(375, 667);
   await js('window.scrollTo(0, 0)');
@@ -744,6 +763,34 @@ const SECCIONES = `(() => {
   await dormir(500);
   chk('se oculta en la sección de contacto', (await js(FAB)).visible === false);
 
+  /* 320×640 es la pantalla más estrecha: los dos CTA deben verse completos sin
+     desplazarse y sin separarse del mensaje (sin tocar la tipografía). */
+  await metricas(320, 640);
+  await js('window.scrollTo(0, 0)');
+  await dormir(350);
+  const cta320 = await js(`(() => {
+    const grupo = document.querySelector('.hero__cta');
+    const wa = document.querySelector('.hero__cta .btn--wa');
+    const sub = document.querySelector('#heroSub');
+    const r = grupo.getBoundingClientRect();
+    const rw = wa.getBoundingClientRect();
+    return {
+      ctaAbajo: Math.round(r.bottom),
+      waAbajo: Math.round(rw.bottom),
+      waAlto: Math.round(rw.height),
+      alto: window.innerHeight,
+      hueco: Math.round(r.top - sub.getBoundingClientRect().bottom),
+      tipografia: getComputedStyle(sub).fontSize
+    };
+  })()`);
+  chk('a 320×640 los dos CTA caben en la primera pantalla',
+    cta320.ctaAbajo <= cta320.alto, cta320.ctaAbajo + 'px de ' + cta320.alto + 'px');
+  chk('a 320×640 el botón de WhatsApp se ve completo',
+    cta320.waAlto >= 44 && cta320.waAbajo <= cta320.alto,
+    cta320.waAbajo + '/' + cta320.alto + ' · alto ' + cta320.waAlto + 'px');
+  chk('a 320×640 el CTA queda cerca del mensaje',
+    cta320.hueco <= 120, cta320.hueco + 'px de separación');
+
   /* Escritorio: dos columnas y mitad derecha ocupada. */
   await metricas(1440, 900);
   await js('window.scrollTo(0, 0)');
@@ -775,8 +822,8 @@ const SECCIONES = `(() => {
   chk('la composición usa las fotos reales del catálogo',
     heroEscritorio.fotos === 2 && heroEscritorio.fotosCargadas === 2,
     heroEscritorio.fotosCargadas + '/' + heroEscritorio.fotos);
-  chk('la composición declara los servicios con texto',
-    heroEscritorio.sello.indexOf('Streaming') !== -1, heroEscritorio.sello);
+  chk('la composición no lleva sello bajo las fotos',
+    heroEscritorio.sello === '', heroEscritorio.sello || 'sin sello');
   chk('las dos columnas quedan equilibradas',
     Math.abs(heroEscritorio.txtAncho - heroEscritorio.anchoVisual) < heroEscritorio.anchoHero * 0.25,
     'texto ' + heroEscritorio.txtAncho + 'px · visual ' + heroEscritorio.anchoVisual + 'px');

@@ -1,0 +1,58 @@
+============================================================
+ COMPARATIVA VISUAL · ANTES (5eafbad)
+ árbol: C:\Users\USUARI~1\AppData\Local\Temp\kz-antes-009
+============================================================
+
+PORTADA (arriba de la página)
+resolución  alto hero  columnas  logo   composición  WhatsApp  flotante  CTA↓   sello
+-------------------------------------------------------------------------------------------
+320x640     634px      1         88px   no           1         oculto    665px  1
+360x640     548px      1         88px   no           1         oculto    579px  1
+375x667     549px      1         88px   no           1         oculto    580px  1
+390x844     553px      1         88px   no           1         oculto    584px  1
+768x1024    567px      1         88px   no           1         oculto    580px  1
+1024x768    676px      2         104px  sí           1         oculto    685px  1
+1440x900    621px      2         104px  sí           1         oculto    630px  1
+
+CATÁLOGO (con la sección en pantalla)
+resolución  cols  tarjeta  1ª tarjeta  título  precio               portadas (foto/graf/icono)  tipos
+--------------------------------------------------------------------------------------------------
+320x640     1     280px    608px       18.24px 15.2px rgb(71, 85, 105)2/6/0                      8
+360x640     1     320px    582px       18.24px 15.2px rgb(71, 85, 105)2/6/0                      8
+375x667     1     335px    582px       18.24px 15.2px rgb(71, 85, 105)2/6/0                      8
+390x844     1     350px    582px       18.24px 15.2px rgb(71, 85, 105)2/6/0                      8
+768x1024    2     338px    518px       18.24px 15.2px rgb(71, 85, 105)2/6/0                      8
+1024x768    3     299px    538px       18.88px 15.2px rgb(71, 85, 105)2/6/0                      8
+1440x900    3     336px    540px       18.88px 15.2px rgb(71, 85, 105)2/6/0                      8
+
+capturas: C:\Users\usuario29\Documents\KONFIO_ZINC\6-LANDING-PAGES\RedCaliNet\capturas\comparativa-009\antes
+
+============================================================
+ COMPARATIVA VISUAL · DESPUÉS (árbol actual)
+ árbol: C:\Users\usuario29\Documents\KONFIO_ZINC\6-LANDING-PAGES\RedCaliNet
+============================================================
+
+PORTADA (arriba de la página)
+resolución  alto hero  columnas  logo   composición  WhatsApp  flotante  CTA↓   sello
+-------------------------------------------------------------------------------------------
+320x640     586px      1         76px   no           1         oculto    625px  0
+360x640     552px      1         76px   no           1         oculto    591px  0
+375x667     549px      1         88px   no           1         oculto    580px  0
+390x844     553px      1         88px   no           1         oculto    584px  0
+768x1024    567px      1         88px   no           1         oculto    580px  0
+1024x768    702px      2         104px  sí           1         oculto    711px  0
+1440x900    621px      2         104px  sí           1         oculto    630px  0
+
+CATÁLOGO (con la sección en pantalla)
+resolución  cols  tarjeta  1ª tarjeta  título  precio               portadas (foto/graf/icono)  tipos
+--------------------------------------------------------------------------------------------------
+320x640     1     280px    608px       18.24px 15.2px rgb(71, 85, 105)2/6/0                      8
+360x640     1     320px    582px       18.24px 15.2px rgb(71, 85, 105)2/6/0                      8
+375x667     1     335px    582px       18.24px 15.2px rgb(71, 85, 105)2/6/0                      8
+390x844     1     350px    582px       18.24px 15.2px rgb(71, 85, 105)2/6/0                      8
+768x1024    2     338px    518px       18.24px 15.2px rgb(71, 85, 105)2/6/0                      8
+1024x768    3     299px    538px       18.88px 15.2px rgb(71, 85, 105)2/6/0                      8
+1440x900    3     336px    540px       18.88px 15.2px rgb(71, 85, 105)2/6/0                      8
+
+capturas: C:\Users\usuario29\Documents\KONFIO_ZINC\6-LANDING-PAGES\RedCaliNet\capturas\comparativa-009\despues
+

@@ -16,6 +16,7 @@ const FALLBACK = {
     nombre: "Red CaliNet",
     nombreLegal: "REDCALINET",
     eslogan: "Tu conexión con servicios y soluciones digitales",
+    descripcion: "Tecnología, entretenimiento digital y asesoría en trámites, con atención cercana y personalizada desde Bello, Antioquia.",
     esloganHistorico: "Calidad de ventas por internet",
     promesa: "Servicio garantizado, lo primordial para nosotros es el cliente.",
     ciudad: "Bello, Antioquia, Colombia"
@@ -346,25 +347,32 @@ function pintarMarca() {
 
   const sub = $("#heroSub");
   if (sub) {
-    const lista = DATA.categorias.map((c) => c.nombre.toLowerCase()).join(", ");
-    sub.textContent = lista.charAt(0).toUpperCase() + lista.slice(1) + ". " + DATA.marca.promesa;
+    /* Descripción comercial editable desde `marca.descripcion`. El respaldo
+       evita componer frases automáticas que sonaban poco naturales. */
+    sub.textContent = DATA.marca.descripcion ||
+      "Tecnología, entretenimiento digital y asesoría en trámites, con atención cercana y personalizada desde Bello, Antioquia.";
   }
 
   const anio = $("#anio");
   if (anio) anio.textContent = String(new Date().getFullYear());
 }
 
-/* El hero dice, en tres golpes, por qué comprar aquí. Todo sale de los datos
-   reales (promesa de marca, ciudad y WhatsApp): no hay promesas inventadas. */
+/* El hero dice, en tres golpes, por qué comprar aquí. Los tres son datos
+   comprobables de la propia ficha del negocio: punto físico, WhatsApp y
+   horario. No se promete ninguna garantía que no esté documentada. */
 function pintarHero() {
   const ul = $("#heroValores");
   if (ul) {
     const ciudadCorta = String(DATA.marca.ciudad || "").split(",")[0].trim() || "Bello";
+    const horario = (DATA.horarios || [])[0] || {};
+    const dias = String(horario.dia || "").trim();
+
     const valores = [
-      { icono: "i-shield", texto: "Servicio garantizado" },
       { icono: "i-pin", texto: "Punto físico en " + ciudadCorta },
-      { icono: "i-whatsapp", texto: "Atención por WhatsApp" }
-    ];
+      { icono: "i-whatsapp", texto: "Atención por WhatsApp" },
+      dias ? { icono: "i-clock", texto: "Atendemos " + dias.toLowerCase() } : null
+    ].filter(Boolean);
+
     ul.innerHTML = valores
       .map((v) => "<li>" + svg(v.icono) + "<span>" + esc(v.texto) + "</span></li>")
       .join("");
@@ -1070,6 +1078,8 @@ function negocioDesdeFirestore(empresa, contacto, categorias, servicios) {
     marca: {
       nombre: empresa.nombre || "Red CaliNet",
       eslogan: empresa.eslogan || "Tu conexión con servicios y soluciones digitales",
+      /* Campo opcional: el panel puede no tenerlo todavía. */
+      descripcion: empresa.descripcion || "",
       esloganHistorico: empresa.esloganHistorico || "",
       promesa: empresa.promesa || "Servicio garantizado, lo primordial para nosotros es el cliente.",
       ciudad: empresa.ciudad || "Bello, Antioquia, Colombia"

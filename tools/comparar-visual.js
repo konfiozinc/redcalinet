@@ -143,6 +143,16 @@ const MEDIR_ARRIBA = `(() => {
     visualVisible: visual ? getComputedStyle(visual).display !== 'none' : false,
     waEnHero: document.querySelectorAll('.hero [data-wa]').length,
     fabOculto: fab ? fab.classList.contains('oculto') : null,
+    ctaAbajo: (() => {
+      const c = document.querySelector('.hero__cta');
+      return c ? Math.round(c.getBoundingClientRect().bottom) : null;
+    })(),
+    waAbajo: (() => {
+      const w = document.querySelector('.hero__cta .btn--wa');
+      return w ? Math.round(w.getBoundingClientRect().bottom) : null;
+    })(),
+    sello: document.querySelectorAll('.hero__sello').length,
+    descripcion: ((document.querySelector('#heroSub') || {}).textContent || '').trim(),
     cuenta: ((document.querySelector('#catCuenta') || {}).textContent || '').trim(),
     desborde: document.documentElement.scrollWidth
   };
@@ -177,6 +187,23 @@ const MEDIR = `(() => {
       const t = document.querySelector('#catGrid .ficha--producto');
       return t ? Math.round(t.getBoundingClientRect().top) : null;
     })(),
+    /* Desglose del arranque del catálogo, para saber qué ocupa el alto. */
+    barraTop: (() => {
+      const b = document.querySelector('.catalogo__barra');
+      return b ? Math.round(b.getBoundingClientRect().top) : null;
+    })(),
+    barraAlto: (() => {
+      const b = document.querySelector('.catalogo__barra');
+      return b ? Math.round(b.getBoundingClientRect().height) : null;
+    })(),
+    gridTop: (() => {
+      const g = document.querySelector('#catGrid');
+      return g ? Math.round(g.getBoundingClientRect().top) : null;
+    })(),
+    cuentaAlto: (() => {
+      const c = document.querySelector('#catCuenta');
+      return c ? Math.round(c.getBoundingClientRect().height) : null;
+    })(),
     heroAlto: hero ? Math.round(hero.getBoundingClientRect().height) : 0,
     heroContacto: Boolean(document.querySelector('.hero__contacto')),
     tipos: document.querySelectorAll('#catGrid .ficha__tipo').length
@@ -207,6 +234,20 @@ const MEDIR = `(() => {
   await cdp.enviar('Emulation.setDeviceMetricsOverride', { width: 375, height: 667, deviceScaleFactor: 1, mobile: true });
   await cdp.enviar('Page.navigate', { url: sitio });
 
+  /* `html` tiene scroll-behavior: smooth, así que un desplazamiento puede
+     seguir en curso cuando se mide. Sin esperar a que pare, una medición sale
+     distinta de otra con la misma página. */
+  const esperarQuieto = async () => {
+    let previo = -1;
+    for (let i = 0; i < 30; i++) {
+      const y = await js('Math.round(window.scrollY)');
+      if (y === previo) return y;
+      previo = y;
+      await dormir(80);
+    }
+    return previo;
+  };
+
   const limite = Date.now() + 20000;
   while (Date.now() < limite) {
     if (await js("document.readyState === 'complete'")) break;
@@ -235,14 +276,14 @@ const MEDIR = `(() => {
 
     /* ---- 1) Portada: arriba de la página ---- */
     await js('window.scrollTo(0, 0)');
-    await dormir(420);
+    await esperarQuieto();
     const portada = await js(MEDIR_ARRIBA);
     const capPortada = await cdp.enviar('Page.captureScreenshot', { format: 'png' });
     fs.writeFileSync(path.join(CAPTURAS, 'hero-' + r.nombre + '.png'), Buffer.from(capPortada.data, 'base64'));
 
     /* ---- 2) Catálogo ---- */
     await js("document.querySelector('#catalogo').scrollIntoView({ behavior: 'instant', block: 'start' })");
-    await dormir(300);
+    await esperarQuieto();
     const m = await js(MEDIR);
 
     const capCatalogo = await cdp.enviar('Page.captureScreenshot', { format: 'png' });
@@ -252,8 +293,8 @@ const MEDIR = `(() => {
   }
 
   decir('PORTADA (arriba de la página)');
-  decir('resolución  alto hero  columnas  logo   composición  WhatsApp  flotante  contador');
-  decir('---------------------------------------------------------------------------------------');
+  decir('resolución  alto hero  columnas  logo   composición  WhatsApp  flotante  CTA↓   sello');
+  decir('-------------------------------------------------------------------------------------------');
   filas.forEach((f) => {
     const p = f.portada;
     decir(
@@ -264,7 +305,8 @@ const MEDIR = `(() => {
       (p.visualVisible ? 'sí' : 'no').padEnd(13) +
       String(p.waEnHero).padEnd(10) +
       (p.fabOculto === null ? '-' : (p.fabOculto ? 'oculto' : 'visible')).padEnd(10) +
-      p.cuenta
+      ((p.ctaAbajo === null ? '-' : p.ctaAbajo + 'px')).padEnd(7) +
+      p.sello
     );
   });
 
