@@ -86,11 +86,16 @@ Las pruebas con emulador de **Auth** (`tools/test-reglas.js`, `tools/test-e2e.js
 
 ### Prueba visual
 
-`tools/test-catalogo-dom.js` ejecuta 36 comprobaciones de comportamiento y captura **siete
-resoluciones** (320×568 … 1920×1080) verificando columna de rejilla y desbordamiento. Necesita
-que el entorno permita los canales IPC de Chromium; si el lanzamiento directo falla, se arranca
-el navegador aparte y se apunta con `KZ_CDP_URL`. Estado y detalle en
-[`docs/misiones/INFORME-KZ-REDCALINET-005.md`](docs/misiones/INFORME-KZ-REDCALINET-005.md).
+`tools/test-catalogo-dom.js` ejecuta ~104 comprobaciones (catálogo, imágenes, precios, WhatsApp,
+filtros, búsqueda, fichas, teclado, desplazamiento, contraste WCAG AA y consola) y captura las
+**siete resoluciones oficiales** —320×640, 360×640, 375×667, 390×844, 768×1024, 1024×768 y
+1440×900— verificando en cada una desbordamiento, columnas de rejilla, solapamiento, ancho de
+tarjeta y posición del título respecto a la cabecera. Deja las capturas en `capturas/responsive/`
+y un informe legible por máquina en `capturas/informe-visual.json`.
+
+Necesita que el entorno permita los canales IPC de Chromium; si el lanzamiento directo falla, se
+arranca el navegador aparte y se apunta con `KZ_CDP_URL`. Estado y dictamen en
+[`docs/misiones/INFORME-KZ-REDCALINET-006.md`](docs/misiones/INFORME-KZ-REDCALINET-006.md).
 
 ## Estructura
 
