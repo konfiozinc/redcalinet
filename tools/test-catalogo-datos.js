@@ -147,7 +147,12 @@ chk('arma enlaces de redes desde contacto',
   negocio.redes.some((r) => r.id === 'whatsapp' && r.url === 'https://wa.me/573014585658') &&
   negocio.redes.some((r) => r.id === 'facebook'));
 chk('conserva los beneficios del respaldo', Array.isArray(negocio.beneficios) && negocio.beneficios.length > 0);
-chk('vuelve a mapear sin errores', C.mapearCatalogo(negocio).categorias.length === 2);
+const recatalogo = C.mapearCatalogo(negocio);
+chk('vuelve a mapear sin errores', recatalogo.categorias.length === 2);
+/* Regresión: negocioDesdeFirestore debe transportar los servicios. Si los
+   pierde, el catálogo sale vacío en producción aunque haya categorías. */
+chk('negocioDesdeFirestore no pierde los servicios',
+  C.contarProductos(recatalogo.categorias) === 3, C.contarProductos(recatalogo.categorias) + ' productos');
 
 console.log('\n== mensaje de WhatsApp por producto ==');
 const primero = local.categorias[0].productos[0];

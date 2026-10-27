@@ -145,5 +145,94 @@ chk('los nombres de producto no se repiten', new Set(nombresFichas).size === nom
 const respaldo = js.match(/const FALLBACK = (\{[\s\S]*?\n\});/);
 chk('el script trae el respaldo embebido', Boolean(respaldo));
 
+/* ---------- 8. Compatibilidad con el panel administrativo ---------- */
+console.log('\n== Compatibilidad con el panel (Codex Sites) ==');
+
+const rutaPanel = path.join(ROOT, 'admin/panel.js');
+if (!fs.existsSync(rutaPanel)) {
+  chk('panel administrativo localizado', false, 'no existe admin/panel.js: se omite la comprobación');
+} else {
+  const panel = leer('admin/panel.js');
+  /* Campos que el panel escribe en `servicios` y en `categorias`. */
+  const camposServicio = unicos(Array.from(panel.matchAll(/fd\.get\("([A-Za-z]+)"\)/g), (m) => m[1]));
+  const camposCategoria = unicos(Array.from(panel.matchAll(/name="([A-Za-z]+)"/g), (m) => m[1]));
+
+  chk('el panel escribe campos', camposServicio.length >= 5, camposServicio.join(', '));
+
+  /* El catálogo accede a los documentos con punto (doc.nombre, cat.icono…),
+     así que el campo cuenta como leído si aparece como `<algo>.<campo>`. */
+  const leido = (campo) => new RegExp('\\.' + campo + '\\b').test(js) || js.indexOf('"' + campo + '"') !== -1;
+  const todos = unicos(camposServicio.concat(camposCategoria));
+  const ignorados = todos.filter((c) => !leido(c));
+  chk('el catálogo lee todos los campos que el panel escribe',
+    ignorados.length === 0, ignorados.length ? 'ignora: ' + ignorados.join(', ') : todos.length + ' campos');
+
+  /* Si el catálogo ignora un campo del panel, el propietario editaría algo
+     que no se ve. Es la garantía de que Codex Sites pueda gestionarlo después. */
+  const estadosPanel = unicos(Array.from(panel.matchAll(/"(BORRADOR|PUBLICADO|OCULTO)"/g), (m) => m[1]));
+  chk('el catálogo conoce los tres estados del panel', estadosPanel.length === 3, estadosPanel.join(', '));
+  chk('el estado PUBLICADO aparece en el catálogo', js.indexOf('"PUBLICADO"') !== -1);
+}
+
+/* ---------- 9. Enlaces comerciales ---------- */
+console.log('\n== WhatsApp, Facebook y teléfono ==');
+const wa = data.contacto.whatsapp;
+chk('el WhatsApp es un número válido de Colombia', /^57\d{10}$/.test(wa), wa);
+const redWa = data.redes.find((r) => r.id === 'whatsapp');
+chk('el enlace de WhatsApp apunta al número correcto',
+  Boolean(redWa) && redWa.url === 'https://wa.me/' + wa, redWa ? redWa.url : 'falta');
+const redFb = data.redes.find((r) => r.id === 'facebook');
+chk('hay enlace de Facebook', Boolean(redFb && /^https:\/\/www\.facebook\.com\//.test(redFb.url)),
+  redFb ? redFb.url : 'falta');
+chk('el sitio genera enlaces de WhatsApp', js.indexOf('https://wa.me/') !== -1);
+chk('el JSON-LD publica el teléfono', html.indexOf('"+' + wa + '"') !== -1 || html.indexOf(wa) !== -1);
+chk('el formulario abre WhatsApp (no guarda en servidor)', js.indexOf('window.open(waLink') !== -1);
+
+/* ---------- 10. El respaldo local no publica ofertas caducadas ---------- */
+console.log('\n== Respaldo local: sin precios ni promociones ==');
+const clavesProhibidas = [];
+(function recorrer(nodo, ruta) {
+  if (nodo === null || typeof nodo !== 'object') return;
+  Object.keys(nodo).forEach((k) => {
+    if (/promo|descuento|oferta|cupon|cupón|vigencia|vigente/i.test(k)) clavesProhibidas.push(ruta + '.' + k);
+    recorrer(nodo[k], ruta + '.' + k);
+  });
+})(data, 'data');
+chk('el respaldo no trae campos de promoción', clavesProhibidas.length === 0, clavesProhibidas.join(', '));
+
+const preciosReales = [];
+(function buscarPrecios(nodo, ruta) {
+  if (nodo === null || typeof nodo !== 'object') return;
+  Object.keys(nodo).forEach((k) => {
+    const v = nodo[k];
+    if (k === 'precio' && v !== null && v !== undefined) preciosReales.push(ruta);
+    buscarPrecios(v, ruta + '.' + k);
+  });
+})(data, 'data');
+chk('el respaldo no publica ningún precio', preciosReales.length === 0, preciosReales.join(', ') || 'todos en null');
+
+const notaStreaming = (data.categorias.find((c) => c.id === 'streaming') || {}).nota || '';
+chk('la categoría con antecedentes aclara que no es oferta vigente',
+  /no se publican como oferta vigente/i.test(notaStreaming), notaStreaming.slice(0, 60) + '…');
+chk('las categorías con antecedentes llevan nota',
+  data.categorias.filter((c) => ['streaming', 'tecnologia'].indexOf(c.id) !== -1).every((c) => c.nota && c.nota.length > 20));
+
+/* ---------- 11. Comportamiento responsive del catálogo ---------- */
+console.log('\n== Rejilla responsive ==');
+const bloque = (desde) => {
+  const m = css.match(new RegExp('@media \\(min-width: ' + desde + 'px\\) \\{([\\s\\S]*?)\\n\\}', ''));
+  return m ? m[1] : '';
+};
+const base = css.slice(css.indexOf('.catalogo__grid {'), css.indexOf('.catalogo__grid {') + 320);
+chk('la rejilla base es de una columna', /grid-template-columns: 1fr/.test(base));
+chk('a 620px pasa a dos columnas',
+  /catalogo__grid[^}]*repeat\(2, 1fr\)/.test(css), 'regla de 620px');
+chk('a 900px pasa a tres columnas',
+  /@media \(min-width: 900px\) \{[^@]*catalogo__grid[^}]*repeat\(3, 1fr\)/.test(css), 'regla de 900px');
+chk('el modal pasa a dos paneles en pantalla ancha',
+  /ficha-modal__in \{ grid-template-columns/.test(css));
+chk('respeta prefers-reduced-motion',
+  /@media \(prefers-reduced-motion: reduce\)/.test(css) && /\.ficha--producto:hover/.test(css));
+
 console.log(`\n  TOTAL ${ok + fail} · PASA ${ok} · FALLA ${fail}`);
 process.exit(fail ? 1 : 0);

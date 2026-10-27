@@ -956,6 +956,9 @@ function negocioDesdeFirestore(empresa, contacto, categorias, servicios) {
     horarios: Array.isArray(contacto.horarios) ? contacto.horarios : [],
     redes: redesDesdeContacto(contacto),
     categorias: categorias,
+    /* Los servicios tienen que viajar con las categorías: sin esta línea el
+       mapeo no encuentra productos y el catálogo queda vacío en producción. */
+    servicios: Array.isArray(servicios) ? servicios : [],
     beneficios: FALLBACK.beneficios,
     origen: "firestore"
   };

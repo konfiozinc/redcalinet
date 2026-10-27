@@ -48,18 +48,49 @@ Configuración de la empresa y contacto se leen de `configuracion/empresa` y
 
 ```bash
 node tools/test-catalogo-datos.js      # mapeo Firestore→catálogo, precios, buscador, filtros
-node tools/test-contrato-estatico.js   # ids, iconos del sprite, clases JS↔CSS, JSON-LD
-node tools/test-catalogo-dom.js        # navegador real por CDP (ver nota abajo)
+node tools/test-contrato-estatico.js   # ids, iconos, clases JS↔CSS, JSON-LD, compatibilidad con el panel
+node tools/test-reglas-publico.js      # reglas + integración, contra el emulador (ver abajo)
+node tools/test-catalogo-dom.js        # navegador real por CDP (ver nota más abajo)
 ```
 
-Las dos primeras no necesitan navegador, ni emulador, ni dependencias npm (80 comprobaciones).
-La tercera lanza Chromium y necesita que el entorno permita los canales IPC del navegador; en
-un entorno restringido se arranca aparte y se apunta con `KZ_CDP_URL` (ver
-[`docs/misiones/INFORME-KZ-REDCALINET-004.md`](docs/misiones/INFORME-KZ-REDCALINET-004.md)).
+Las dos primeras no necesitan navegador, ni emulador, ni dependencias npm (100 comprobaciones).
 
-Las pruebas con emulador (`tools/test-reglas.js`, `tools/test-e2e.js`, `tools/test-landing.js`)
-requieren **Java** para el emulador de Firestore (`firebase emulators:start --only auth,firestore
---config firebase.test.json`).
+### Reglas e integración con el emulador
+
+No hace falta instalar Java: el **JetBrains Runtime de Android Studio** sirve
+(`C:\Program Files\Android\Android Studio\jbr`). Se arranca el emulador directamente, porque
+`firebase emulators:exec` no puede lanzar `java` en todos los entornos:
+
+```powershell
+$java = "C:\Program Files\Android\Android Studio\jbr\bin\java.exe"
+$jar  = "$env:USERPROFILE\.cache\firebase\emulators\cloud-firestore-emulator-v1.22.0.jar"
+
+# -Duser.language=en es obligatorio: con locale español el compilador de reglas
+# del emulador falla con "Can't find bundle ... locale es_CO" y devuelve HTTP 500.
+Start-Process -FilePath $java -ArgumentList '-Duser.language=en','-Duser.country=US',
+  '-jar', "`"$jar`"", '--host','127.0.0.1','--port','8090',
+  '--rules', "`"$PWD\firestore.rules`"", '--project_id','red-calinet'
+
+$env:KZ_FIRESTORE = "http://127.0.0.1:8090"
+node tools/test-reglas-publico.js
+```
+
+Comprueba que el público solo lee lo `PUBLICADO`, que `BORRADOR`/`OCULTO` dan 403, que la
+consulta real del catálogo no arrastra borradores y que el mapeo no publica precios inventados.
+Nunca toca producción. Antes de medir, verifica que el puerto esté libre: un emulador viejo
+responde igual y arruina la medición.
+
+Las pruebas con emulador de **Auth** (`tools/test-reglas.js`, `tools/test-e2e.js`,
+`tools/test-landing.js`) necesitan `firebase emulators:exec` completo, es decir, poder lanzar
+`java` con su salida capturada.
+
+### Prueba visual
+
+`tools/test-catalogo-dom.js` ejecuta 36 comprobaciones de comportamiento y captura **siete
+resoluciones** (320×568 … 1920×1080) verificando columna de rejilla y desbordamiento. Necesita
+que el entorno permita los canales IPC de Chromium; si el lanzamiento directo falla, se arranca
+el navegador aparte y se apunta con `KZ_CDP_URL`. Estado y detalle en
+[`docs/misiones/INFORME-KZ-REDCALINET-005.md`](docs/misiones/INFORME-KZ-REDCALINET-005.md).
 
 ## Estructura
 

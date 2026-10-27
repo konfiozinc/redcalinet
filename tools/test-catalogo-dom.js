@@ -415,12 +415,55 @@ async function captura(destino, completo) {
   chk('el botón de cerrar funciona',
     (await js("document.querySelector('#fichaModal').hidden")) === true);
 
-  console.log('\n== Capturas ==');
+  console.log('\n== Capturas en siete resoluciones ==');
   await js("document.querySelector('#catalogo').scrollIntoView({ behavior: 'instant', block: 'start' })");
   await dormir(250);
   await captura(path.join(ROOT, 'capturas', 'redcalinet-catalogo-movil.png'));
-  await captura(path.join(ROOT, 'capturas', 'redcalinet-catalogo-completo.png'), true);
-  console.log('  capturas/redcalinet-catalogo-movil.png y redcalinet-catalogo-completo.png');
+
+  const RESOLUCIONES = [
+    { ancho: 320, alto: 568, nombre: '320x568-movil-minimo' },
+    { ancho: 360, alto: 640, nombre: '360x640-android' },
+    { ancho: 375, alto: 667, nombre: '375x667-kz-movil' },
+    { ancho: 390, alto: 844, nombre: '390x844-iphone-moderno' },
+    { ancho: 768, alto: 1024, nombre: '768x1024-tablet-vertical' },
+    { ancho: 1366, alto: 768, nombre: '1366x768-portatil' },
+    { ancho: 1920, alto: 1080, nombre: '1920x1080-escritorio' }
+  ];
+
+  for (const r of RESOLUCIONES) {
+    await cdp.enviar('Emulation.setDeviceMetricsOverride', {
+      width: r.ancho, height: r.alto, deviceScaleFactor: 1, mobile: r.ancho < 768
+    });
+    await dormir(400);
+    await js("document.querySelector('#catalogo').scrollIntoView({ behavior: 'instant', block: 'start' })");
+    await dormir(200);
+
+    const m = await js(`(() => {
+      const g = document.querySelector('#catGrid');
+      const cols = g ? getComputedStyle(g).gridTemplateColumns.split(' ').filter(Boolean).length : 0;
+      return {
+        desborde: document.documentElement.scrollWidth,
+        tarjetas: document.querySelectorAll('.ficha--producto').length,
+        filtros: document.querySelectorAll('#catFiltros .filtro').length,
+        columnas: cols
+      };
+    })()`);
+
+    const columnasEsperadas = r.ancho >= 900 ? 3 : (r.ancho >= 620 ? 2 : 1);
+
+    chk(r.ancho + '×' + r.alto + ': sin desbordamiento horizontal', m.desborde <= r.ancho, m.desborde + 'px');
+    chk(r.ancho + '×' + r.alto + ': catálogo completo', m.tarjetas === totalEsperado, m.tarjetas + '/' + totalEsperado);
+    chk(r.ancho + '×' + r.alto + ': rejilla en ' + columnasEsperadas + ' columna(s)',
+      m.columnas === columnasEsperadas, m.columnas + ' columnas');
+
+    await captura(path.join(ROOT, 'capturas', 'responsive', r.nombre + '.png'));
+  }
+
+  console.log('  capturas/responsive/*.png (7 resoluciones)');
+
+  await cdp.enviar('Emulation.setDeviceMetricsOverride', {
+    width: 375, height: 667, deviceScaleFactor: 1, mobile: true
+  });
 
   console.log('\n== Sin errores de JavaScript ==');
   chk('no hubo excepciones en la página', excepciones.length === 0,
