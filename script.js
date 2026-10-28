@@ -1118,12 +1118,54 @@ function datosDeLaNube() {
 /* Aplica el mejor origen disponible: nube → data.json → respaldo embebido. */
 let datosLocales = null;
 
+/* KZ-024 — data.json es respaldo, no coartada. Si el catálogo mostrado no viene
+   de Firestore teniendo el proyecto configurado, el visitante lo ve: así una
+   publicación que no llega al público no puede pasar desapercibida. */
+let origenDatos = "local";
+let avisoOrigen = null;
+let temporizadorAviso = null;
+
+function mostrarAvisoOrigen(texto) {
+  if (!avisoOrigen) {
+    avisoOrigen = document.createElement("div");
+    avisoOrigen.id = "aviso-origen-datos";
+    avisoOrigen.setAttribute("role", "status");
+    avisoOrigen.setAttribute("aria-live", "polite");
+    avisoOrigen.style.cssText = [
+      "position:fixed", "left:0", "right:0", "bottom:0", "z-index:2147483000",
+      "background:#7a1f1f", "color:#fff", "font:500 13px/1.45 system-ui,sans-serif",
+      "padding:10px 14px", "text-align:center", "box-shadow:0 -2px 10px rgba(0,0,0,.25)"
+    ].join(";");
+    document.body.appendChild(avisoOrigen);
+  }
+  if (avisoOrigen.textContent !== texto) avisoOrigen.textContent = texto;
+}
+
+function ocultarAvisoOrigen() {
+  if (temporizadorAviso) { clearTimeout(temporizadorAviso); temporizadorAviso = null; }
+  if (avisoOrigen) { avisoOrigen.remove(); avisoOrigen = null; }
+}
+
+function vigilarOrigen() {
+  if (origenDatos === "nube" || !window.firebaseConfig) return;
+  if (temporizadorAviso) return;
+  temporizadorAviso = setTimeout(() => {
+    temporizadorAviso = null;
+    if (origenDatos !== "nube") {
+      mostrarAvisoOrigen("Catálogo de respaldo (data.json): puede no reflejar las últimas publicaciones del panel.");
+    }
+  }, 3000);
+}
+
 function aplicarDatos() {
   const deNube = datosDeLaNube();
+  origenDatos = deNube ? "nube" : "local";
   if (deNube) {
     DATA = deNube;
+    ocultarAvisoOrigen();
   } else if (datosLocales) {
     DATA = datosLocales;
+    vigilarOrigen();
   }
   pintar();
 }
@@ -1148,7 +1190,10 @@ async function suscribirFirestore() {
     }
 
     const alFallar = (etiqueta) => (e) => {
-      console.warn("Red CaliNet: Firestore (" + etiqueta + ") no disponible.", e && e.message ? e.message : e);
+      /* Un fallo de Firestore ya no se queda en la consola del desarrollador:
+         el catálogo está mostrando el respaldo y el visitante debe saberlo. */
+      console.error("Red CaliNet: Firestore (" + etiqueta + ") no disponible.", e && e.message ? e.message : e);
+      mostrarAvisoOrigen("Sin conexión con el catálogo en vivo (Firestore · " + etiqueta + "): se muestra el respaldo data.json y puede faltar lo último publicado.");
     };
 
     onSnapshot(doc(db, "configuracion", "empresa"), (snap) => {
