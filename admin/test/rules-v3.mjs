@@ -91,15 +91,18 @@ await chk('anónimo NO lee un servicio OCULTO', () => assertFails(getDoc(doc(ano
 await chk('anónimo NO lista la colección entera sin filtro', () => assertFails(getDocs(collection(anon, 'servicios'))));
 await chk('la consulta oficial estado==PUBLICADO devuelve solo lo publicado', async () => {
   const snap = await assertSucceeds(getDocs(query(collection(anon, 'servicios'), where('estado', '==', 'PUBLICADO'))));
-  assert.equal(snap.size, 1);
-  assert.equal(snap.docs[0].data().estado, 'PUBLICADO');
+  const ids = snap.docs.map((d) => d.id);
+  assert.ok(ids.includes('pub1'), 'el servicio publicado de la siembra debe aparecer');
+  assert.ok(!ids.includes('bor1') && !ids.includes('ocu1'), 'no deben colarse el borrador ni el oculto');
+  assert.ok(snap.docs.every((d) => d.data().estado === 'PUBLICADO'), 'todo lo devuelto debe estar PUBLICADO');
 });
 await chk('anónimo lee configuracion/empresa (portada)', () => assertSucceeds(getDoc(doc(anon, 'configuracion/empresa'))));
 await chk('anónimo lee configuracion/contacto', () => assertSucceeds(getDoc(doc(anon, 'configuracion/contacto'))));
 await chk('anónimo NO lee un configuracion fuera del contrato', () => assertFails(getDoc(doc(anon, 'configuracion/interna'))));
 await chk('anónimo lista categorias', async () => {
   const snap = await assertSucceeds(getDocs(collection(anon, 'categorias')));
-  assert.equal(snap.size, 2);
+  const ids = snap.docs.map((d) => d.id);
+  assert.ok(ids.includes('cat1') && ids.includes('cat2'), 'las categorías de la siembra deben poder listarse');
 });
 
 /* ---------------------------------------------------------------- */

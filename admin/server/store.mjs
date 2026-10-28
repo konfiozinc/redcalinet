@@ -8,6 +8,15 @@ export function initFirebase(){
  else{if(contract.status!=='HARNESS_VERIFIED'||process.env.RCL_CONTRACT_APPROVED_HASH!==contractHash||!projectId||projectId.startsWith('demo-'))throw Error('Producción bloqueada: contrato Harness no verificado/aprobado.');if(process.env.FIRESTORE_EMULATOR_HOST||process.env.FIREBASE_AUTH_EMULATOR_HOST)throw Error('No mezclar emulación con producción.');}
  const app=initializeApp({projectId,...(!local?{credential:applicationDefault()}: {})});const db=getFirestore(app);db.settings({preferRest:!local});return {db,auth:getAuth(app),local,projectId};
 }
+/* KZ-REDCALINET-020 — Cursor opaco de la auditoría.
+   Lleva la fecha y el id del último registro entregado, para que la página
+   siguiente continúe exactamente detrás de él aunque varios registros
+   compartan la misma fecha. */
+const leerCursorAuditoria=c=>{
+ if(!c)return null;
+ try{const [fecha,id]=Buffer.from(String(c),'base64url').toString('utf8').split('|');return fecha&&id?{fecha,id}:null}catch{return null}
+};
+const escribirCursorAuditoria=(fecha,id)=>Buffer.from(fecha+'|'+id,'utf8').toString('base64url');
 export class Store{
  constructor({db,auth,local,projectId}){Object.assign(this,{db,auth,local,projectId})}
  async actor(token){if(!token)throw new Fault(401,'Inicia sesión.');let decoded;try{decoded=await this.auth.verifyIdToken(token,true)}catch{throw new Fault(401,'Sesión inválida o vencida.');}const record=await this.db.doc('usuarios/'+decoded.uid).get();const user=record.data();if(!user||user.activo!==true||!['PROPIETARIO','SUPERADMIN'].includes(user.rol))throw new Fault(403,'Cuenta sin permisos administrativos activos.');return{uid:decoded.uid,email:decoded.email||'',rol:user.rol,nombre:user.nombre||''}}
@@ -17,6 +26,19 @@ export class Store{
  async hydrate(c,d){const extra=(await this.meta(c,d.id).get()).data()||{};return{...defaults(c),...(c==='categorias'?{tipo:catalogType({},d.data())}:{}),...d.data(),...extra,id:d.id}}
  async list(c,actor,cursor=''){
   if(c==='auditoria'||c==='usuarios')this.requireSuper(actor);if(![...CATALOG,'configuracion','usuarios','auditoria'].includes(c))throw new Fault(404,'Colección no disponible.');
+  /* KZ-REDCALINET-020 — La auditoría se ordena y pagina EN EL SERVIDOR por
+     fecha descendente (lo más reciente primero) con el id del documento como
+     desempate. La primera página trae lo último ocurrido y las siguientes
+     continúan exactamente donde terminó la anterior: sin duplicados ni
+     omisiones aunque varias entradas compartan fecha. Consulta de solo
+     lectura: no modifica ningún documento histórico. */
+  if(c==='auditoria'){
+   const desde=leerCursorAuditoria(cursor);
+   let q=this.db.collection('auditoria').orderBy('fecha','desc').orderBy('__name__','desc').limit(101);
+   if(desde)q=q.startAfter(desde.fecha,desde.id);
+   const snap=await q.get(),todos=snap.docs.map(d=>({id:d.id,...d.data()})),items=todos.slice(0,100),ultimo=items.at(-1);
+   return{items,next:todos.length>100&&ultimo?escribirCursorAuditoria(ultimo.fecha,ultimo.id):null};
+  }
   const cats=['productos','servicios'].includes(c)?await this.db.collection('categorias').get():null,byCat=new Map(cats?.docs.map(d=>[d.id,d.data()]));let rows=[],after=cursor? id(cursor):null;
   do{let q=this.db.collection(this.physical(c)).orderBy('__name__').limit(101);if(after)q=q.startAfter(after);const snap=await q.get();for(const d of snap.docs){if(['productos','servicios'].includes(c)&&catalogType(d.data(),byCat.get(d.data().categoriaId))!==(c==='productos'?'producto':'servicio'))continue;rows.push(['productos','servicios','categorias','configuracion'].includes(c)?await this.hydrate(c,d):{id:d.id,...d.data()});if(rows.length===101)break;}if(rows.length>100||snap.size<101)break;after=snap.docs.at(-1).id;}while(true);
   return{items:rows.slice(0,100),next:rows.length>100?rows[99].id:null};

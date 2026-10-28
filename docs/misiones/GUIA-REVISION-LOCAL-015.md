@@ -133,22 +133,32 @@ Restauración comprobada el 28-oct-2026 (clon en `integracion/panel-codex`, hist
 completa, `admin/` con los 49 archivos, `firestore.v3.rules` y los informes de misión). La
 rama también vive en el repositorio local, intacta, sin upstream.
 
-## 6. Limitación pendiente (declarada, no resuelta)
+## 6. Recuperación del emulador de Auth (RESUELTO en KZ-020)
 
-**La recuperación del emulador de Auth no está ejercitada.** En la validación de
-KZ-REDCALINET-014:
+En KZ-014 la exportación de Auth fallaba con `PROJECT_NOT_FOUND`. **Ya está resuelto**: la
+clave es exportar con `--only auth` y con el emulador arrancado por la CLI, que es quien
+registra el hub.
 
-- La de **Firestore sí fue real**: se destruyó el emulador y se reconstruyó desde el
-  export, con hash y conteos idénticos en las 8 colecciones (`test/persistence.mjs`
-  → 4/4).
-- La de **Auth no**: `firebase auth:export` falló contra el emulador con
-  `PROJECT_NOT_FOUND` en `identitytoolkit`; el CLI intentó ir a la API de Google en lugar
-  del emulador. Así que el emulador de Auth **no se reinició** y la comprobación de
-  cuentas pasó sin ejercer destrucción/recuperación.
+```powershell
+cd admin
+# 1. Exportar el estado de Auth (con el emulador arriba)
+node node_modules\firebase-tools\lib\bin\firebase.js emulators:export .runtime\export-auth `
+  --only auth --project demo-redcalinet-admin --config emulators/firebase.json
 
-Consecuencia práctica para esta revisión: si se reinicia el emulador de Auth, las cuentas
-desaparecen y hay que volver a ejecutar `scripts/bootstrap-emulator.mjs`. No hay
-procedimiento automático de exportación/importación de Auth verificado.
+# 2. Reiniciar el emulador importando la exportación
+node node_modules\firebase-tools\lib\bin\firebase.js emulators:start --only auth `
+  --project demo-redcalinet-admin --config emulators/firebase.json --import=.runtime\export-auth
+```
+
+El `accounts.json` exportado lleva `localId`, `email`, `salt` y `passwordHash`, así que se
+recuperan **identidades, contraseñas y el estado `disabled`**. Verificado el 28-oct-2026 con
+`node test/auth-recuperacion-020.mjs antes|despues`: 5/5 antes del reinicio y 17/17 después
+(mismas cuentas y uid, `disabled` intacto, login con la contraseña original, roles y
+permisos iguales, cuenta cesada sigue bloqueada y un token emitido antes del reinicio queda
+rechazado con 401).
+
+Si se reinicia el emulador **sin** importar, las cuentas desaparecen y hay que volver a
+ejecutar `scripts/bootstrap-emulator.mjs`.
 
 ## 7. Lo que esta revisión NO es
 
