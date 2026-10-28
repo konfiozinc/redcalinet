@@ -84,11 +84,17 @@ const FALLBACK = {
   ]
 };
 
-function destinoWhatsApp(value) {
-  try {
-    const url = new URL(value);
-    return url.protocol === "https:" && url.hostname === "wa.me" && !url.username && !url.password && !url.port && /^\/[1-9]\d{7,14}$/.test(url.pathname) && !url.search && !url.hash ? url.href : null;
-  } catch { return null; }
+const CLAVE_LOCAL = "redcalinet-contacto";
+
+const $ = (s) => document.querySelector(s);
+const $$ = (s) => Array.from(document.querySelectorAll(s));
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+/* Solo acepto ids de icono del sprite; cualquier otra cosa cae a un check. */
+const icono = (id) => (/^i-[a-z]+$/.test(String(id)) ? id : "i-check");
+
+function svg(id, clase) {
+  return '<svg class="ico' + (clase ? " " + clase : "") + '" aria-hidden="true"><use href="#' + icono(id) + '"></use></svg>';
 }
 
 /* ============================================================
@@ -918,16 +924,24 @@ function prepararCabecera() {
 }
 
 function prepararMenu() {
-  const btn = $("#menuBtn"), nav = $("#nav");
+  const btn = $("#menuBtn");
+  const nav = $("#nav");
   if (!btn || !nav) return;
-  const cerrar = () => { nav.classList.remove("abierto"); btn.setAttribute("aria-expanded","false"); btn.setAttribute("aria-label","Abrir menú"); };
+
+  const cerrar = () => {
+    nav.classList.remove("abierto");
+    btn.setAttribute("aria-expanded", "false");
+    btn.setAttribute("aria-label", "Abrir menú");
+  };
+
   btn.addEventListener("click", () => {
-    const opened = nav.classList.toggle("abierto");
-    btn.setAttribute("aria-expanded",String(opened)); btn.setAttribute("aria-label",opened ? "Cerrar menú" : "Abrir menú");
+    const abierto = nav.classList.toggle("abierto");
+    btn.setAttribute("aria-expanded", String(abierto));
+    btn.setAttribute("aria-label", abierto ? "Cerrar menú" : "Abrir menú");
   });
-  nav.addEventListener("click", event => { if (event.target.closest("a")) cerrar(); });
-  document.addEventListener("keydown", event => {
-    if (event.key === "Escape" && nav.classList.contains("abierto")) { const focusInside = nav.contains(document.activeElement); cerrar(); if (focusInside) btn.focus(); }
+
+  nav.addEventListener("click", (e) => {
+    if (e.target.closest("a")) cerrar();
   });
 
   document.addEventListener("keydown", (e) => {
@@ -1286,5 +1300,3 @@ if (typeof module !== "undefined" && module.exports) {
     FALLBACK
   };
 }
-if (document.readyState === "loading") document.addEventListener("DOMContentLoaded",iniciar,{once:true});
-else iniciar();
