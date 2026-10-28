@@ -1,0 +1,72 @@
+rules_version = '2';
+
+// ============================================================
+// Red CaliNet — Firestore Security Rules · v3 (CANDIDATA)
+// ------------------------------------------------------------
+// KZ-REDCALINET-014. Este archivo NO está desplegado: producción sigue
+// con `firestore.rules` (v2). La promoción es explícita y autorizada:
+//     git mv firestore.v3.rules firestore.rules
+//     firebase deploy --only firestore:rules
+//
+// QUÉ CAMBIA FRENTE A v2 Y POR QUÉ
+//
+// 1. Se elimina TODA escritura de cliente.
+//    El panel deja de escribir Firestore desde el navegador: las
+//    escrituras entran solo por la API Node con Admin SDK, que valida los
+//    campos, comprueba activo/rol y sella la auditoría en la MISMA
+//    transacción. Un cliente que escriba directo ya no puede saltarse la
+//    validación ni la auditoría: simplemente no puede escribir.
+//    Esto cierra el hallazgo A-02 de la auditoría 012.
+//
+// 2. Se elimina la lectura de cliente de usuarios/{uid}.
+//    El rol y el campo `activo` los resuelve la API contra el documento
+//    real; ni la landing ni el panel los necesitan por SDK. Con esto el
+//    hallazgo A-01 (`activo` ignorado por las reglas) deja de tener
+//    superficie: no queda lectura de rol en el cliente que ignorar.
+//
+// 3. configuracion queda restringida a los DOS documentos del contrato.
+//    Antes cualquier documento de esa colección era legible en público.
+//
+// 4. Auditoría, `_adminRegistros`, multimedia, promociones y cualquier
+//    colección futura quedan cerradas por el bloque final. El Admin SDK
+//    no pasa por estas reglas, así que el panel sigue funcionando.
+//
+// LO QUE NO CAMBIA: las cuatro consultas públicas oficiales del catálogo
+// (configuracion/empresa, configuracion/contacto, categorias y servicios
+// filtrado por estado == 'PUBLICADO'), verificadas por tools/test-reglas-publico.js.
+// ============================================================
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Configuración de la empresa: solo los dos documentos del contrato.
+    match /configuracion/{id} {
+      allow read: if id == 'empresa' || id == 'contacto';
+      allow write: if false;
+    }
+
+    // Categorías: lectura pública (el flag `visible` se filtra en la landing).
+    match /categorias/{id} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    // Servicios: el público solo alcanza lo PUBLICADO, y siempre filtrando
+    // por `estado` (la regla no se puede satisfacer con una lista abierta).
+    match /servicios/{id} {
+      allow read: if resource.data.estado == 'PUBLICADO';
+      allow write: if false;
+    }
+
+    // Usuarios y roles: sin acceso de cliente. Se administran por la API.
+    match /usuarios/{uid} {
+      allow read, write: if false;
+    }
+
+    // Todo lo demás (auditoria, _adminRegistros, multimedia, promociones…):
+    // cerrado. Estas colecciones solo las toca el Admin SDK desde el servidor.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

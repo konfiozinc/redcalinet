@@ -154,16 +154,28 @@ chk('el script trae el respaldo embebido', Boolean(respaldo));
 /* ---------- 8. Compatibilidad con el panel administrativo ---------- */
 console.log('\n== Compatibilidad con el panel (Codex Sites) ==');
 
-const rutaPanel = path.join(ROOT, 'admin/panel.js');
-if (!fs.existsSync(rutaPanel)) {
-  chk('panel administrativo localizado', false, 'no existe admin/panel.js: se omite la comprobación');
-} else {
-  const panel = leer('admin/panel.js');
-  /* Campos que el panel escribe en `servicios` y en `categorias`. */
-  const camposServicio = unicos(Array.from(panel.matchAll(/fd\.get\("([A-Za-z]+)"\)/g), (m) => m[1]));
-  const camposCategoria = unicos(Array.from(panel.matchAll(/name="([A-Za-z]+)"/g), (m) => m[1]));
+/* KZ-REDCALINET-014: el panel MVP que escribía desde el navegador
+   (admin/panel.js) se retiró por decisión de arquitectura. El panel vigente
+   es el de Codex Sites: la SPA en admin/src/app.js y la API Node en
+   admin/server/*.mjs, que es la única que escribe en Firestore. Por eso la
+   fuente de verdad de los campos públicos ya no es un formulario HTML sino
+   PUBLIC_FIELDS en admin/server/schema.mjs. */
+const rutaSchema = path.join(ROOT, 'admin/server/schema.mjs');
+const rutaSpa = path.join(ROOT, 'admin/src/app.js');
+const hayPanel = fs.existsSync(rutaSchema) && fs.existsSync(rutaSpa);
+chk('panel administrativo localizado', hayPanel,
+  hayPanel ? 'API + SPA del panel presentes' : 'falta admin/server/schema.mjs o admin/src/app.js');
 
-  chk('el panel escribe campos', camposServicio.length >= 5, camposServicio.join(', '));
+if (hayPanel) {
+  const schema = leer('admin/server/schema.mjs');
+  const bloqueCatalogo = schema.match(/catalogo:\s*\[([^\]]+)\]/);
+  const bloqueCategorias = schema.match(/categorias:\s*\[([^\]]+)\]/);
+  const camposDe = (bloque) => (bloque ? unicos(Array.from(bloque[1].matchAll(/'([A-Za-z]+)'/g), (m) => m[1])) : []);
+  const camposServicio = camposDe(bloqueCatalogo);
+  const camposCategoria = camposDe(bloqueCategorias);
+
+  chk('el panel escribe campos', camposServicio.length >= 5,
+    camposServicio.length + ' de catálogo · ' + camposCategoria.length + ' de categoría');
 
   /* El catálogo accede a los documentos con punto (doc.nombre, cat.icono…),
      así que el campo cuenta como leído si aparece como `<algo>.<campo>`. */
@@ -174,8 +186,9 @@ if (!fs.existsSync(rutaPanel)) {
     ignorados.length === 0, ignorados.length ? 'ignora: ' + ignorados.join(', ') : todos.length + ' campos');
 
   /* Si el catálogo ignora un campo del panel, el propietario editaría algo
-     que no se ve. Es la garantía de que Codex Sites pueda gestionarlo después. */
-  const estadosPanel = unicos(Array.from(panel.matchAll(/"(BORRADOR|PUBLICADO|OCULTO)"/g), (m) => m[1]));
+     que no se ve. Es la garantía de que el panel siga siendo útil cuando
+     cambie de manos. */
+  const estadosPanel = unicos(Array.from(schema.matchAll(/'(BORRADOR|PUBLICADO|OCULTO)'/g), (m) => m[1]));
   chk('el catálogo conoce los tres estados del panel', estadosPanel.length === 3, estadosPanel.join(', '));
   chk('el estado PUBLICADO aparece en el catálogo', js.indexOf('"PUBLICADO"') !== -1);
 }
