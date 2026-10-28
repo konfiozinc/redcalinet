@@ -1,0 +1,36 @@
+{
+  "proyecto": "red-calinet",
+  "estado": "PREVISTO — no activado en producción",
+  "proveedor": {
+    "emailPassword": true,
+    "enlaceMagico": false,
+    "telefono": false,
+    "proveedoresOAuth": []
+  },
+  "dominiosAutorizados": [
+    "localhost",
+    "<SUBDOMINIO>.workers.dev",
+    "konfiozinc.github.io"
+  ],
+  "politicaDeContrasena": {
+    "minimoCaracteres": 12,
+    "exigirMayusculaMinuscula": true,
+    "exigirNumero": true,
+    "exigirSimbolo": false,
+    "nota": "Se aplica al definir la contraseña con el enlace de restablecimiento; nadie más la conoce."
+  },
+  "cuentasPrevistas": [
+    { "correo": "redcalinet9@gmail.com", "rol": "SUPERADMIN" },
+    { "correo": "redcalinetmono@gmail.com", "rol": "PROPIETARIO" }
+  ],
+  "reglasDeActivacion": [
+    "Las cuentas se crean SIN contraseña y deshabilitadas (disabled=true en Auth, activo=false en usuarios).",
+    "No se activa ninguna cuenta hasta que el API esté verificado y las reglas v3 desplegadas.",
+    "La contraseña la define cada responsable con su enlace de restablecimiento; nunca se genera ni se guarda una por defecto.",
+    "El rol se fija en cuentas-previstas.json y no puede pedirse por línea de comandos."
+  ],
+  "notas": [
+    "Este archivo NO contiene credenciales. Solo declara la configuración deseada de Authentication.",
+    "Activarlo es una acción del propietario en la consola de Firebase; el repositorio no la ejecuta."
+  ]
+}

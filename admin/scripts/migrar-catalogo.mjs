@@ -5,7 +5,7 @@
 //   configuracion/empresa, configuracion/contacto, categorias y servicios.
 //
 // Reglas de la herramienta:
-//   · SOLO emuladores. Se niega a correr contra producción.
+//   · Emuladores por defecto. Producción solo con --entorno produccion, el
 //   · Idempotente: cada registro lleva una clave de operación derivada de su
 //     contenido; repetir la migración con los mismos datos no escribe nada.
 //   · Valida con el MISMO esquema que usa el API (admin/server/schema.mjs).
@@ -19,6 +19,7 @@
 //   node scripts/migrar-catalogo.mjs                     # vista previa
 //   node scripts/migrar-catalogo.mjs --aplicar           # escribe
 //   node scripts/migrar-catalogo.mjs --revertir <archivo.json>
+//   node scripts/migrar-catalogo.mjs --entorno produccion --aplicar --confirmar red-calinet
 
 import fs from 'node:fs/promises';
 import crypto from 'node:crypto';
@@ -40,9 +41,31 @@ const clave = (coleccion, id, valores) => 'migracion-' + coleccion + '-' + id + 
 /* El API guarda productos y servicios en la MISMA colección física. */
 const fisica = (c) => (c === 'productos' ? 'servicios' : c);
 
-const runtime = initFirebase();
-if (!runtime.local) {
-  console.error('ABORTADO: esta herramienta solo funciona con emuladores (RCL_MODE=emulator).');
+/* Guardián de entorno. En producción exige las tres condiciones a la vez
+   (proyecto correcto, credenciales fuera del repositorio y confirmación
+   explícita del proyecto) y sigue exigiendo --aplicar para escribir. */
+const entorno = (() => { const i = process.argv.indexOf('--entorno'); return i > 0 ? process.argv[i + 1] : 'emulador'; })();
+const produccion = entorno === 'produccion';
+const confirmar = (() => { const i = process.argv.indexOf('--confirmar'); return i > 0 ? process.argv[i + 1] : ''; })();
+const planCuentas = JSON.parse(await fs.readFile(new URL('../deploy/cuentas-previstas.json', import.meta.url), 'utf8'));
+
+if (produccion) {
+  if (process.env.RCL_MODE === 'emulator') { console.error('ABORTADO: contradicción RCL_MODE=emulator con --entorno produccion.'); process.exit(2); }
+  if (process.env.GCLOUD_PROJECT !== planCuentas.proyecto) { console.error('ABORTADO: GCLOUD_PROJECT debe ser ' + plan.proyecto + '.'); process.exit(2); }
+  if (!process.env.GOOGLE_APPLICATION_CREDENTIALS) { console.error('ABORTADO: falta GOOGLE_APPLICATION_CREDENTIALS (ruta fuera del repositorio).'); process.exit(2); }
+  if (aplicar && confirmar !== planCuentas.proyecto) { console.error('ABORTADO: en producción, --aplicar exige --confirmar ' + planCuentas.proyecto); process.exit(2); }
+} else if (process.env.RCL_MODE !== 'emulator' || !process.env.FIRESTORE_EMULATOR_HOST || !process.env.FIREBASE_AUTH_EMULATOR_HOST) {
+  console.error('ABORTADO: modo emulador: exporta RCL_MODE=emulator y los dos *_EMULATOR_HOST. Para producción añade --entorno produccion.');
+  process.exit(2);
+}
+
+let runtime;
+try {
+  runtime = initFirebase();
+} catch (e) {
+  // En producción esto incluye el cerrojo del contrato: si no está promovido a
+  // HARNESS_VERIFIED con su hash aprobado, no se toca nada.
+  console.error('ABORTADO al inicializar Firebase: ' + e.message);
   process.exit(2);
 }
 const db = runtime.db;

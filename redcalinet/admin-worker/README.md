@@ -91,3 +91,42 @@ la verificación.
 4. Alta de cuentas por lotes con `admin/scripts/alta-cuentas.mjs` (GitHub Actions): el Worker
    **no** crea identidades en Auth — no expone esa capacidad a propósito.
 5. Desplegar el Worker, verificar y **solo después** desplegar las reglas v3.
+
+## Publicar y revertir (producción)
+
+**No ejecutado en esta misión.** No requiere cuenta nueva: es la cuenta de Cloudflare que ya
+opera la agencia.
+
+```powershell
+cd redcalinet/admin-worker
+
+# 1. Panel compilado y copiado (mismo dist que se aprobó)
+npm run panel
+
+# 2. Secretos: se piden una vez, no se escriben en el repositorio
+node node_modules/wrangler/bin/wrangler.js secret put FIREBASE_SA --env produccion
+node node_modules/wrangler/bin/wrangler.js secret put CLOUDINARY_API_SECRET --env produccion   # solo al habilitar la subida real
+
+# 3. Completar los marcadores de wrangler.toml (entorno produccion)
+#    <FIREBASE_WEB_API_KEY_PUBLICA>, <SUBDOMINIO>, <CLOUDINARY_CLOUD_NAME>, <CLOUDINARY_API_KEY>
+
+# 4. Publicar
+node node_modules/wrangler/bin/wrangler.js deploy --env produccion
+
+# 5. Verificar antes de tocar nada más
+curl https://<SUBDOMINIO>.workers.dev/admin/api/bootstrap   # esperado: local=false, entorno=WORKER_CLOUDFLARE
+```
+
+**Reversión inmediata** (vuelve a la versión anterior ya publicada):
+
+```powershell
+node node_modules/wrangler/bin/wrangler.js deployments list --env produccion
+node node_modules/wrangler/bin/wrangler.js rollback <ID_DESPLIEGUE> --env produccion
+```
+
+**Reversión de datos**: la migración deja un respaldo JSON antes de escribir; se restaura con
+`node scripts/migrar-catalogo.mjs --revertir <archivo.json>`. Las reglas v3 se revierten
+desplegando el `firestore.rules` v2 del commit `17a2d06`.
+
+**Orden obligatorio:** Worker publicado y verificado → reglas v3 → certificación de permisos →
+activación de cuentas → migración del catálogo → publicación de la URL del panel.

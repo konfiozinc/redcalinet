@@ -61,12 +61,19 @@ async function hidratar(db, c, publico) {
 
 /* ---------- validación de relaciones (antes del commit, ver cabecera) ---------- */
 
+/* Devuelve las escrituras "testigo" que hay que incluir en el MISMO commit: un
+   update sin cambios sobre cada documento relacionado con su `updateTime` leído.
+   Si la categoría o el archivo cambian o se borran entre la validación y el
+   commit, la precondición falla y NADA se escribe: no quedan datos
+   inconsistentes. Es la alternativa correcta a una transacción de lectura-escritura
+   sobre varios documentos, que Cloud Firestore REST no ofrece. */
 async function validarRelaciones(db, c, row) {
+  const testigos = [];
   const lecturas = [];
   if (row.categoriaId) lecturas.push('categorias/' + id(row.categoriaId));
   for (const campo of ['imagenes', 'videos']) for (const mid of row[campo] || []) lecturas.push('multimedia/' + id(mid));
   if (c === 'promociones') for (const campo of ['productos', 'servicios']) for (const rid of row[campo] || []) lecturas.push('servicios/' + id(rid));
-  if (!lecturas.length) return {};
+  if (!lecturas.length) return { testigos };
   const docs = await db.leer(lecturas);
 
   if (row.categoriaId) {
@@ -74,6 +81,7 @@ async function validarRelaciones(db, c, row) {
     if (!categoria || (row.estado === 'PUBLICADO' && categoria.visible !== true)) {
       throw new Fault(400, 'Categoría inexistente o inactiva.');
     }
+    testigos.push({ actualizar: 'categorias/' + row.categoriaId, datos: { nombre: categoria.nombre }, mascara: ['nombre'], tiempo: categoria._updateTime });
   }
   for (const [campo, tipo] of [['imagenes', 'image'], ['videos', 'video']]) {
     for (const mid of row[campo] || []) {
@@ -85,6 +93,7 @@ async function validarRelaciones(db, c, row) {
           (archivo.estado !== 'PUBLICADO' || archivo.procesamiento !== 'LISTO' || (tipo === 'image' && !archivo.alt))) {
         throw new Fault(400, 'Publica primero los archivos con texto alternativo y procesamiento completo.');
       }
+      testigos.push({ actualizar: 'multimedia/' + mid, datos: { tipo: archivo.tipo }, mascara: ['tipo'], tiempo: archivo._updateTime });
     }
   }
   if (c === 'promociones') {
@@ -95,7 +104,7 @@ async function validarRelaciones(db, c, row) {
       }
     }
   }
-  return docs;
+  return { testigos };
 }
 
 /* ---------- guardar (crear / editar) con auditoría en el mismo commit ---------- */
@@ -138,7 +147,7 @@ async function guardar(env, db, quien, { coleccion: c, rid, valores: entrada, re
   const anterior = { ...(existente || {}), ...(extra || {}) };
   const row = validate(c, entrada, anterior);
   if (['productos', 'servicios'].includes(c) && !row.categoriaId) throw new Fault(400, 'Selecciona una categoría existente.');
-  await validarRelaciones(db, c, row);
+  const { testigos } = await validarRelaciones(db, c, row);
   if (c === 'multimedia' && row.estado === 'PUBLICADO' && (row.procesamiento !== 'LISTO' || (row.tipo === 'image' && !row.alt))) {
     throw new Fault(400, 'Completa el texto alternativo y espera el procesamiento.');
   }
@@ -177,6 +186,8 @@ async function guardar(env, db, quien, { coleccion: c, rid, valores: entrada, re
       : { crear: rutaPublica, datos: row });
   }
 
+  // Testigos de concurrencia: si una relación cambió o desapareció, el commit falla entero.
+  escrituras.push(...testigos);
   escrituras.push({
     crear: rutaAuditoria,
     datos: {
@@ -189,7 +200,7 @@ async function guardar(env, db, quien, { coleccion: c, rid, valores: entrada, re
   if (!resultado.ok) {
     const detalle = JSON.stringify(resultado.datos || {});
     if (resultado.status === 409 || /ALREADY_EXISTS|FAILED_PRECONDITION|aborted/i.test(detalle)) {
-      throw new Fault(409, 'El registro cambió o la operación ya se aplicó. Recarga antes de guardar.');
+      throw new Fault(409, 'El registro o una de sus relaciones cambió mientras guardabas. Recarga antes de guardar.');
     }
     const detalleCommit = JSON.stringify(resultado.datos || {}).slice(0, 300);
     throw new Fault(502, 'No se pudo guardar en Firestore.' + (media.esEmulador(env) ? ' [' + resultado.status + '] ' + detalleCommit : ''));
