@@ -90,11 +90,23 @@ cd ..\.. ; node tools\servir-sitio.js
 
 ### Trampas conocidas del entorno
 
-- **El emulador de Firestore debe arrancar con `--rules firestore.v3.rules`.** Si se arranca
-  sin ese argumento, aplica las reglas v2 del repositorio y **las pruebas de denegación pasan
-  a dar 200**: cualquier PATCH directo de un PROPIETARIO a `servicios`, `categorias` o
-  `configuracion` se acepta. Comprobado el 28-oct-2026: comprueba siempre que un PATCH directo
-  devuelve 403 antes de creer los resultados.
+- **El emulador de Firestore tiene UN solo ruleset activo y el último que carga gana.**
+  `--rules firestore.v3.rules` solo fija el ruleset **inicial**. Cualquier suite que use
+  `@firebase/rules-unit-testing` (`initializeTestEnvironment` con el contenido de un archivo)
+  **sobrescribe** el ruleset de la instancia compartida y lo deja puesto al terminar. Medido el
+  28-oct-2026 con A/B reproducible sobre el mismo proceso:
+  - tras `test/rules-v3.mjs` o `test/escrituras-v3-023.mjs` (cargan **v3**) → un PATCH directo
+    con token real de PROPIETARIO devuelve **403** y **no** modifica el dato;
+  - tras `test/rules.mjs` o `test/harness-contract.mjs` (cargan las **reglas del Harness**, del
+    tipo v2: escritura de cliente para PROPIETARIO/SUPERADMIN) → el mismo PATCH devuelve **200**
+    y **sí** modifica el dato.
+
+  **Regla de oro:** antes de creer cualquier prueba de denegación, comprueba qué ruleset está
+  activo con `node test/sonda-ruleset-023.mjs` (sale con código 0 solo si v3 está cargado). Un
+  200 ahí **no** significa que las reglas v3 estén mal: significa que el ruleset activo no es v3.
+- Un PATCH al emulador con `updateMask` mal escapado desde PowerShell devuelve **400**
+  (`Document name ... lacks "/"`), no 403. No confundas ese 400 con un resultado de seguridad:
+  usa un cliente HTTP que no reescriba la URL.
 - Los argumentos `-Duser.language=en -Duser.country=US` no son decorativos: con locale español
   el emulador falla al compilar las reglas.
 - **Vite y Playwright necesitan crear procesos hijo con tuberías** (esbuild su canal de
@@ -123,6 +135,7 @@ lanza un hijo por archivo. Ejecuta el archivo directamente, que corre en el mism
 ```powershell
 $env:RCL_CHROMIUM="$env:LOCALAPPDATA\ms-playwright\chromium-1243\chrome-win64\chrome.exe"
 node test/integration.mjs            # 45 · ciclo del API y contrato público
+node test/escrituras-v3-023.mjs      # 59 · v3: ninguna identidad escribe directo (determinista)
 node test/subida-directa-023.mjs     # 43 · subida directa firmada de punta a punta
 node test/rules.mjs                  # 42 · contrato Harness
 node test/rules-v3.mjs               # 35 · reglas v3 con rules-unit-testing
@@ -152,12 +165,13 @@ los identificadores de multimedia de `admin/.runtime/integration-results.json`.
 para ejercitar la paginación; en un emulador recién sembrado falla en «el cursor avanza» sin
 que haya defecto alguno. Ejecuta antes `joint-014` o `integration` para generar volumen.
 
-**Inestabilidad conocida (28-oct-2026).** Las dos comprobaciones `DENEGAR` de `joint-014`
-(petición directa a Firestore con token real) dan **403 correctamente en un emulador recién
-arrancado** y pasaron a dar **200 tras horas de uso continuo**, con reinicios de conexión
-repetidos en el log del emulador. No es un defecto del API ni de `firestore.v3.rules` (que
-declaran `allow write: if false` sin condiciones): es el motor de reglas del emulador. Si
-aparece, reinicia el emulador y vuelve a comprobarlo antes de dar por roto el aislamiento.
+**Causa raíz del vaivén 403 → 200 en `joint-014` (resuelta el 28-oct-2026).** Las dos
+comprobaciones `DENEGAR` de `joint-014` lanzan un PATCH directo a Firestore con un token real.
+Su resultado depende del **ruleset activo**, no de `joint-014` y no del API: 403 si la suite
+previa cargó v3, 200 si la suite previa cargó las reglas del Harness. No es una degradación del
+emulador ni un defecto de aislamiento: está demostrado con el experimento A/B de §3. Para que
+`joint-014` mida lo que dice medir, ejecútalo **después** de `test/escrituras-v3-023.mjs`, que
+deja v3 cargado y certificado.
 
 **No ejecutado en KZ-023:** `persistence.mjs`, que es un ciclo de dos fases
 (`before` → exportar → reiniciar el emulador importando → verificar). Requiere reiniciar los
@@ -300,7 +314,32 @@ marcó como probado. Es lo primero que hay que ensayar en la ventana de desplieg
 | B-07 | Migración inicial a producción: la herramienta solo corre en emuladores | Requiere una misión autorizada que añada el guardián de producción |
 | B-08 | Ensayo real de Cloudinary | Requiere B-04 |
 
-## 10. Reglas de trabajo
+## 10. Dictamen sobre el aislamiento de escrituras (reglas v3)
+
+**Certificado el 28-oct-2026 con `node test/escrituras-v3-023.mjs` → 59/59.** Metodología
+determinista: se carga el contenido de `firestore.v3.rules` en un entorno de pruebas
+controlado, se siembran documentos con las reglas desactivadas (equivalente al Admin SDK) y se
+intentan **create, update y delete** desde 6 identidades (anónimo, PROPIETARIO, SUPERADMIN,
+cuenta desactivada, cuenta sin rol y uid sin documento) sobre **8 colecciones** (`configuracion`,
+`categorias`, `servicios`, `usuarios`, `auditoria`, `multimedia`, `promociones`,
+`_adminRegistros`).
+
+Resultado: **ninguna escritura directa se acepta**, ningún documento cambia, y la lectura
+pública del contrato (empresa, contacto, categorías, servicios PUBLICADO) sigue funcionando
+mientras usuarios, auditoría, multimedia y borradores quedan cerrados. Artefacto:
+`admin/.runtime/escrituras-v3-023-results.json`.
+
+**Lo que NO queda certificado:** que el emulador mantenga v3 como ruleset activo entre suites
+(efecto de instancia compartida, ver §3), y el comportamiento en producción, porque
+**producción sigue con las reglas v2 desplegadas**.
+
+**Dictamen: NO-GO para producción.** El aislamiento de v3 está certificado en sí mismo, pero no
+se puede autorizar el paso a producción mientras: (1) las reglas v3 no estén desplegadas *y
+antes* el API esté funcionando; (2) Firebase Auth siga sin configurar; (3) Cloud Functions no
+tenga Blaze; (4) el contrato no esté promovido a `HARNESS_VERIFIED` con su hash aprobado; y
+(5) el adaptador real de Cloudinary no se haya ensayado contra el servicio.
+
+## 11. Reglas de trabajo
 
 - Sin push, sin merge, sin despliegue, sin Blaze, sin tocar Firebase real, sin Cloudinary real.
 - Commits por etapa, en `integracion/panel-codex`, con el árbol limpio entre etapas.
