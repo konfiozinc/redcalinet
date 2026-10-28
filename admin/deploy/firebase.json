@@ -1,0 +1,7 @@
+{
+  "functions": {
+    "source": ".",
+    "runtime": "nodejs22",
+    "predeploy": ["node preparar.mjs"]
+  }
+}
