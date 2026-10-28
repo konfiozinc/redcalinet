@@ -1,5 +1,11 @@
 # Guía de revisión local — KZ-REDCALINET-015
 
+> **Documento histórico (28-oct-2026).** La guía principal vigente es
+> [`GUIA-REDCALINET.md`](./GUIA-REDCALINET.md), que recoge el arranque del entorno, las
+> pruebas y la preparación de producción. Este documento se conserva porque dos cosas siguen
+> siendo útiles y no se repiten allí con detalle: la **copia recuperable de la rama** (§5) y la
+> **recuperación del emulador de Auth** (§6). Lo de §3 y §4 quedó superado.
+
 Cómo dejar el panel y la web funcionando en el navegador para revisión del
 propietario, y cómo reiniciar todo si se cierra la sesión.
 

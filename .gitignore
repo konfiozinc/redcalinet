@@ -14,6 +14,10 @@ desktop.ini
 # Node (por si se usan herramientas locales de captura/compresión)
 node_modules/
 
+# Artefacto de Hosting ensamblado por admin/deploy/preparar-hosting.mjs:
+# se regenera con `npm run build` + ese script, no se versiona.
+hosting-public/
+
 # Originales fuera del sitio desplegado (los scripts de tools/ sí se versionan)
 tools/originales/
 

@@ -14,9 +14,11 @@ export const api = onRequest(
   {
     region: process.env.RCL_FUNCTIONS_REGION || 'us-central1',
     memory: '512MiB',
-    // Las cargas son de hasta 25 MB (vídeo QA) y se sirven en streaming con
-    // Busboy; el timeout alto cubre subidas lentas en móvil.
-    timeoutSeconds: 120,
+    // Desde KZ-023 el archivo multimedia NO atraviesa la función: el navegador
+    // lo envía directo al proveedor con una firma de vida corta. La función solo
+    // recibe JSON pequeño (firma, registro, catálogo), así que 60 s sobran; el
+    // límite de tamaño lo pone el proveedor y no Cloud Functions.
+    timeoutSeconds: 60,
     maxInstances: 10,
     concurrency: 10
   },
