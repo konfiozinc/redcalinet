@@ -127,3 +127,33 @@ Firestore real, sin desplegar y sin push.
 - No crea cuentas de prueba ni correos ficticios.
 - No toca reglas, funciones ni datos del catálogo.
 - No imprime credenciales; el enlace de restablecimiento es de un solo uso.
+
+## Credenciales separadas por servicio (KZ-029)
+
+La herramienta usa **dos credenciales distintas**, cada una con el permiso mínimo:
+
+| Servicio | Credencial | Permiso |
+|---|---|---|
+| Firestore | cuenta de servicio del Worker (ADC) | `roles/datastore.user` |
+| Authentication | sesión del propietario en Firebase CLI | administrar usuarios de Auth (ya la tenía) |
+
+Así la cuenta de servicio `redcalinet-admin-worker` **no recibe ningún privilegio nuevo**.
+
+```powershell
+# El token del CLI vive solo en la variable de entorno de ese proceso: nunca en
+# argumentos, archivos, logs ni repositorio.
+$env:RCL_ACCESS_TOKEN = (Get-Content "$env:USERPROFILE\.config\configstore\firebase-tools.json" -Raw | ConvertFrom-Json).tokens.access_token
+$env:GOOGLE_APPLICATION_CREDENTIALS = "C:\ruta\fuera\del\repositorio\servicio.json"
+$env:GCLOUD_PROJECT = "red-calinet"
+
+node scripts/alta-cuentas.mjs --revisar --entorno produccion
+node scripts/alta-cuentas.mjs --crear --entorno produccion --cuenta <correo> --confirmar <correo>
+
+Remove-Item Env:RCL_ACCESS_TOKEN   # al terminar
+```
+
+Sin `RCL_ACCESS_TOKEN`, la herramienta se comporta como antes (todo por cuenta de servicio) y
+fallará en Authentication si esa cuenta no tiene permisos de Auth Admin.
+
+**Estado tras KZ-029:** las dos cuentas existen en Auth con `disabled=true`, sin contraseña, y
+con su documento `usuarios/{uid}` en `rol` correcto y `activo=false`. **Acceso bloqueado.**

@@ -61,10 +61,66 @@ if (modifica) {
 const proyecto = produccion ? plan.proyecto : (process.env.GCLOUD_PROJECT || 'demo-redcalinet-admin');
 const app = initializeApp({ projectId: proyecto, ...(produccion ? { credential: applicationDefault() } : {}) }, 'alta-cuentas');
 const auth = getAuth(app);
+
+/* KZ-029 — Credenciales SEPARADAS por servicio.
+   Firestore sigue usando la cuenta de servicio (ADC), que solo tiene
+   roles/datastore.user. Firebase Authentication se administra con la sesión ya
+   autenticada del propietario en el CLI, que llega por la variable de entorno
+   RCL_ACCESS_TOKEN: nunca por argumento, archivo, log ni repositorio.
+   Así la cuenta de servicio del Worker conserva sus permisos actuales. */
+const tokenCli = process.env.RCL_ACCESS_TOKEN || '';
+const authRest = tokenCli ? (() => {
+  const base = 'https://identitytoolkit.googleapis.com/v1/projects/' + proyecto + '/accounts';
+  const pedir = async (ruta, cuerpo) => {
+    const r = await fetch(base + ruta, {
+      method: 'POST',
+      headers: { Authorization: 'Bearer ' + tokenCli, 'Content-Type': 'application/json' },
+      body: JSON.stringify(cuerpo || {})
+    });
+    const datos = await r.json().catch(() => ({}));
+    return { ok: r.ok, status: r.status, datos };
+  };
+  const fallo = (datos, status) => {
+    const mensaje = (datos && datos.error && datos.error.message) || ('HTTP ' + status);
+    const e = new Error(mensaje);
+    e.code = mensaje === 'EMAIL_NOT_FOUND' ? 'auth/user-not-found' : 'auth/' + mensaje;
+    return e;
+  };
+  return {
+    async getUserByEmail(email) {
+      const r = await pedir(':lookup', { email: [email] });
+      const u = (r.datos.users || [])[0];
+      if (!u) throw fallo({ error: { message: 'EMAIL_NOT_FOUND' } }, r.status);
+      return { uid: u.localId, email: u.email || '', disabled: Boolean(u.disabled), emailVerified: Boolean(u.emailVerified) };
+    },
+    async createUser({ email, disabled }) {
+      const r = await pedir('', { email, emailVerified: false, disabled: disabled === true });
+      if (!r.ok) throw fallo(r.datos, r.status);
+      return { uid: r.datos.localId };
+    },
+    async updateUser(uid, campos) {
+      const cuerpo = { localId: uid };
+      if (typeof campos.disabled === 'boolean') cuerpo.disableUser = campos.disabled;
+      const r = await pedir(':update', cuerpo);
+      if (!r.ok) throw fallo(r.datos, r.status);
+      return { uid };
+    },
+    async generatePasswordResetLink(email) {
+      const r = await pedir(':sendOobCode', { requestType: 'PASSWORD_RESET', email, returnOobLink: true });
+      if (!r.ok) throw fallo(r.datos, r.status);
+      return r.datos.oobLink || '(el enlace se envia al correo)';
+    }
+  };
+})() : auth;
+
+/* Administración de Auth: sesión del CLI si está, cuenta de servicio si no. */
+const dirAuth = authRest;
+
+console.log('  credenciales: Firestore=cuenta de servicio · Auth=' + (tokenCli ? 'sesión del propietario (CLI)' : 'cuenta de servicio'));
 const db = getFirestore(app);
 
 const leer = async (correo) => {
-  const usuario = await auth.getUserByEmail(correo).catch(() => null);
+  const usuario = await dirAuth.getUserByEmail(correo).catch(() => null);
   const doc = usuario ? ((await db.doc('usuarios/' + usuario.uid).get()).data() || null) : null;
   const accesible = !!usuario && usuario.disabled === false && !!doc && doc.activo === true && ROLES.includes(doc.rol);
   return { usuario, doc, accesible };
@@ -81,7 +137,7 @@ const pintar = (correo, esperado, e) => {
 const documento = async (uid, c) => {
   const ahora = new Date().toISOString();
   const batch = db.batch();
-  batch.set(db.doc('usuarios/' + uid), { nombre: c.nombre, email: c.correo, rol: c.rol, activo: false, createdAt: ahora });
+  batch.set(db.doc('usuarios/' + uid), { nombre: c.nombre, email: c.correo, rol: c.rol, activo: false, revision: 1, createdAt: ahora, updatedAt: ahora });
   batch.set(db.doc('auditoria/alta-cuenta-' + uid), {
     actor: 'alta-cuentas', rol: 'SISTEMA', accion: 'CREAR_CUENTA', coleccion: 'usuarios',
     registro: uid, fecha: ahora, campos: ['email', 'rol', 'activo'], detalle: c.rol
@@ -109,21 +165,21 @@ if (accion === '--estado' || accion === '--revisar') {
       console.log('  la identidad ya existía en Auth (uid=' + e.usuario.uid + '); Auth NO se modificó');
       console.log('  documento usuarios/' + e.usuario.uid + ' creado con rol ' + c.rol + ' y activo=false');
       console.log('  sigue sin acceso hasta --activar. Enlace de restablecimiento:');
-      console.log('  ' + await auth.generatePasswordResetLink(c.correo));
+      console.log('  ' + await dirAuth.generatePasswordResetLink(c.correo));
     } else {
-      const uid = (await auth.createUser({ email: c.correo, emailVerified: false, disabled: true })).uid;
+      const uid = (await dirAuth.createUser({ email: c.correo, emailVerified: false, disabled: true })).uid;
       await documento(uid, c);
       console.log('  creada SIN contraseña, desactivada · usuarios/' + uid + ' con rol ' + c.rol + ' y activo=false');
       console.log('  enlace de restablecimiento (un solo uso, no se guarda):');
-      console.log('  ' + await auth.generatePasswordResetLink(c.correo));
+      console.log('  ' + await dirAuth.generatePasswordResetLink(c.correo));
     }
   } else if (accion === '--restablecer') {
     if (!e.usuario) salir('La cuenta no existe.');
-    console.log('  enlace de restablecimiento (un solo uso, no se guarda):\n  ' + await auth.generatePasswordResetLink(c.correo));
+    console.log('  enlace de restablecimiento (un solo uso, no se guarda):\n  ' + await dirAuth.generatePasswordResetLink(c.correo));
   } else if (accion === '--activar') {
     if (!e.usuario) salir('Primero crea la cuenta con --crear.');
     if (!e.doc || e.doc.rol !== c.rol) salir('El documento no tiene el rol previsto (' + c.rol + '). No se activa.');
-    await auth.updateUser(e.usuario.uid, { disabled: false });
+    await dirAuth.updateUser(e.usuario.uid, { disabled: false });
     await db.doc('usuarios/' + e.usuario.uid).update({ activo: true, activadoEn: new Date().toISOString() });
     e = await leer(c.correo);
     pintar(c.correo, c.rol, e);
@@ -131,7 +187,7 @@ if (accion === '--estado' || accion === '--revisar') {
     console.log('\n  LISTO: ' + c.correo + ' (' + c.rol + ') puede iniciar sesión.');
   } else if (accion === '--desactivar') {
     if (!e.usuario) salir('La cuenta no existe.');
-    await auth.updateUser(e.usuario.uid, { disabled: true });
+    await dirAuth.updateUser(e.usuario.uid, { disabled: true });
     await db.doc('usuarios/' + e.usuario.uid).update({ activo: false, desactivadoEn: new Date().toISOString() });
     console.log('  ' + c.correo + ': disabled=true y activo=false. El API la rechaza de inmediato.');
   } else if (accion === '--verificar') {
