@@ -17,7 +17,7 @@ documentos técnicos complementarios siguen citándose donde aportan detalle.
 | Panel administrativo | Integrado, 12 módulos, responsive | `admin/` |
 | Catálogo público | Aprobado y en producción en GitHub Pages | `index.html`, `data.json` |
 | API Node | Funcional en emuladores; **no desplegada** | `admin/server/` |
-| Reglas Firestore v3 | Candidatas, certificadas en emulador | `firestore.v3.rules` |
+| Reglas Firestore v3 | Candidatas, certificadas en emulador | `firestore.rules` |
 | Reglas desplegadas en producción | **siguen siendo v2** | `firestore.rules` |
 | Multimedia | **Subida directa firmada**, adaptador QA local | `admin/server/directa.mjs` |
 | Cuentas administrativas | Herramienta única, probada en emulador | `admin/scripts/alta-cuentas.mjs` |
@@ -57,7 +57,7 @@ cd C:\Users\usuario29\Documents\KONFIO_ZINC\6-LANDING-PAGES\RedCaliNet
 & "C:\Program Files\Android\Android Studio\jbr\bin\java.exe" `
   '-Duser.language=en' '-Duser.country=US' `
   -jar "$env:USERPROFILE\.cache\firebase\emulators\cloud-firestore-emulator-v1.22.0.jar" `
-  --host 127.0.0.1 --port 8080 --rules (Resolve-Path .\firestore.v3.rules)
+  --host 127.0.0.1 --port 8080 --rules (Resolve-Path .\firestore.rules)
 
 # 2. Auth (otra ventana)
 cd admin
@@ -91,7 +91,7 @@ cd ..\.. ; node tools\servir-sitio.js
 ### Trampas conocidas del entorno
 
 - **El emulador de Firestore tiene UN solo ruleset activo y el último que carga gana.**
-  `--rules firestore.v3.rules` solo fija el ruleset **inicial**. Cualquier suite que use
+  `--rules firestore.rules` solo fija el ruleset **inicial**. Cualquier suite que use
   `@firebase/rules-unit-testing` (`initializeTestEnvironment` con el contenido de un archivo)
   **sobrescribe** el ruleset de la instancia compartida y lo deja puesto al terminar. Medido el
   28-oct-2026 con A/B reproducible sobre el mismo proceso:
@@ -325,7 +325,7 @@ marcó como probado. Es lo primero que hay que ensayar en la ventana de desplieg
 ## 10. Dictamen sobre el aislamiento de escrituras (reglas v3)
 
 **Certificado el 28-oct-2026 con `node test/escrituras-v3-023.mjs` → 59/59.** Metodología
-determinista: se carga el contenido de `firestore.v3.rules` en un entorno de pruebas
+determinista: se carga el contenido de `firestore.rules` en un entorno de pruebas
 controlado, se siembran documentos con las reglas desactivadas (equivalente al Admin SDK) y se
 intentan **create, update y delete** desde 6 identidades (anónimo, PROPIETARIO, SUPERADMIN,
 cuenta desactivada, cuenta sin rol y uid sin documento) sobre **8 colecciones** (`configuracion`,

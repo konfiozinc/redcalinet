@@ -168,7 +168,7 @@ sin ninguna forma de editar el catálogo.
    un PATCH directo a `configuracion`, `categorias` y `servicios` debe devolver **403** y no
    modificar el dato. Ejecutarlo con `admin/test/sonda-ruleset-023.mjs` adaptado al proyecto
    real, **nunca** con la sonda apuntando al emulador.
-7. **Desplegar las reglas v3**: `git mv firestore.v3.rules firestore.rules` y
+7. **Desplegar las reglas v3**: `ya promocionado en KZ-031 (una sola fuente de verdad)` y
    `firebase deploy --only firestore:rules`. **Las reglas sí se despliegan en Spark**: no
    requieren facturación.
 8. **Repetir la prueba del paso 6** con las reglas ya desplegadas, y comprobar que el panel

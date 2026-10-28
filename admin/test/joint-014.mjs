@@ -6,7 +6,7 @@
 // crear, editar, publicar, ocultar, cambiar precio, desactivar usuario, denegar
 // escrituras directas, registrar auditoría y comprobar visibilidad en catálogo.
 //
-// Requiere: emulador de Firestore en 8080 con firestore.v3.rules cargadas,
+// Requiere: emulador de Firestore en 8080 con firestore.rules cargadas,
 // emulador de Auth en 9099 y la API del panel en 5176.
 // Ejecutar: cd admin && node test/joint-014.mjs
 

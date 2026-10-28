@@ -1,4 +1,4 @@
-// KZ-REDCALINET-014 — Prueba conjunta de las reglas v3 (firestore.v3.rules).
+// KZ-REDCALINET-014 — Prueba conjunta de las reglas v3 (firestore.rules).
 //
 // Esta suite la escribió el Harness, no Codex Sites. Comprueba exactamente lo
 // que la fase 2 de la misión exige y que ninguna de las dos partes había
@@ -16,7 +16,7 @@ import fs from 'node:fs/promises';
 import { initializeTestEnvironment, assertFails, assertSucceeds } from '@firebase/rules-unit-testing';
 import { doc, getDoc, getDocs, setDoc, updateDoc, deleteDoc, collection, query, where } from 'firebase/firestore';
 
-const reglas = await fs.readFile(new URL('../../firestore.v3.rules', import.meta.url), 'utf8');
+const reglas = await fs.readFile(new URL('../../firestore.rules', import.meta.url), 'utf8');
 
 const env = await initializeTestEnvironment({
   projectId: 'demo-redcalinet-admin',

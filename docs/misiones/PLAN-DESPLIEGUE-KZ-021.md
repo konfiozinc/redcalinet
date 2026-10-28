@@ -136,7 +136,7 @@ Cada paso indica qué rompe si se adelanta. El orden **no es negociable** en los
 | 4 | **Desplegar índices** (`firestore.indexes.json`) | paso 3 | la auditoría ordenada por fecha **fallaría en producción** |
 | 5 | **Promover el contrato** a `HARNESS_VERIFIED` y fijar `RCL_CONTRACT_APPROVED_HASH` | decisión del propietario | el API arranca y **se niega a servir** (falla cerrado) |
 | 6 | **Desplegar el API** (`functions:api`) y verificar `/admin/api/bootstrap` (`local:false`, contrato verificado) | pasos 1, 2, 5 | sin API verificada no se puede tocar reglas |
-| 7 | **Desplegar reglas v3** (`git mv firestore.v3.rules firestore.rules` + deploy) | **paso 6 funcionando** | **si se adelanta, nadie puede editar nada**: se cierra la escritura de cliente sin que exista la única puerta (la API) |
+| 7 | **Desplegar reglas v3** (`ya promocionado en KZ-031 (una sola fuente de verdad)` + deploy) | **paso 6 funcionando** | **si se adelanta, nadie puede editar nada**: se cierra la escritura de cliente sin que exista la única puerta (la API) |
 | 8 | **Publicar el panel** (Hosting o Pages) con el origen del API configurado | pasos 2, 6, 7 | panel sin backend o sin poder escribir |
 | 9 | **Crear el primer SUPERADMIN** a mano en Auth y en `usuarios` | pasos 2, 6, 7 | sin cuenta no se entra (y nunca con cuentas ficticias) |
 | 10 | **Publicar el catálogo aprobado** (línea `17a2d06`) en Pages | pasos 3, 7 | si se publica sin datos, la web funciona igual por `data.json`; no rompe nada |

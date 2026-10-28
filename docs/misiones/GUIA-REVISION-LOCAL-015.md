@@ -57,7 +57,7 @@ cd C:\Users\usuario29\Documents\KONFIO_ZINC\6-LANDING-PAGES\RedCaliNet
 & "C:\Program Files\Android\Android Studio\jbr\bin\java.exe" `
   '-Duser.language=en' '-Duser.country=US' `
   -jar "$env:USERPROFILE\.cache\firebase\emulators\cloud-firestore-emulator-v1.22.0.jar" `
-  --host 127.0.0.1 --port 8080 --rules (Resolve-Path .\firestore.v3.rules)
+  --host 127.0.0.1 --port 8080 --rules (Resolve-Path .\firestore.rules)
 
 # 2. Emulador de Auth (otra ventana)
 cd admin
@@ -136,7 +136,7 @@ git status --porcelain                                      # vacío
 ```
 
 Restauración comprobada el 28-oct-2026 (clon en `integracion/panel-codex`, historia
-completa, `admin/` con los 49 archivos, `firestore.v3.rules` y los informes de misión). La
+completa, `admin/` con los 49 archivos, `firestore.rules` y los informes de misión). La
 rama también vive en el repositorio local, intacta, sin upstream.
 
 ## 6. Recuperación del emulador de Auth (RESUELTO en KZ-020)

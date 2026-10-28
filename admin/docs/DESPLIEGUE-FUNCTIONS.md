@@ -64,7 +64,7 @@ a Firestore + Auth de ese proyecto. **Nunca** un JSON de cuenta de servicio en e
 
 ## 4. Seguridad
 
-1. **El Admin SDK no pasa por las reglas.** Por eso `firestore.v3.rules` cierra toda
+1. **El Admin SDK no pasa por las reglas.** Por eso `firestore.rules` cierra toda
    escritura de cliente: la API es el único camino de escritura, y con eso la validación y
    la auditoría no se pueden eludir.
 2. **Origen explícito.** `sameOrigin()` exige `Origin` en toda escritura y compara contra
@@ -113,7 +113,7 @@ curl https://<region>-<proyecto>.cloudfunctions.net/api/admin/api/bootstrap
 #    Debe responder local:false y contractStatus HARNESS_VERIFIED con el hash esperado.
 
 # 5. Reglas, DESPUÉS de que la API responda (si no, el dueño se queda sin poder editar)
-git mv firestore.v3.rules firestore.rules
+ya promocionado en KZ-031 (una sola fuente de verdad)
 firebase deploy --only firestore:rules --project red-calinet
 ```
 

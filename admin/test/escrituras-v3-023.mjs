@@ -4,7 +4,7 @@
 // ruleset tenga cargado el emulador: ¿alguna identidad administrativa puede
 // escribir DIRECTAMENTE en Firestore con las reglas v3?
 //
-// Se carga el archivo firestore.v3.rules en un entorno de pruebas controlado
+// Se carga el archivo firestore.rules en un entorno de pruebas controlado
 // (`initializeTestEnvironment`), se siembran documentos con las reglas
 // desactivadas (equivalente al Admin SDK) y se comprueba que create, update y
 // delete fallan para todas las identidades y todas las colecciones.
@@ -20,7 +20,7 @@ import assert from 'node:assert/strict';
 import { initializeTestEnvironment, assertFails, assertSucceeds } from '@firebase/rules-unit-testing';
 import { doc, getDoc, getDocs, setDoc, updateDoc, deleteDoc, collection, query, where } from 'firebase/firestore';
 
-const reglas = await fs.readFile(new URL('../../firestore.v3.rules', import.meta.url), 'utf8');
+const reglas = await fs.readFile(new URL('../../firestore.rules', import.meta.url), 'utf8');
 const env = await initializeTestEnvironment({
   projectId: 'demo-redcalinet-admin',
   firestore: { host: '127.0.0.1', port: 8080, rules: reglas }
@@ -118,7 +118,7 @@ for (const f of fallos) console.log('  · ' + f);
 
 const salida = new URL('../.runtime/escrituras-v3-023-results.json', import.meta.url);
 await fs.writeFile(salida, JSON.stringify({
-  reglas: 'firestore.v3.rules',
+  reglas: 'firestore.rules',
   identidades: IDENTIDADES.map(([n]) => n),
   colecciones: COLECCIONES,
   operaciones: ['create', 'update', 'delete'],
