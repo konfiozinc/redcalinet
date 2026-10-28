@@ -575,6 +575,18 @@ function pintarBeneficios() {
         "</article>"
     )
     .join("");
+
+  /* KZ-034 — Estas tarjetas se crean AQUI, despues de que el observador de
+     `.revelar` se registrara, asi que nunca recibian `.visible` y quedaban con
+     opacity 0 ocupando 142 + 118 + 142 px de altura vacia: ese era el hueco
+     blanco entre «Servicio garantizado» y el catalogo. Se marcan al pintarse. */
+  const pendientes = [...cont.querySelectorAll(".revelar:not(.visible)")];
+  if (!pendientes.length) return;
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    pendientes.forEach((el) => el.classList.add("visible"));
+    return;
+  }
+  pendientes.forEach((el, i) => setTimeout(() => el.classList.add("visible"), 90 * i));
 }
 
 function pintarInfo() {
