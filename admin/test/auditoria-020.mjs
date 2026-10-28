@@ -77,8 +77,15 @@ chk('todas las entradas traen fecha', fechas.every(Boolean));
 
 console.log('\n== Integridad de la paginación ==');
 const ids = uno.items.map((r) => r.id);
+/* La referencia solo puede contar documentos que la consulta ordenada por
+   `fecha` puede devolver: Firestore omite los documentos que no tienen el campo
+   de ordenación. `test/rules-v3.mjs` siembra `auditoria/a1` (sin fecha) para
+   probar reglas, y si esa siembra queda en el mismo emulador la referencia
+   anterior contaba un documento que ninguna consulta ordenada puede entregar.
+   El API siempre escribe `fecha`; esto corrige la referencia, no el criterio. */
+const conFecha = [...antes.entries()].filter(([, valor]) => typeof JSON.parse(valor).fecha === 'string').length;
 chk('sin duplicados entre páginas', new Set(ids).size === ids.length, ids.length + ' entregados, ' + new Set(ids).size + ' únicos');
-chk('sin omisiones: entrega todo lo que hay en la colección', ids.length === total, ids.length + ' de ' + total);
+chk('sin omisiones: entrega todo lo que hay en la colección', ids.length === conFecha, ids.length + ' de ' + conFecha + (conFecha === total ? '' : ' (' + (total - conFecha) + ' sin fecha, fuera de toda consulta ordenada)'));
 chk('los ids entregados son exactamente los de la colección', ids.every((i) => antes.has(i)));
 chk('recorrido repetido devuelve la misma secuencia', JSON.stringify(ids) === JSON.stringify(dos.items.map((r) => r.id)));
 chk('se usaron varias páginas (el cursor avanza)', uno.paginas > 1, uno.paginas + ' páginas');

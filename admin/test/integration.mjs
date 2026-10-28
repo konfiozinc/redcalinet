@@ -30,7 +30,20 @@ const stale=(await record('productos',product)).revision;ok(await edit('producto
 check('price and inventory persist',(await record('productos',product)).precio===49900&&(await record('productos',product)).stock===3);
 check('stale edit denied',(await edit('productos',product,{precio:20000},stale)).status===409);
 const png=await fs.readFile(new URL('../.runtime/fixtures/test.png',import.meta.url)),video=await fs.readFile(new URL('../.runtime/fixtures/test.mp4',import.meta.url));
-async function upload(buffer,type,title,token=superadmin){const form=new FormData();form.append('file',new Blob([buffer],{type}),'not-trusted-name');form.append('titulo',title);form.append('alt','Imagen ficticia de QA');const r=await fetch(BASE+'/admin/api/multimedia',{method:'POST',headers:{Origin:BASE,...(token?{Authorization:'Bearer '+token}:{})},body:form});return{status:r.status,data:await r.json()}}
+/* KZ-REDCALINET-023 — La carga ya no atraviesa la API: se pide la firma, el
+   archivo va directo al proveedor (adaptador QA local) y después se registran
+   los metadatos. Es el mismo recorrido que hace el navegador. */
+const EXT={'image/png':'.png','image/jpeg':'.jpg','image/webp':'.webp','video/mp4':'.mp4','video/webm':'.webm'};
+async function upload(buffer,type,title,token=superadmin,registrar=true){
+ const tipo=type.startsWith('image/')?'image':'video',firma=await api('multimedia/firma',{token,method:'POST',body:{tipo}});
+ if(firma.status!==200)return firma;
+ const f=firma.data,form=new FormData();
+ form.append('file',new Blob([buffer],{type}),'not-trusted-name'+(EXT[type]||''));
+ for(const [k,v] of [['api_key',f.apiKey],['timestamp',String(f.timestamp)],['signature',f.signature],['folder',f.carpeta],['public_id',f.publicId],['allowed_formats',f.formatos.join(',')]])form.append(k,v);
+ const envio=await fetch(BASE+f.uploadUrl,{method:'POST',body:form}),resultado=await envio.json().catch(()=>null);
+ if(!registrar||envio.status!==200)return{status:envio.status,data:resultado};
+ return api('multimedia/registrar',{token,method:'POST',body:{tipo,timestamp:f.timestamp,signature:f.signature,resultado,titulo:title,alt:'Imagen ficticia de QA'}});
+}
 check('anonymous upload denied',(await upload(png,'image/png','QA',null)).status===401);
 check('forged image bytes rejected',(await upload(Buffer.from('<script>not an image</script>'),'image/png','QA')).status===415);
 check('MIME mismatch rejected',(await upload(png,'image/jpeg','QA')).status===400);
@@ -38,7 +51,7 @@ check('oversized image rejected',(await upload(Buffer.concat([png,Buffer.alloc(1
 const mid=ok(await upload(png,'image/png','QA imagen')).id,vid=ok(await upload(video,'video/mp4','QA video')).id;
 check('image metadata persists in Firestore',(await record('multimedia',mid)).tipo==='image');
 check('video metadata persists in Firestore',(await record('multimedia',vid)).tipo==='video');
-check('fixture mode is explicit, not presented as Cloudinary',(await record('multimedia',mid)).provider==='QA_FIXTURE');
+check('fixture mode is explicit, not presented as Cloudinary',(await record('multimedia',mid)).provider==='QA_DIRECT_FIXTURE');
 const imageRecord=await record('multimedia',mid);check('uploaded original bytes preserved',Buffer.from(await(await fetch(BASE+imageRecord.url)).arrayBuffer()).equals(png));
 ok(await edit('multimedia',mid,{estado:'PUBLICADO',alt:'Cuadro azul de prueba'}));ok(await edit('multimedia',vid,{estado:'PUBLICADO'}));
 ok(await edit('productos',product,{imagenes:[mid],videos:[vid],estado:'PUBLICADO',validado:true,fuenteValidacion:'Validación ficticia de QA'}));

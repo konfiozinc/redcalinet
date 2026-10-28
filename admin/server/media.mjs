@@ -27,6 +27,11 @@ export class CloudinaryMediaProvider{
  }
  async remove(asset){if(asset.provider!=='CLOUDINARY')throw new Fault(409,'Proveedor incompatible.');const r=await this.client.uploader.destroy(asset.publicId,{resource_type:asset.tipo,invalidate:true});if(!['ok','not found'].includes(r.result))throw new Fault(502,'Cloudinary no confirmó la eliminación.');}
 }
+/* KZ-REDCALINET-023 — Este módulo conserva los límites, la comprobación real de
+   bytes (`inspectFile`, usada por el adaptador QA de carga directa) y el
+   contrato del transporte de servidor que certifica `test/schema.test.mjs`.
+   El camino HTTP ya no pasa por aquí: el navegador sube el archivo directo al
+   proveedor con una firma de vida corta (ver `directa.mjs`). */
 export async function mediaProvider(local){
  if(process.env.RCL_TEST_MEDIA==='fixture'){if(!local)throw Error('La fixture multimedia solo existe en QA local.');return new FixtureMediaProvider(fileURLToPath(new URL('../.runtime/media/',import.meta.url)))}
  // ADMIN-003: contract-only integration. Even configured credentials must not enable real uploads here.
