@@ -1,6 +1,6 @@
 {
   "version": "KZ-REDCALINET-ADMIN-003",
-  "status": "HARNESS_CONTRACT_RECEIVED_LOCAL_ONLY",
+  "status": "HARNESS_VERIFIED",
   "collections": [
     "configuracion",
     "categorias",
@@ -35,9 +35,11 @@
   "extensionsPublicConsumer": false,
   "harnessCommit": "2dfff109984b3a67cd1967a91d831a4508da8814",
   "sourceAuthenticity": "Provided documentation; SHA-256 matches supplied manifest, not a signature or production certification",
-  "productionEnabled": false,
+  "productionEnabled": true,
   "requests": {
     "enabled": false
   },
-  "publicReader": "Exact four Firestore queries from Harness. GET public/catalogo is auxiliary QA; public website unchanged."
+  "publicReader": "Exact four Firestore queries from Harness. GET public/catalogo is auxiliary QA; public website unchanged.",
+  "verifiedAt": "2026-10-28T06:29:09.429Z",
+  "verifiedMethod": "Contenido verificado contra admin/server/schema.mjs (colecciones, extensiones privadas, estados, roles, documentos de configuración, tipo de precio y canal de solicitudes) y contra el despliegue real: reglas v3 activas en red-calinet y las dos cuentas con los roles aprobados. Promoción KZ-031."
 }
