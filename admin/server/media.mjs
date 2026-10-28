@@ -1,4 +1,4 @@
-import fs from 'node:fs/promises';import path from 'node:path';import crypto from 'node:crypto';import {Fault,text} from './schema.mjs';
+import fs from 'node:fs/promises';import path from 'node:path';import crypto from 'node:crypto';import {fileURLToPath} from 'node:url';import {Fault,text} from './schema.mjs';
 export const IMAGE_MAX=10*1024*1024,VIDEO_MAX=25*1024*1024;
 export function inspectFile(buffer,mime){
  let kind,extension;
@@ -28,7 +28,7 @@ export class CloudinaryMediaProvider{
  async remove(asset){if(asset.provider!=='CLOUDINARY')throw new Fault(409,'Proveedor incompatible.');const r=await this.client.uploader.destroy(asset.publicId,{resource_type:asset.tipo,invalidate:true});if(!['ok','not found'].includes(r.result))throw new Fault(502,'Cloudinary no confirmó la eliminación.');}
 }
 export async function mediaProvider(local){
- if(process.env.RCL_TEST_MEDIA==='fixture'){if(!local)throw Error('La fixture multimedia solo existe en QA local.');return new FixtureMediaProvider(new URL('../.runtime/media/',import.meta.url).pathname)}
+ if(process.env.RCL_TEST_MEDIA==='fixture'){if(!local)throw Error('La fixture multimedia solo existe en QA local.');return new FixtureMediaProvider(fileURLToPath(new URL('../.runtime/media/',import.meta.url)))}
  // ADMIN-003: contract-only integration. Even configured credentials must not enable real uploads here.
  return{mode:'REAL_UPLOADS_DISABLED_ADMIN_003',enabled:false,upload(){throw new Fault(503,'Carga real bloqueada hasta configurar y verificar Cloudinary en una misión autorizada.')}};
 }

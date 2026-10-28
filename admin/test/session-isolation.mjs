@@ -1,7 +1,7 @@
 import {chromium} from '@playwright/test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
-const browser=await chromium.launch({executablePath:'/usr/bin/chromium',headless:true,args:['--no-sandbox','--disable-dev-shm-usage']});
+const browser=await chromium.launch({executablePath:process.env.RCL_CHROMIUM||(process.platform==='linux'?'/usr/bin/chromium':undefined),headless:true,args:['--no-sandbox','--disable-dev-shm-usage']});
 const context=await browser.newContext({viewport:{width:1440,height:900}}),page=await context.newPage();const checks=[];
 const check=(name,value)=>{assert.ok(value,name);checks.push(name)};
 async function login(email){await page.locator('#login-form input[name=email]').fill(email);await page.locator('#login-form input[name=password]').fill('RCL-Only-QA-2026!');await page.getByRole('button',{name:'Entrar al panel',exact:true}).click();await page.locator('.stats').waitFor();}
