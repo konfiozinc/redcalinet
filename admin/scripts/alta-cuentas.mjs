@@ -106,9 +106,12 @@ const authRest = tokenCli ? (() => {
       return { uid };
     },
     async generatePasswordResetLink(email) {
-      const r = await pedir(':sendOobCode', { requestType: 'PASSWORD_RESET', email, returnOobLink: true });
+      /* Sin `returnOobLink`: Firebase envía el correo de restablecimiento al
+         titular y el enlace de un solo uso NO pasa por esta máquina, ni por la
+         salida de la herramienta, ni por ningún archivo. */
+      const r = await pedir(':sendOobCode', { requestType: 'PASSWORD_RESET', email });
       if (!r.ok) throw fallo(r.datos, r.status);
-      return r.datos.oobLink || '(el enlace se envia al correo)';
+      return 'correo de restablecimiento ENVIADO al titular (un solo uso; no se muestra ni se guarda)';
     }
   };
 })() : auth;
