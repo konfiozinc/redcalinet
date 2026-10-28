@@ -99,23 +99,28 @@ Es la prueba de que ambas superficies están listas para revisar.
 
 ```
 C:\Users\usuario29\Documents\KONFIO_ZINC\_respaldos\redcalinet\2026-10-28-kz-015\
-  integracion-panel-codex.bundle   3 006 004 bytes
-  SHA256SUMS.txt                   5381cc43…  (sha256 del bundle)
+  integracion-panel-codex.bundle
+  SHA256SUMS.txt                   (sha256 del bundle, regenerado con él)
 ```
 
-Contiene la historia completa (36 commits), con punta `5a8f215`. Restaurar en cualquier
-máquina — hay que indicar la rama, porque el bundle no guarda `HEAD`:
+Contiene la historia completa de la rama. Se regenera con
+`git bundle create <ruta> integracion/panel-codex` al cerrar cualquier cambio; el hash
+vigente es el que diga `SHA256SUMS.txt`, no el de este documento (que no se actualiza
+solo y por tanto no debe citarse de memoria).
+
+Restaurar en cualquier máquina — hay que indicar la rama, porque el bundle no guarda `HEAD`:
 
 ```powershell
-git bundle verify integracion-panel-codex.bundle            # "is okay"
+git bundle verify integracion-panel-codex.bundle            # debe decir "is okay"
+git bundle list-heads integracion-panel-codex.bundle        # punta de la rama
 git clone -b integracion/panel-codex integracion-panel-codex.bundle redcalinet-015
 cd redcalinet-015
-git log --oneline -1                                        # 5a8f215
+git log --oneline -1                                        # debe coincidir con list-heads
 git status --porcelain                                      # vacío
 ```
 
-Restauración comprobada el 28-oct-2026: el clon sale en `integracion/panel-codex`, con
-36 commits, 49 archivos en `admin/`, `firestore.v3.rules` y los informes de misión. La
+Restauración comprobada el 28-oct-2026 (clon en `integracion/panel-codex`, historia
+completa, `admin/` con los 49 archivos, `firestore.v3.rules` y los informes de misión). La
 rama también vive en el repositorio local, intacta, sin upstream.
 
 ## 6. Limitación pendiente (declarada, no resuelta)
