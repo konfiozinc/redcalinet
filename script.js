@@ -1157,6 +1157,19 @@ function vigilarOrigen() {
   }, 3000);
 }
 
+/* KZ-033 — El respaldo data.json NO puede exponer borradores.
+   Si Firestore no responde, solo se muestran los registros cuyo estado es
+   PUBLICADO. Como el catálogo aprobado entra como BORRADOR, el resultado es un
+   catálogo vacío, que es el estado seguro: nunca se enseña lo no publicado. */
+function soloPublicados(catalogo) {
+  if (!catalogo) return null;
+  const visibles = (catalogo.categorias || []).map((cat) => {
+    const fichas = (cat.productos || []).filter((p) => p && p.estado === "PUBLICADO");
+    return Object.assign({}, cat, { productos: fichas });
+  }).filter((cat) => cat.productos.length > 0);
+  return Object.assign({}, catalogo, { categorias: visibles });
+}
+
 function aplicarDatos() {
   const deNube = datosDeLaNube();
   origenDatos = deNube ? "nube" : "local";
@@ -1164,7 +1177,7 @@ function aplicarDatos() {
     DATA = deNube;
     ocultarAvisoOrigen();
   } else if (datosLocales) {
-    DATA = datosLocales;
+    DATA = soloPublicados(datosLocales);
     vigilarOrigen();
   }
   pintar();
