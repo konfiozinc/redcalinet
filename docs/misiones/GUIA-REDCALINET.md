@@ -255,9 +255,17 @@ herramienta única y se retiraron tras comprobar que nada más los referenciaba.
 
 ## 8. Preparación de producción (candidata, nada ejecutado)
 
+> **Decisión del propietario (28-oct-2026): el proyecto se queda en Spark y NO se activará
+> Blaze.** Eso descarta Cloud Functions, así que el API ya no se despliega en Firebase: vive en
+> un servicio Node externo gratuito que también sirve el panel en el **mismo origen**. El
+> procedimiento completo, la comparación de opciones con sus límites verificados y las
+> limitaciones que esto introduce están en
+> [`DECISION-ALOJAMIENTO-SPARK.md`](./DECISION-ALOJAMIENTO-SPARK.md). Lo de esta sección se
+> conserva como preparación técnica de la API, no como plan de Firebase.
+
 La secuencia y las dependencias están en [`PLAN-DESPLIEGUE-KZ-021.md`](./PLAN-DESPLIEGUE-KZ-021.md)
-§ Fase 4. **El orden no es negociable: API primero, reglas después.** Al revés, el propietario
-se queda sin ninguna forma de editar el catálogo.
+§ Fase 4, **con la corrección de la decisión Spark**. **El orden no es negociable: API primero,
+reglas después.** Al revés, el propietario se queda sin ninguna forma de editar el catálogo.
 
 ### Lo que ya está configurado en el repositorio
 
@@ -306,10 +314,10 @@ marcó como probado. Es lo primero que hay que ensayar en la ventana de desplieg
 | # | Bloqueo | Quién lo desbloquea |
 |---|---|---|
 | B-01 | Firebase Auth **no configurada** en `red-calinet` (Identity Toolkit: `CONFIGURATION_NOT_FOUND`) | Propietario, en la consola. No requiere Blaze |
-| B-02 | Cloud Functions deshabilitada; gen 2 exige **Blaze** | Propietario: aprobar plan + alerta de presupuesto |
+| B-02 | ~~Cloud Functions exige Blaze~~ **Resuelto por decisión:** el proyecto se queda en Spark; el API va a un servicio Node externo gratuito (ver `DECISION-ALOJAMIENTO-SPARK.md`) | — |
 | B-03 | Contrato sin promover a `HARNESS_VERIFIED` ni hash aprobado | Decisión del propietario |
 | B-04 | Credenciales de Cloudinary en Secret Manager | Propietario |
-| B-05 | Decisión: publicar el panel en **Hosting o GitHub Pages** | Propietario |
+| B-05 | ~~Decisión: publicar el panel en Hosting o GitHub Pages~~ **Resuelto:** el panel se sirve desde el mismo servicio Node que la API (mismo origen). Firebase Hosting queda como alternativa descartada por CORS | — |
 | B-06 | Dominios autorizados de Auth | Propietario, al configurar Auth |
 | B-07 | Migración inicial a producción: la herramienta solo corre en emuladores | Requiere una misión autorizada que añada el guardián de producción |
 | B-08 | Ensayo real de Cloudinary | Requiere B-04 |

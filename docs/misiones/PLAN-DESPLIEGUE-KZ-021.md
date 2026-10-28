@@ -4,6 +4,15 @@
 **Rama:** `integracion/panel-codex` · **artefacto certificado:** `3d7e5c6`
 **Estado:** plan completo y verificado · **nada desplegado, nada activado**
 
+> **SUPERADO EN PARTE el 28-oct-2026.** El propietario decidió mantener el proyecto en **Spark**
+> y no activar **Blaze**. Por tanto la Fase 1 (paso «activar Blaze»), la Fase 2 (alojar el API
+> en Cloud Functions) y los pasos 1 y 6 de la Fase 4 **ya no aplican**: el API vive en un
+> servicio Node externo gratuito que sirve además el panel en el mismo origen. El análisis de
+> riesgos, el orden *API antes que reglas*, los índices, las variables de entorno y la
+> conciliación de pruebas **siguen siendo válidos**. La decisión vigente, con la comparación de
+> opciones y sus límites verificados, está en
+> [`DECISION-ALOJAMIENTO-SPARK.md`](./DECISION-ALOJAMIENTO-SPARK.md).
+
 > **Código congelado.** Todo lo certificado en KZ-020 corresponde a `3d7e5c6`. Cualquier
 > cambio de código posterior invalida esa certificación y obliga a repetirla. Por eso este
 > plan **no modifica código**: describe lo que hay que hacer y en qué orden.
