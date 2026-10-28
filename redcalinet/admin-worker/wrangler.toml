@@ -1,0 +1,31 @@
+# KZ-REDCALINET-025 — Worker administrativo de Red CaliNet.
+#
+# Reemplaza a Cloud Functions (deshabilitado: el proyecto está en Spark).
+# El panel estático y la API comparten el MISMO origen para no necesitar CORS.
+#
+# Desarrollo local (sin cuenta de Cloudflare y sin credenciales):
+#   npx wrangler dev
+# Despliegue (no ejecutado en esta misión): npx wrangler deploy
+name = "redcalinet-admin"
+main = "src/index.mjs"
+compatibility_date = "2026-01-01"
+# Da acceso a node:crypto, Buffer y utilidades que el schema ya usa.
+compatibility_flags = ["nodejs_compat"]
+
+# El panel compilado se sirve como estático. Solo /admin/api/* entra al Worker.
+[assets]
+directory = "./public"
+binding = "ASSETS"
+run_worker_first = ["/admin/api/*"]
+
+# Valores NO secretos. Los secretos van con `wrangler secret put`:
+#   FIREBASE_SA     JSON de la cuenta de servicio del proyecto
+#   CLOUDINARY_API_SECRET
+[vars]
+PROYECTO_FIREBASE = "demo-redcalinet-admin"
+FIREBASE_API_KEY = "demo-key"
+CARPETA_MEDIA = "redcalinet/admin"
+# 1 = habla con los emuladores en loopback (sin OAuth). 0 = producción.
+MODO_EMULADOR = "1"
+# Orígenes autorizados para escribir. En producción: https://<worker>.<subdominio>.workers.dev
+RCL_PUBLIC_ORIGIN = "http://127.0.0.1:8787"

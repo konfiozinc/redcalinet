@@ -1,0 +1,15 @@
+{
+  "name": "redcalinet-admin-worker",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "API y panel de Red CaliNet en Cloudflare Workers. Sustituye a Cloud Functions manteniendo Spark.",
+  "scripts": {
+    "panel": "node scripts/preparar-panel.mjs",
+    "dev": "wrangler dev",
+    "probar": "node test/worker-025.mjs"
+  },
+  "devDependencies": {
+    "wrangler": "^4.0.0"
+  }
+}

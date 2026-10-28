@@ -1,0 +1,12 @@
+# Dependencias y artefactos del Worker
+node_modules/
+.wrangler/
+.dev.vars
+
+# Panel compilado: se genera con `npm run panel` (copia de admin/dist).
+# No se versiona, igual que admin/dist.
+public/admin/
+
+# Evidencias de pruebas
+.runtime/
+*.log

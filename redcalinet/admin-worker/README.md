@@ -1,0 +1,93 @@
+# Worker administrativo de Red CaliNet
+
+API y panel de Red CaliNet en **Cloudflare Workers**, para no depender de Cloud Functions
+(que exigiría Blaze). El proyecto Firebase sigue en **Spark**.
+
+**Estado: funcionando en local contra los emuladores. No desplegado.**
+
+## Por qué existe
+
+| Pieza | Antes (KZ-023) | Ahora (KZ-025) |
+|---|---|---|
+| API | Proceso Node en 5176 | Worker en 8787 (`wrangler dev`) |
+| Panel | Servido por el proceso Node | `public/admin/` como estáticos del mismo Worker |
+| Datos | `firebase-admin` (Admin SDK) | Firestore REST con cuenta de servicio |
+| Credenciales | ADC / JSON | Emulador: `Bearer owner` · Producción: `FIREBASE_SA` firmado con WebCrypto |
+| Origen | Mismo origen | **El mismo origen se conserva**: sin CORS |
+
+## Arranque local
+
+```powershell
+# 1. Emuladores (Firestore 8080 y Auth 9099) y datos sembrados
+cd ../../../admin
+node scripts/bootstrap-emulator.mjs
+
+# 2. Panel compilado + copia al Worker
+npm run build
+cd ../redcalinet/admin-worker
+npm install
+node scripts/preparar-panel.mjs
+
+# 3. Worker
+node node_modules/wrangler/bin/wrangler.js dev --port 8787 --ip 127.0.0.1
+#    Panel: http://127.0.0.1:8787/admin/
+#    API:   http://127.0.0.1:8787/admin/api/bootstrap
+```
+
+Cuentas del emulador: `superadmin@rcl.example.test` (SUPERADMIN) y
+`admin@rcl.example.test` (PROPIETARIO), contraseña `RCL-Only-QA-2026!`.
+
+## Pruebas
+
+```powershell
+$env:RCL_CHROMIUM="$env:LOCALAPPDATA\ms-playwright\chromium-1243\chrome-win64\chrome.exe"
+node test/worker-025.mjs     # 27/27 · API, permisos, auditoría, idempotencia, multimedia
+node test/interfaz-025.mjs   #  7/7  · panel desde el Worker, escritorio y móvil
+```
+
+## Qué conserva del diseño anterior
+
+- **El navegador nunca escribe en Firestore.** La única puerta es el Worker, con sesión
+  verificada, rol, `activo === true` y `Origin` obligatorio.
+- **Auditoría obligatoria**: cada escritura incluye su entrada en `auditoria` en el mismo commit.
+- **Validación idéntica**: se reutiliza `src/schema.mjs`, copia del certificado en KZ-023.
+- **Multimedia firmada**: misma semántica, con la firma SHA-1 adaptada a WebCrypto.
+- **Reglas v3 intactas**: siguen cerrando toda escritura de cliente (certificado 59/59).
+
+## Atomicidad e idempotencia
+
+Cada escritura va en **un solo `:commit`** con:
+
+- `currentDocument.updateTime` → **precondición de versión** (una edición concurrente se rechaza);
+- `currentDocument.exists: false` → **alta que no duplica** si dos peticiones coinciden;
+- la entrada de auditoría en el mismo lote, creada con `exists: false` → **idempotencia**
+  (reintentar con la misma `Idempotency-Key` devuelve el mismo registro y no audita dos veces).
+
+**Desviación declarada:** la validación de relaciones (categoría visible, archivo existente) se
+hace **antes** del commit, no dentro de una transacción como en la versión Node. El documento
+escrito queda protegido igual por la precondición de `updateTime`.
+
+## Límites del plan gratuito (respetados)
+
+| Límite | Cómo se respeta |
+|---|---|
+| CPU por petición (10 ms) | El ID token se verifica en Identity Toolkit, **no** con criptografía local; el `access_token` de la cuenta de servicio se firma una vez por hora y se cachea en el isolate |
+| Sin cifrar en cada petición | Se cachea el token; las lecturas se deduplican (`leer()` elimina rutas repetidas) |
+| Firestore Spark (50k lecturas / 20k escrituras al día) | Un `leer()` por operación en vez de lecturas sueltas; el listado filtra por tipo en memoria tras una sola consulta |
+| Peticiones 100k/día | Muy por debajo del uso de dos operadores |
+
+**No se relaja ninguna comprobación para ahorrar recursos.** Si una operación superara el CPU
+disponible, el bloqueo real es el límite del plan y se documentaría aquí en lugar de debilitar
+la verificación.
+
+## Pendiente antes de producción (no ejecutado)
+
+1. Cuenta de servicio de `red-calinet` con rol mínimo y su clave. **No se reutiliza la de otro
+   proyecto.**
+2. `wrangler secret put FIREBASE_SA` (JSON de la cuenta de servicio) y, cuando toque,
+   `CLOUDINARY_API_SECRET`.
+3. `MODO_EMULADOR = "0"`, `PROYECTO_FIREBASE = "red-calinet"`, `FIREBASE_API_KEY` real y
+   `RCL_PUBLIC_ORIGIN` con el origen del Worker.
+4. Alta de cuentas por lotes con `admin/scripts/alta-cuentas.mjs` (GitHub Actions): el Worker
+   **no** crea identidades en Auth — no expone esa capacidad a propósito.
+5. Desplegar el Worker, verificar y **solo después** desplegar las reglas v3.
