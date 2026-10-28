@@ -43,7 +43,9 @@ const objetivo = () => {
   return c;
 };
 
-if (accion !== '--estado' && !correoPedido) salir('Falta --cuenta <correo>.');
+/* --estado y --revisar recorren las cuentas previstas y no escriben nada, así
+   que no piden --cuenta. El resto de acciones actúa sobre una sola cuenta. */
+if (!['--estado', '--revisar'].includes(accion) && !correoPedido) salir('Falta --cuenta <correo>.');
 if (produccion) {
   if (process.env.RCL_MODE === 'emulator') salir('Contradicción: RCL_MODE=emulator con --entorno produccion.');
   if (process.env.GCLOUD_PROJECT !== plan.proyecto) salir('GCLOUD_PROJECT debe ser ' + plan.proyecto + '.');
@@ -76,6 +78,17 @@ const pintar = (correo, esperado, e) => {
   return { correo, esperado, ...e };
 };
 
+const documento = async (uid, c) => {
+  const ahora = new Date().toISOString();
+  const batch = db.batch();
+  batch.set(db.doc('usuarios/' + uid), { nombre: c.nombre, email: c.correo, rol: c.rol, activo: false, createdAt: ahora });
+  batch.set(db.doc('auditoria/alta-cuenta-' + uid), {
+    actor: 'alta-cuentas', rol: 'SISTEMA', accion: 'CREAR_CUENTA', coleccion: 'usuarios',
+    registro: uid, fecha: ahora, campos: ['email', 'rol', 'activo'], detalle: c.rol
+  });
+  await batch.commit();
+};
+
 console.log('== Cuentas administrativas · proyecto ' + proyecto + (produccion ? ' (PRODUCCIÓN)' : ' (emulador)') + ' ==');
 console.log('  acción: ' + accion + '\n');
 
@@ -87,19 +100,23 @@ if (accion === '--estado' || accion === '--revisar') {
   let e = await leer(c.correo);
 
   if (accion === '--crear') {
-    if (e.usuario) salir('La cuenta ' + c.correo + ' ya existe. Usa --verificar o --restablecer.');
-    const uid = (await auth.createUser({ email: c.correo, emailVerified: false, disabled: true })).uid;
-    const ahora = new Date().toISOString();
-    const batch = db.batch();
-    batch.set(db.doc('usuarios/' + uid), { nombre: c.nombre, email: c.correo, rol: c.rol, activo: false, createdAt: ahora });
-    batch.set(db.doc('auditoria/alta-cuenta-' + uid), {
-      actor: 'alta-cuentas', rol: 'SISTEMA', accion: 'CREAR_CUENTA', coleccion: 'usuarios',
-      registro: uid, fecha: ahora, campos: ['email', 'rol', 'activo'], detalle: c.rol
-    });
-    await batch.commit();
-    console.log('  creada SIN contraseña, desactivada · usuarios/' + uid + ' con rol ' + c.rol + ' y activo=false');
-    console.log('  enlace de restablecimiento (un solo uso, no se guarda):');
-    console.log('  ' + await auth.generatePasswordResetLink(c.correo));
+    if (e.usuario && e.doc) salir('La cuenta ' + c.correo + ' ya existe completa. Usa --verificar o --restablecer.');
+    if (e.usuario) {
+      /* La identidad existe en Auth pero falta su documento en Firestore: pasa
+         tras restaurar Firestore sin restaurar Auth. Se reconstruye solo el
+         documento y Auth no se toca, así que el acceso sigue cerrado. */
+      await documento(e.usuario.uid, c);
+      console.log('  la identidad ya existía en Auth (uid=' + e.usuario.uid + '); Auth NO se modificó');
+      console.log('  documento usuarios/' + e.usuario.uid + ' creado con rol ' + c.rol + ' y activo=false');
+      console.log('  sigue sin acceso hasta --activar. Enlace de restablecimiento:');
+      console.log('  ' + await auth.generatePasswordResetLink(c.correo));
+    } else {
+      const uid = (await auth.createUser({ email: c.correo, emailVerified: false, disabled: true })).uid;
+      await documento(uid, c);
+      console.log('  creada SIN contraseña, desactivada · usuarios/' + uid + ' con rol ' + c.rol + ' y activo=false');
+      console.log('  enlace de restablecimiento (un solo uso, no se guarda):');
+      console.log('  ' + await auth.generatePasswordResetLink(c.correo));
+    }
   } else if (accion === '--restablecer') {
     if (!e.usuario) salir('La cuenta no existe.');
     console.log('  enlace de restablecimiento (un solo uso, no se guarda):\n  ' + await auth.generatePasswordResetLink(c.correo));
