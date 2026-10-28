@@ -95,6 +95,16 @@ Cubre: acceso y login del panel, indicadores, tres secciones, panel en móvil, p
 institucional KZ-011, catálogo desde `data.json`, modo Firestore y ausencia de excepciones.
 Es la prueba de que ambas superficies están listas para revisar.
 
+**Orden obligatorio de las suites del panel.** Tras reiniciar el emulador hay que ejecutar
+`test/integration.mjs` **antes** de `test/browser.mjs`: la suite de navegador lee los
+identificadores de multimedia que produce la de integración
+(`admin/.runtime/integration-results.json`). Si se invierte el orden, `browser.mjs` falla al
+seleccionar multimedia con un `selectOption` que no encuentra opciones — parece un fallo del
+panel y en realidad es del entorno. Comprobado el 28-oct-2026.
+
+El acceso administrativo tiene además su propia medición visual, que compara antes/después
+en las siete resoluciones y comprueba teclado: `node test/visual-login-016.mjs <etiqueta>`.
+
 ## 5. Copia recuperable de la rama
 
 ```
