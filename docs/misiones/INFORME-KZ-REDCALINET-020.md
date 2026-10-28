@@ -76,7 +76,9 @@ Todo repetido sobre el entorno local con los emuladores reales:
 | Harness: catálogo, contrato estático, DOM, reglas v3 | 51 + 50 + 157 + 26 |
 | Conjuntas: denegación de escrituras, negocio | 35 + 23 |
 
-**Total: 600 comprobaciones ejecutadas, 0 fallos.** Persistencia de Firestore re-verificada
+**Total: 632 comprobaciones ejecutadas, 0 fallos** (este informe decía 600 por un error de
+suma; la conciliación detallada está en `PLAN-DESPLIEGUE-KZ-021.md` §«Conciliación del total
+de pruebas»). Persistencia de Firestore re-verificada
 con un reinicio real desde exportación (4/4) y reglas v3 intactas (26/26 oficiales + 35/35
 conjuntas).
 
@@ -128,7 +130,7 @@ Firebase real, ni Cloudinary. No se activó Blaze. Sin push, sin merge, sin desp
 **GO para preparar el despliegue.** Los dos problemas técnicos pendientes están cerrados:
 la auditoría se pagina en el servidor en orden cronológico estable, sin duplicados ni
 omisiones y sin tocar los documentos, y la recuperación de Auth está ejercitada de verdad
-tras un reinicio. Las 600 comprobaciones pasan y no hay regresiones visuales ni de permisos.
+tras un reinicio. Las 632 comprobaciones pasan y no hay regresiones visuales ni de permisos.
 
 **NO-GO para producción** por los seis bloqueos de la sección 6, que no son de código: son
 de despliegue, de proyecto real y de decisiones que no me corresponden.

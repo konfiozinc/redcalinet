@@ -1,5 +1,10 @@
 # Despliegue de la API del panel en Cloud Functions gen 2 — KZ-REDCALINET-014
 
+> **Antes de seguir:** el plan completo de puesta en producción —inventario real del
+> proyecto, orden de los pasos con sus dependencias, respaldo, reversión, costos y
+> riesgos— está en [`docs/misiones/PLAN-DESPLIEGUE-KZ-021.md`](../../docs/misiones/PLAN-DESPLIEGUE-KZ-021.md).
+> Este documento cubre solo el empaquetado y despliegue de la función.
+
 **Estado: PREPARADO, NO EJECUTADO.** No se activó facturación (Blaze), no se desplegó
 ninguna función, no se desplegaron reglas y no se creó ninguna credencial real.
 
