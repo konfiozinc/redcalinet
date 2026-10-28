@@ -1,0 +1,11 @@
+{
+  "proyecto": "red-calinet",
+  "correoAutorizado": "redcalinet9@gmail.com",
+  "rol": "SUPERADMIN",
+  "estado": "PREVISTO — no creado todavía",
+  "notas": [
+    "Este archivo NO contiene contraseñas ni ninguna credencial: solo el correo autorizado y el rol previsto.",
+    "La cuenta se crea sin contraseña. El propietario define la suya con el enlace de restablecimiento de Firebase.",
+    "Ningún otro correo puede darse de alta como SUPERADMIN con el script: si no coincide con correoAutorizado, aborta."
+  ]
+}
