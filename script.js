@@ -304,7 +304,11 @@ function contarProductos(categorias) {
    Estado de la interfaz
    ============================================================ */
 
-let DATA = mapearCatalogo({ ...FALLBACK, origen: "respaldo" });
+/* KZ-033 — El respaldo embebido TAMPOCO puede exponer borradores. Se arranca con
+   el contenido institucional (marca, contacto, redes, beneficios) pero con el
+   catálogo vacío: si Firestore no responde, el estado es vacío y seguro, nunca
+   las fichas no publicadas que viven en FALLBACK. */
+let DATA = mapearCatalogo({ ...FALLBACK, categorias: [], servicios: [], productos: [], origen: "respaldo" });
 const FILTRO = { q: "", categoriaId: "todas" };
 
 /* ---------- Enlaces de WhatsApp ---------- */
