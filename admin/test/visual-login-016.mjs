@@ -147,7 +147,7 @@ console.log('\n== Teclado ==');
   await pagina.locator('body').click({ position: { x: 4, y: 4 } });
 
   const orden = [];
-  for (let i = 0; i < 4; i++) {
+  for (let i = 0; i < 6; i++) {
     await pagina.keyboard.press('Tab');
     orden.push(await pagina.evaluate(() => {
       const a = document.activeElement;
@@ -155,10 +155,15 @@ console.log('\n== Teclado ==');
       return (a.getAttribute('name') || a.textContent || a.tagName || '').trim().replace(/\s+/g, ' ').slice(0, 30);
     }));
   }
+  /* El crédito de la agencia es un enlace y puede ir antes del formulario:
+     lo que se exige es que la secuencia INTERNA del acceso sea la correcta. */
+  const desde = orden.findIndex((t) => t.toLowerCase().includes('email'));
+  const secuencia = desde >= 0 ? orden.slice(desde, desde + 4) : [];
   const esperado = ['email', 'password', 'Entrar al panel', 'Olvidé mi contraseña'];
-  const ordenOk = esperado.every((v, i) => (orden[i] || '').toLowerCase().includes(v.toLowerCase()));
-  if (ordenOk) console.log('  PASA   el orden de tabulación es correo → contraseña → entrar → recuperación');
-  else { fallos++; console.log('  **FALLA** orden de tabulación: ' + orden.join(' → ')); }
+  const ordenOk = esperado.every((v, i) => (secuencia[i] || '').toLowerCase().includes(v.toLowerCase()));
+  if (ordenOk) console.log('  PASA   la secuencia del acceso es correo → contraseña → entrar → recuperación');
+  else { fallos++; console.log('  **FALLA** secuencia de tabulación: ' + (orden.join(' → ') || 'sin foco')); }
+  console.log('         (paradas previas al formulario: ' + desde + ': ' + orden.slice(0, Math.max(desde, 0)).join(' → ') + ')');
 
   const foco = await pagina.evaluate(() => {
     const el = document.querySelector('#login-form input[name=email]');
@@ -232,6 +237,90 @@ console.log('\n== Contraste ==');
     if (p.ok) console.log('  PASA ' + linea);
     else { fallos++; console.log('  **FALLA** ' + linea); }
   }
+  await contexto.close();
+}
+
+/* ---------------------------------------------------------------- */
+/* Logotipo oficial y crédito (KZ-REDCALINET-017)                     */
+/* ---------------------------------------------------------------- */
+console.log('\n== Logotipo y crédito ==');
+{
+  const contexto = await navegador.newContext({ viewport: { width: 1440, height: 900 }, reducedMotion: 'reduce' });
+  const pagina = await contexto.newPage();
+  await pagina.goto(BASE, { waitUntil: 'load', timeout: 30000 });
+  await pagina.locator('#login-form').waitFor({ timeout: 20000 });
+  await pagina.waitForTimeout(400);
+
+  const logo = await pagina.evaluate(() => {
+    const img = document.querySelector('.brand-mark img');
+    if (!img) return null;
+    const r = img.getBoundingClientRect();
+    const cs = getComputedStyle(img);
+    return {
+      cargada: img.complete && img.naturalWidth > 0,
+      natural: [img.naturalWidth, img.naturalHeight],
+      render: [Math.round(r.width), Math.round(r.height)],
+      ajuste: cs.objectFit,
+      src: img.currentSrc || img.src
+    };
+  });
+  if (!logo) { fallos++; console.log('  **FALLA** no hay imagen de logotipo en la marca'); }
+  else {
+    const nat = logo.natural[0] / logo.natural[1];
+    const ren = logo.render[0] / logo.render[1];
+    const desvio = Math.abs(nat - ren) / nat;
+    if (logo.cargada && /logo-200/.test(logo.src)) console.log('  PASA   el logotipo oficial carga (' + logo.natural.join('x') + ')');
+    else { fallos++; console.log('  **FALLA** el logotipo no carga: ' + logo.src); }
+    if (nat === ren) console.log('  PASA   conserva la proporción ' + nat.toFixed(3) + ' (cuadrado)');
+    else { fallos++; console.log('  **FALLA** proporción deformada: natural ' + nat.toFixed(3) + ' vs render ' + ren.toFixed(3) + ' (desvío ' + (desvio * 100).toFixed(1) + '%)'); }
+    if (logo.render[0] >= 48) console.log('  PASA   tamaño legible en escritorio (' + logo.render[0] + 'px)');
+    else { fallos++; console.log('  **FALLA** logotipo pequeño (' + logo.render[0] + 'px)'); }
+    if (logo.ajuste === 'contain') console.log('  PASA   ajuste contain: nunca recorta ni estira');
+    else { fallos++; console.log('  **FALLA** ajuste inesperado: ' + logo.ajuste); }
+    if (logo.src.includes('/admin/assets/')) console.log('  PASA   se sirve desde el build del panel (mismo dominio)');
+    else { fallos++; console.log('  **FALLA** el logotipo no viene del build: ' + logo.src); }
+  }
+
+  const credito = await pagina.evaluate(() => {
+    const s = document.querySelector('.login-brand>small.credito-marca');
+    if (!s) return null;
+    const a = s.querySelector('a');
+    const cs = getComputedStyle(s);
+    return {
+      texto: s.textContent.replace(/\s+/g, ' ').trim(),
+      href: a ? a.href : null,
+      rel: a ? a.rel : null,
+      visible: s.offsetParent !== null,
+      tamano: parseFloat(cs.fontSize),
+      separado: (() => {
+        const h1 = document.querySelector('.login-brand h1');
+        if (!h1) return null;
+        return Math.round(s.getBoundingClientRect().top - h1.getBoundingClientRect().bottom);
+      })()
+    };
+  });
+  if (credito && /KONFÍO ZINC/i.test(credito.texto)) console.log('  PASA   crédito a KONFÍO ZINC presente: "' + credito.texto + '"');
+  else { fallos++; console.log('  **FALLA** falta el crédito de KONFÍO ZINC'); }
+  if (credito && credito.href === 'https://konfiozinc.github.io/card/') console.log('  PASA   el enlace usa la web oficial de la agencia');
+  else { fallos++; console.log('  **FALLA** enlace del crédito: ' + (credito ? credito.href : 'sin enlace')); }
+  if (credito && /noopener/.test(credito.rel || '')) console.log('  PASA   el enlace no expone window.opener (noopener)');
+  else { fallos++; console.log('  **FALLA** falta rel=noopener'); }
+  if (credito && credito.tamano <= 11) console.log('  PASA   crédito discreto (' + credito.tamano + 'px, secundario frente al titular)');
+  else { fallos++; console.log('  **FALLA** el crédito compite con la marca (' + (credito ? credito.tamano : '?') + 'px)'); }
+
+  await pagina.screenshot({ path: salida + 'login-016-' + etiqueta + '-marca-1440.png' });
+  await pagina.setViewportSize({ width: 390, height: 844 });
+  await pagina.waitForTimeout(300);
+  await pagina.screenshot({ path: salida + 'login-016-' + etiqueta + '-marca-390.png' });
+  const enMovil = await pagina.evaluate(() => {
+    const img = document.querySelector('.brand-mark img');
+    const r = img.getBoundingClientRect();
+    return { visible: img.offsetParent !== null, w: Math.round(r.width), h: Math.round(r.height), desborda: document.documentElement.scrollWidth > window.innerWidth + 1 };
+  });
+  if (enMovil.visible && enMovil.w >= 40 && enMovil.w === enMovil.h) console.log('  PASA   en móvil el logotipo sigue visible y cuadrado (' + enMovil.w + 'px)');
+  else { fallos++; console.log('  **FALLA** logotipo en móvil: ' + JSON.stringify(enMovil)); }
+  if (!enMovil.desborda) console.log('  PASA   sin desbordamiento horizontal en móvil');
+  else { fallos++; console.log('  **FALLA** desbordamiento horizontal en móvil'); }
   await contexto.close();
 }
 
