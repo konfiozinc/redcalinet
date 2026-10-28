@@ -2,6 +2,9 @@
 <html lang="es-CO">
 <head>
 <meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; base-uri 'none'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'none'; connect-src 'none'; form-action 'none'; object-src 'none'">
+<meta name="referrer" content="no-referrer">
+<!-- Generado desde data.json y plantillas/index.html. No editar esta salida a mano. -->
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Red CaliNet — Tu conexión con servicios y soluciones digitales | Bello, Antioquia</title>
 <meta name="description" content="Red CaliNet en Bello, Antioquia: streaming, trámites y citas, TV por aplicación y tecnología (equipos y accesorios). Servicio garantizado, lo primordial para nosotros es el cliente. Atención por WhatsApp y punto físico.">
@@ -31,11 +34,7 @@
 <link rel="icon" type="image/webp" sizes="64x64" href="assets/logo/favicon-64.webp">
 <link rel="apple-touch-icon" sizes="180x180" href="assets/logo/apple-touch-icon.png">
 
-<!-- Tipografía (no bloqueante) -->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" media="print" onload="this.media='all'">
-<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"></noscript>
+<!-- Tipografía del sistema: sin conexiones a proveedores de fuentes. -->
 
 <link rel="stylesheet" href="styles.css">
 
@@ -152,11 +151,11 @@
       <a href="#contacto">Contacto</a>
     </nav>
 
-    <a class="btn btn--wa cabecera__cta" data-wa data-wa-texto="Hola, vi su página web y quiero información." target="_blank" rel="noopener">
+    <a class="btn btn--wa cabecera__cta" href="https://wa.me/573014585658?text=Hola%2C%20vi%20su%20p%C3%A1gina%20web%20y%20quiero%20informaci%C3%B3n." target="_blank" rel="noopener noreferrer">
       <svg class="ico" aria-hidden="true"><use href="#i-whatsapp"></use></svg>Escríbenos
     </a>
 
-    <button class="menu-btn" id="menuBtn" type="button" aria-label="Abrir menú" aria-expanded="false" aria-controls="nav">
+    <button class="menu-btn" id="menuBtn" type="button" hidden aria-label="Abrir menú" aria-expanded="false" aria-controls="nav">
       <span></span><span></span><span></span>
     </button>
   </div>
@@ -212,7 +211,9 @@
         <p class="sec-sub">Lo primordial para nosotros es el cliente. Por eso vendemos por internet, pero respondemos como un negocio de barrio: con nombre, con punto físico y con atención uno a uno.</p>
       </header>
 
-      <div class="grid grid--3" id="beneficiosGrid"></div>
+      <div class="grid grid--3" id="beneficiosGrid"><article class="beneficio revelar"><div class="beneficio__ico"><svg class="ico" aria-hidden="true"><use href="#i-heart"></use></svg></div><div><h3>Lo primordial es el cliente</h3><p>Tu satisfacción manda: te acompañamos antes, durante y después de la compra.</p></div></article>
+<article class="beneficio revelar"><div class="beneficio__ico"><svg class="ico" aria-hidden="true"><use href="#i-chat"></use></svg></div><div><h3>Atención personalizada</h3><p>Te atendemos uno a uno por WhatsApp y en el punto físico.</p></div></article>
+<article class="beneficio revelar"><div class="beneficio__ico"><svg class="ico" aria-hidden="true"><use href="#i-pin"></use></svg></div><div><h3>Punto físico en Bello</h3><p>Nos puedes encontrar en Bello, Antioquia. No somos solo un chat.</p></div></article></div>
     </div>
   </section>
 
@@ -256,42 +257,52 @@
         <header class="sec-head sec-head--left revelar">
           <p class="eyebrow">Contacto</p>
           <h2>Cuéntanos qué necesitas</h2>
-          <p class="sec-sub">Completa el formulario y se abrirá WhatsApp con tu mensaje listo para enviar.</p>
+          <p class="sec-sub">Prepara tu consulta y continúa en WhatsApp. Podrás revisar el mensaje antes de enviarlo.</p>
         </header>
 
-        <form class="form revelar" id="formContacto" novalidate>
+        <form class="form revelar" id="formContacto" data-contacto="https://wa.me/573014585658" action="#contacto" novalidate>
+          <fieldset class="form__campos" id="camposFormulario" disabled>
+          <legend class="sr-only">Datos para preparar tu consulta</legend>
           <div class="campo">
             <label for="fNombre">Tu nombre *</label>
-            <input type="text" id="fNombre" name="nombre" autocomplete="name" placeholder="Ej.: María Pérez" required>
+            <input type="text" id="fNombre" maxlength="120" aria-describedby="errorNombre" aria-invalid="false" autocomplete="name" placeholder="Ej.: María Pérez" required>
+            <span class="campo__error" id="errorNombre"></span>
           </div>
 
           <div class="campo">
             <label for="fCorreo">Tu correo *</label>
-            <input type="email" id="fCorreo" name="correo" autocomplete="email" inputmode="email" placeholder="Ej.: maria@correo.com" required>
+            <input type="email" id="fCorreo" maxlength="254" aria-describedby="errorCorreo" aria-invalid="false" autocomplete="email" inputmode="email" placeholder="Ej.: maria@correo.com" required>
+            <span class="campo__error" id="errorCorreo"></span>
           </div>
 
           <div class="campo">
             <label for="fServicio">¿Qué servicio te interesa?</label>
-            <select id="fServicio" name="servicio"></select>
+            <select id="fServicio"><option value="">Aún no lo sé / quiero asesoría</option><option value="streaming">Streaming</option>
+<option value="tecnologia">Tecnología</option>
+<option value="seguros">Seguros</option>
+<option value="tramites">Trámites</option><option value="otro">Otro (te cuento en el mensaje)</option></select>
           </div>
 
           <div class="campo">
             <label for="fMensaje">Cuéntanos un poco más</label>
-            <textarea id="fMensaje" name="mensaje" placeholder="Ej.: quiero saber qué plataformas de streaming tienen disponibles."></textarea>
+            <textarea id="fMensaje" maxlength="2000" placeholder="Ej.: quiero saber qué plataformas de streaming tienen disponibles."></textarea>
           </div>
 
+          </fieldset>
           <p class="form__aviso" id="formAviso" role="alert"></p>
 
-          <button class="btn btn--wa btn--block btn--lg" type="submit">
-            <svg class="ico" aria-hidden="true"><use href="#i-whatsapp"></use></svg>Enviar por WhatsApp
+          <button class="btn btn--wa btn--block btn--lg" type="submit" id="prepararMensaje" disabled>
+            <svg class="ico" aria-hidden="true"><use href="#i-whatsapp"></use></svg>Preparar mensaje para WhatsApp
           </button>
 
-          <p class="form__nota">Tus datos se usan solo para preparar el mensaje de WhatsApp. El sitio guarda un borrador en tu navegador para tu comodidad.</p>
+          <p class="form__nota" id="estadoFormulario">Para usar el formulario necesitas JavaScript. También puedes abrir WhatsApp directamente.</p>
+          <p id="waResultado" hidden><a id="waContinuar" class="btn btn--wa btn--block" target="_blank" rel="noopener noreferrer">Continuar en WhatsApp</a></p>
+          <a class="form__alternativa" id="waDirecto" href="https://wa.me/573014585658" target="_blank" rel="noopener noreferrer">Abrir WhatsApp sin formulario</a>
         </form>
       </div>
 
       <aside aria-label="Datos de contacto">
-        <a class="btn btn--wa btn--lg contacto__cta" data-wa target="_blank" rel="noopener">
+        <a class="btn btn--wa btn--lg contacto__cta" href="https://wa.me/573014585658?text=Hola%2C%20vi%20su%20p%C3%A1gina%20web%20y%20quiero%20informaci%C3%B3n." target="_blank" rel="noopener noreferrer">
           <svg class="ico" aria-hidden="true"><use href="#i-whatsapp"></use></svg>Escríbenos por WhatsApp
         </a>
         <a class="btn btn--facebook btn--lg contacto__cta" id="facebookCta" target="_blank" rel="noopener noreferrer" aria-label="Visitar el Facebook de Red CaliNet">
@@ -348,12 +359,13 @@
 
       <p class="pie__txt">Streaming, trámites, TV por app y tecnología en Bello, Antioquia. Servicio garantizado: lo primordial para nosotros es el cliente.</p>
 
-      <div class="pie__redes" id="pieRedes"></div>
+      <div class="pie__redes" id="pieRedes"><a class="social-btn instagram" href="https://www.instagram.com/red_calinet" target="_blank" rel="noopener noreferrer" aria-label="Instagram de Red CaliNet"><svg class="ico" aria-hidden="true"><use href="#i-instagram"></use></svg></a>
+<a class="social-btn whatsapp" href="https://wa.me/573014585658" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp de Red CaliNet"><svg class="ico" aria-hidden="true"><use href="#i-whatsapp"></use></svg></a></div>
     </div>
 
     <div class="pie__legal">
       <p>© <span id="anio">2026</span> Red CaliNet · Bello, Antioquia, Colombia</p>
-      <p>Sitio web por <a href="https://konfiozinc.github.io/card/" target="_blank" rel="noopener">KONFÍO ZINC</a></p>
+      <p>Sitio web por <a href="https://konfiozinc.github.io/card/" target="_blank" rel="noopener noreferrer">KONFÍO ZINC</a></p>
       <a href="privacidad.html">Política de privacidad</a>
     </div>
   </div>
@@ -380,27 +392,41 @@
   "email": "redcalinetmono@gmail.com",
   "address": {
     "@type": "PostalAddress",
-      "streetAddress": "Calle 64 AB #105 A 93",
+    "streetAddress": "Calle 64 AB #105 A 93",
     "addressLocality": "Bello",
     "addressRegion": "Antioquia",
     "addressCountry": "CO"
   },
-  "areaServed": { "@type": "AdministrativeArea", "name": "Antioquia, Colombia" },
+  "areaServed": {
+    "@type": "AdministrativeArea",
+    "name": "Antioquia, Colombia"
+  },
   "openingHoursSpecification": [
     {
       "@type": "OpeningHoursSpecification",
-      "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+      "dayOfWeek": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday"
+      ],
       "opens": "09:00",
       "closes": "21:30"
     },
     {
       "@type": "OpeningHoursSpecification",
-      "dayOfWeek": "Sunday",
+      "dayOfWeek": [
+        "Sunday"
+      ],
       "opens": "10:00",
       "closes": "20:00"
     }
   ],
-  "sameAs": ["https://www.instagram.com/red_calinet"],
+  "sameAs": [
+    "https://www.instagram.com/red_calinet"
+  ],
   "contactPoint": {
     "@type": "ContactPoint",
     "contactType": "customer service",

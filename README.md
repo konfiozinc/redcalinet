@@ -1,13 +1,15 @@
-# Red CaliNet — Landing Page
+# Red CaliNet
 
-Sitio web de **Red CaliNet** (REDCALINET) · Bello, Antioquia, Colombia.
+Landing estática de Red CaliNet en Bello, Antioquia. HTML, CSS y JavaScript nativo;
+sin backend, paquetes de aplicación, fuentes remotas ni analítica incorporada.
+La galería contiene dos fotografías. Los precios y disponibilidad se consultan
+por WhatsApp; la web no procesa compras ni pagos.
 
 > **Tu conexión con servicios y soluciones digitales** — Servicio garantizado, lo primordial para nosotros es el cliente.
 
-- **En vivo:** https://konfiozinc.github.io/redcalinet/
-- **WhatsApp:** [+57 301 458 5658](https://wa.me/573014585658)
-- **Correo:** [redcalinetmono@gmail.com](mailto:redcalinetmono@gmail.com)
-- **Instagram:** [@red_calinet](https://www.instagram.com/red_calinet)
+`data.json` es la fuente de configuración. `plantillas/index.html` y
+`plantillas/privacidad.html` contienen estructura y textos editoriales.
+**No editar a mano `index.html` ni `privacidad.html`: son salidas generadas.**
 
 ## Categorías
 
@@ -112,7 +114,12 @@ assets/logo/    Logo procesado (WebP/PNG/JPG) + OG image
 assets/img/galeria/  Fotos de producto (WebP)
 ```
 
-## Cómo editar contenido
+Se validan marca, contacto, HTTPS sin credenciales, teléfono numérico, dirección
+postal, servicios, detalles, iconos, redes y horarios antes de escribir. Una entrada
+inválida, un JSON ausente/incompatible o una plantilla ausente impide generar y
+conserva los archivos anteriores. `--check` detecta salidas obsoletas. No se consulta
+`data.json` desde el navegador: fallos o demoras de esa ruta no bloquean el sitio
+ni activan un segundo juego de datos.
 
 Edita `data.json` (marca, contacto, horarios, redes, `categorias` → `fichas`, y beneficios).
 Cada ficha admite `nombre`, `descripcion`, `precio` (`null` = "consultar por WhatsApp"),
@@ -121,18 +128,76 @@ Si cambias los datos ahí, **replica el cambio en el objeto `FALLBACK`**
 de `script.js`, que es el respaldo que se usa cuando `data.json` no se puede leer
 (p. ej. abriendo el HTML con `file://`).
 
-El formulario de contacto **no guarda datos en ningún servidor**: al enviarlo se abre WhatsApp con un mensaje pre-armado. Solo se conserva nombre y correo en `localStorage` (el dispositivo del visitante) para prellenar la próxima visita.
+Redes con URL vacía no producen botones. No se aceptan HTTP, esquemas de datos,
+credenciales en URL ni puertos alternativos. La configuración sigue siendo pública:
+no introducir claves ni datos de clientes.
 
-## Publicación
+## Formulario y privacidad
 
-GitHub Pages sirve la rama `main` desde la raíz del repo. Un `git push origin main` publica los cambios (sin `--force`; el historial se conserva).
+El HTML contiene servicios, contactos y enlaces operativos sin JavaScript.
+Sin JavaScript el formulario permanece deshabilitado y ofrece contacto directo.
+Con JavaScript prepara un enlace; no puede confirmar envío, recepción ni
+disponibilidad de WhatsApp. La continuación queda visible incluso si falla la
+apertura automática. Los campos no tienen `name` y CSP deniega envío nativo.
 
-## Notas
+No se escriben ni restauran nombre/correo mediante localStorage. Se intenta borrar
+solo la clave antigua `redcalinet-contacto`, sin leerla ni tocar otras aplicaciones.
+Un navegador que no vuelva a cargar esta versión o impida el borrado puede conservar
+el borrador anterior; puede eliminarse desde sus ajustes.
 
-- El archivo original `redcalinet.png` era en realidad un **JPEG** (magic bytes `FF D8 FF E0 … JFIF`); se guardó como `tools/originales/redcalinet.jpg` con su extensión real.
-- El contenido anterior de este repo (tarjeta de Nicole Montalvo, `plan-de-trabajo-musical-nicole.md`, etc.) quedó respaldado en el mirror `12-BACKUPS-ANTIGUOS/redcalinet-ANTES-DE-REDCALINET-2026-10-13.git` del workspace local, fuera de este repo público.
-- Iconos: SVG inline (sin CDN, sin Font Awesome). Tipografía: Inter vía Google Fonts (preconnect + carga no bloqueante, con fallback a fuentes del sistema).
+Al abrir WhatsApp su proveedor recibe el texto en la URL antes de que el visitante
+decida enviar el mensaje. La política describe ese paso. El formulario limita el
+nombre a 120, el correo a 254 y el mensaje a 2000 caracteres. No hay Google Fonts.
 
----
+## Regresiones de navegador
 
-Sitio desarrollado por [KONFÍO ZINC](https://konfiozinc.github.io/card/).
+Requieren herramientas QA **ya disponibles**: Node, Playwright, Chromium y
+`pdftotext`. No son dependencias de la aplicación publicada ni se solicita
+instalarlas en el computador del propietario.
+
+```sh
+node --test --test-isolation=none pruebas/contenido.test.cjs pruebas/navegador.test.cjs
+```
+
+El harness sirve solo `127.0.0.1` bajo `/redcalinet/`, bloquea conexiones externas y
+service workers y sustituye la apertura de WhatsApp. Usa identidades ficticias.
+Guarda evidencias fuera del checkout en `../validacion-saneamiento/`;
+`RCL_EVIDENCIAS` permite otra carpeta y `RCL_CHROMIUM` otro binario ya disponible.
+Los ensayos negativos de CSP generan violaciones **esperadas**; las navegaciones
+normales deben quedar sin violaciones, excepciones ni intentos de red externos.
+
+## Publicación, robots y recuperación
+
+El sitio existente utiliza GitHub Pages, main y la raíz del repositorio, bajo
+`https://konfiozinc.github.io/redcalinet/`. Pages no ejecuta el generador: antes de
+una publicación autorizada deben estar versionadas las dos salidas actualizadas
+y pasar `--check`. Un push a main puede publicar: **este lote no autoriza push,
+merge ni despliegue**.
+
+`_config.yml` excluye plantillas, herramientas, pruebas y documentación de la
+publicación Jekyll para evitar páginas con variables sin resolver. Se comprueba
+la configuración estáticamente; el build real de Pages debe validarse antes de
+publicar porque Ruby/Jekyll no están disponibles en este entorno.
+
+CSP y Referrer-Policy se proporcionan mediante meta compatible con Pages.
+No equivale a configurar cabeceras HTTP. `frame-ancestors` no funciona en CSP meta;
+el control de framing por cabecera requiere una decisión de alojamiento.
+
+`/redcalinet/robots.txt` no sustituye a `/robots.txt` del origen compartido. Su
+directiva Sitemap no acredita descubrimiento. El propietario deberá comprobar
+Search Console o una configuración autorizada en la raíz. No se cambia otro
+repositorio ni la raíz compartida para resolverlo.
+
+Para recuperar una versión usar una copia limpia del commit aprobado, generar,
+verificar y revisar el diff antes de integrar con autorización. No usar reset ni
+force push sobre main. El generador reemplaza cada archivo por rename desde un
+temporal local; no es una transacción de dos archivos ante fallo del sistema.
+Si se interrumpe, repetir generación y `--check` antes de versionar. No hay
+respaldos externos verificados ni un original `tools/originales/` incluido.
+
+Los tres recursos sin referencias actuales se conservan por compatibilidad con
+URLs públicas históricas: no se acreditó ausencia de consumidores externos.
+No se cambian logotipos ni fotografías. Detalle: `docs/SANEAMIENTO-RCL-001-016.md`.
+
+El agente IA de Konfío Zinc mantiene auditoría específica pendiente; estas pruebas
+validan exclusivamente el alcance local de Red CaliNet.
