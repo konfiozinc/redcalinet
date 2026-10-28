@@ -1,0 +1,21 @@
+{
+  "proyecto": "red-calinet",
+  "estado": "PREVISTO — no creado todavía",
+  "notas": [
+    "Solo correo y rol. Ni contraseñas ni credenciales: las cuentas se crean sin contraseña y cada responsable define la suya.",
+    "El script aborta con cualquier correo que no esté en esta lista y con cualquier rol fuera de SUPERADMIN/PROPIETARIO.",
+    "El rol queda fijado aquí: no se puede pedir otro rol por línea de comandos."
+  ],
+  "cuentas": [
+    {
+      "correo": "redcalinet9@gmail.com",
+      "rol": "SUPERADMIN",
+      "nombre": "Administración general"
+    },
+    {
+      "correo": "redcalinetmono@gmail.com",
+      "rol": "PROPIETARIO",
+      "nombre": "Propietario de Red CaliNet"
+    }
+  ]
+}
