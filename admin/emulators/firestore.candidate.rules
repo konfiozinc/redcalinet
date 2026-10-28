@@ -1,0 +1,48 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function usuarioActual() {
+      return isSignedIn()
+        ? get(/databases/$(database)/documents/usuarios/$(request.auth.uid)).data
+        : null;
+    }
+
+    function rol() {
+      return usuarioActual() != null ? usuarioActual().rol : '';
+    }
+
+    function esPropietario() {
+      return rol() == 'PROPIETARIO' || rol() == 'SUPERADMIN';
+    }
+
+    function esSuperAdmin() {
+      return rol() == 'SUPERADMIN';
+    }
+
+    match /configuracion/{id} {
+      allow read: if true;
+      allow write: if esPropietario();
+    }
+
+    match /categorias/{id} {
+      allow read: if true;
+      allow write: if esPropietario();
+    }
+
+    match /servicios/{id} {
+      allow read: if resource.data.estado == 'PUBLICADO' || esPropietario();
+      allow write: if esPropietario();
+    }
+
+    match /usuarios/{uid} {
+      allow read: if isSignedIn() && (request.auth.uid == uid || esSuperAdmin());
+      allow write: if esSuperAdmin();
+    }
+  }
+}

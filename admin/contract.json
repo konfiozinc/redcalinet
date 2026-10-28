@@ -1,0 +1,43 @@
+{
+  "version": "KZ-REDCALINET-ADMIN-003",
+  "status": "HARNESS_CONTRACT_RECEIVED_LOCAL_ONLY",
+  "collections": [
+    "configuracion",
+    "categorias",
+    "servicios",
+    "usuarios"
+  ],
+  "configDocuments": [
+    "empresa",
+    "contacto"
+  ],
+  "publicationStates": [
+    "BORRADOR",
+    "PUBLICADO",
+    "OCULTO"
+  ],
+  "roles": [
+    "PROPIETARIO",
+    "SUPERADMIN"
+  ],
+  "price": {
+    "field": "precio",
+    "currency": "COP",
+    "type": "integer-or-null",
+    "zeroMeans": "consultar por WhatsApp"
+  },
+  "privateExtensions": [
+    "_adminRegistros",
+    "multimedia",
+    "promociones",
+    "auditoria"
+  ],
+  "extensionsPublicConsumer": false,
+  "harnessCommit": "2dfff109984b3a67cd1967a91d831a4508da8814",
+  "sourceAuthenticity": "Provided documentation; SHA-256 matches supplied manifest, not a signature or production certification",
+  "productionEnabled": false,
+  "requests": {
+    "enabled": false
+  },
+  "publicReader": "Exact four Firestore queries from Harness. GET public/catalogo is auxiliary QA; public website unchanged."
+}

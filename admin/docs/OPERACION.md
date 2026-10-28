@@ -1,0 +1,30 @@
+# Operación privada — ADMIN-003
+
+Ver COMPATIBILIDAD-003.md antes de operar. No publicar ni desplegar. El contrato oficial está recibido; faltan backend real, comprobación de reglas/activo, cuentas/dominos/configuración real y certificación conjunta.
+
+## Uso local
+
+Productos y servicios comparten servicios; BORRADOR no se publica, PUBLICADO se decide explícitamente, OCULTO se retira. Precio null/0 significa consultar. Editar empresa y redes guarda por separado empresa/contacto con merge. Categoría visible:false oculta sus fichas en la UI pública, pero no vuelve privados los documentos PUBLICADO. Galerías/videos y promociones son extensiones que la web de Harness no consume. Cloudinary real sigue bloqueado sin configuración/revisión; solo QA_FIXTURE tiene subida habilitada en estas pruebas.
+
+## Entorno local reproducible
+
+Node 24 y Java 21, Chromium, npm y ffmpeg. `npm ci` dentro de admin. `npm run build` genera únicamente admin/dist. Todas las rutas privadas y el cliente se sirven con `npm start` pero requieren variables explícitas.
+
+1. Firebase Emulator Suite: `npm run emulators` con proyecto demo del script. Descarga normalmente el emulador oficial. La red de esta sesión bloqueó la descarga directa; se usó la distribución OFICIAL Google Cloud SDK desde Docker Hub permitido, sin cambiar la política ni acceder al host bloqueado.
+2. Alternativa reproducible usada: imagen `google/cloud-sdk@sha256:45d588b937600ed7210df263ddd59ca52d10b5061c14dfa5a96bdd65ee6874a7`, extraer `/google-cloud-sdk/platform/cloud-firestore-emulator/`. SHA-256 del jar: `6262939c48d3d6b08495931706b8920399e57d5f5918e6af133a3d30cb3ae369`. Ejecutar SU lanzador `cloud_firestore_emulator`, no `java -jar` (no tiene Main-Class), con `--host=127.0.0.1 --port=8080 --project_id=demo-redcalinet-admin --single_project_mode=true --single_project_mode_error=true --rules=emulators/firestore.candidate.rules`. Auth oficial se inicia con Firebase CLI `emulators:start --only auth --project demo-redcalinet-admin --config emulators/firebase.json`.
+3. Exportar RCL_MODE=emulator, GCLOUD_PROJECT=demo-redcalinet-admin, FIRESTORE_EMULATOR_HOST=127.0.0.1:8080 y FIREBASE_AUTH_EMULATOR_HOST=127.0.0.1:9099. Ejecutar `node scripts/bootstrap-emulator.mjs`. Solo crea cuentas ficticias en el proyecto demo; preserva documentos existentes. Las referencias iniciales proceden del encargo y no se publican. Nunca usarlo en otro proyecto.
+4. Para pruebas multimedia locales añadir RCL_TEST_MEDIA=fixture. Ejecutar `npm start`: http://127.0.0.1:5176/admin/. La interfaz indica explícitamente QA y que no usa Cloudinary real. No abrir el servidor QA a Internet.
+5. Cuentas SOLO QA: superadmin@rcl.example.test y admin@rcl.example.test; contraseña de fixture RCL-Only-QA-2026! No son secretos de producción ni cuentas del cliente.
+6. `npm test`, `node test/integration.mjs`, `node test/users.mjs`, `node test/harness-contract.mjs`, `node test/browser.mjs`, en ese orden. Añadir node test/harness-examples.mjs con RCL_HARNESS_EXAMPLES apuntando al archivo oficial recibido; node test/session-isolation.mjs; node test/ui-failures.mjs. No contar test/rules.mjs por separado: delega en la misma suite de contrato. Generar antes los archivos ficticios con `node scripts/create-fixtures.mjs` (ffmpeg, color azul y un segundo de video H264). Las pruebas requieren ambos emuladores/API activos y modifican únicamente QA. Los fallos previos de sincronización se corrigieron antes de contabilizar una ejecución completa.
+
+Los resultados y capturas viven en .runtime y no se publican. No empaquetar node_modules, .runtime, logs, perfiles Chrome ni .env privados para despliegue. No hacer push a main: GitHub Pages podría publicar archivos internos. El responsable de publicación deberá revisar la exclusión del backend, reglas, herramientas y documentación antes de cualquier integración; no se alteró _config.yml en esta entrega.
+
+## Persistencia, originales y recuperación
+
+Los registros se guardan en Firestore real de emulador, no en memoria del navegador. El emulador admite exportación al disco/importación para recuperar QA. El ensayo inicial de cierre automático NO produjo export de Firestore y no se contabilizó como aprobación; no confiar en ese indicador del lanzador. Ejecutar primero `RCL_MODE=emulator GCLOUD_PROJECT=demo-redcalinet-admin FIRESTORE_EMULATOR_HOST=127.0.0.1:8080 node scripts/export-firestore-emulator.mjs`, que utiliza el endpoint oficial de exportación y exige metadata no vacía ANTES de detener. Luego arrancar el lanzador con `--seed_from_export=.runtime/admin-003-firestore-export/firestore_export/firestore_export.overall_export_metadata`. Auth se exporta/importa con el CLI oficial y su firebase-export-metadata.json. El test/persistence.mjs compara hashes de todos los campos, conteos de las ocho colecciones y cuentas, y verifica login/rol después de restaurar ambos servicios. Eso no configura backup de Firestore de producción. Antes de cualquier uso real se debe revisar plan/región/retención y probar un respaldo autorizado del proyecto, sin copiar datos personales a este repositorio. Una versión Git no respalda Firestore ni archivos Cloudinary. La auditoría de la aplicación no es un registro inmutable frente a administradores del proveedor.
+
+No se activaron servicios, buckets, facturación ni planes. No se crearon identidades reales ni se desplegaron reglas, API, frontend o Firebase. La recuperación de contraseña se probó como solicitud OOB del Auth Emulator; no acredita entrega real de correo.
+
+Las reglas locales son copia exacta de las recibidas, NO una propuesta endurecida. Los roles directos pueden eludir auditoría/validación del API y el campo activo no se aplica en esas reglas. No crear un primer propietario real ni configurar Cloudinary/credenciales en esta misión.
+
+ADMIN-003 mantiene un bloqueo explícito del proveedor Cloudinary real, incluso con variables configuradas. Se conserva el SDK de transporte para una misión posterior de configuración y verificación autorizada. Solo QA_FIXTURE local puede subir archivos en este candidato.
