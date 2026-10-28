@@ -130,3 +130,51 @@ desplegando el `firestore.rules` v2 del commit `17a2d06`.
 
 **Orden obligatorio:** Worker publicado y verificado → reglas v3 → certificación de permisos →
 activación de cuentas → migración del catálogo → publicación de la URL del panel.
+## Credenciales exactas que necesita el Worker
+
+| Nombre | Tipo | Contenido | Dónde vive |
+|---|---|---|---|
+| `FIREBASE_SA` | **secreto** | JSON de cuenta de servicio de `red-calinet` (`client_email`, `private_key`, `project_id`, `token_uri`) | `wrangler secret put` |
+| `FIREBASE_API_KEY` | público | API key web del proyecto (viaja al navegador) | `wrangler.toml` — **ya completada** |
+| `PROYECTO_FIREBASE` | público | `red-calinet` | idem |
+| `CARPETA_MEDIA` | público | `redcalinet/admin` | idem |
+| `MODO_EMULADOR` | público | `0` en producción | idem |
+| `RCL_PUBLIC_ORIGIN` | público | `https://redcalinet-admin.konfiozinc.workers.dev` | idem |
+| `CLOUDINARY_CLOUD_NAME` / `CLOUDINARY_API_KEY` | públicos | solo al habilitar la subida real | idem (marcadores) |
+| `CLOUDINARY_API_SECRET` | **secreto** | solo al habilitar la subida real | `wrangler secret put` |
+
+**Permiso mínimo de la cuenta de servicio: `roles/datastore.user`, y nada más.**
+El Worker verifica los ID tokens contra Identity Toolkit con la API key pública, así que
+**no necesita permisos de Auth Admin** ni la Admin API de Identity Toolkit.
+
+## Activación (comandos exactos, en este orden)
+
+```powershell
+cd redcalinet/admin-worker
+
+# 0. Seguridad previa: empaqueta y valida SIN publicar
+node node_modules/wrangler/bin/wrangler.js deploy --env produccion --dry-run
+
+# 1. Secreto de la cuenta de servicio (se pega el JSON completo; no se guarda en el repo)
+node node_modules/wrangler/bin/wrangler.js secret put FIREBASE_SA --env produccion
+
+# 2. Publicar el Worker (crea 'redcalinet-admin'; no toca los otros tres)
+node node_modules/wrangler/bin/wrangler.js deploy --env produccion
+
+# 3. Verificar el despliegue
+curl https://redcalinet-admin.konfiozinc.workers.dev/admin/api/bootstrap
+#    esperado: "local":false  ·  "entorno":"WORKER_CLOUDFLARE"  ·  media.mode REAL_UPLOADS_DISABLED
+
+# 4. Registrar el origen en Firebase Authentication (consola → Authentication → Settings →
+#    Authorized domains): redcalinet-admin.konfiozinc.workers.dev
+
+# 5. Probar el login real del SUPERADMIN en el panel publicado.
+#    Si falla con "auth/unauthorized-domain", el paso 4 no está guardado.
+
+# 6. Reversión inmediata si algo va mal
+node node_modules/wrangler/bin/wrangler.js deployments list --env produccion
+node node_modules/wrangler/bin/wrangler.js rollback <ID> --env produccion
+```
+
+**No desplegar las reglas v3 antes del paso 5.** El orden es: Worker verificado → login real →
+certificación de permisos → reglas v3 → activación de cuentas → migración → URL pública.

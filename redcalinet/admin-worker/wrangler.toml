@@ -35,7 +35,7 @@ RCL_PUBLIC_ORIGIN = "http://127.0.0.1:8787"
 # ---------------------------------------------------------------------------
 [env.produccion]
 name = "redcalinet-admin"
-vars = { PROYECTO_FIREBASE = "red-calinet", FIREBASE_API_KEY = "<FIREBASE_WEB_API_KEY_PUBLICA>", CARPETA_MEDIA = "redcalinet/admin", MODO_EMULADOR = "0", RCL_PUBLIC_ORIGIN = "https://<SUBDOMINIO>.workers.dev", CLOUDINARY_CLOUD_NAME = "<CLOUDINARY_CLOUD_NAME>", CLOUDINARY_API_KEY = "<CLOUDINARY_API_KEY>" }
+vars = { PROYECTO_FIREBASE = "red-calinet", FIREBASE_API_KEY = "AIzaSyAJ4mWGO1gdXtnsJQDveY0l6icBM_uFlSk", CARPETA_MEDIA = "redcalinet/admin", MODO_EMULADOR = "0", RCL_PUBLIC_ORIGIN = "https://redcalinet-admin.konfiozinc.workers.dev", CLOUDINARY_CLOUD_NAME = "<CLOUDINARY_CLOUD_NAME>", CLOUDINARY_API_KEY = "<CLOUDINARY_API_KEY>" }
 
 [env.produccion.assets]
 directory = "./public"

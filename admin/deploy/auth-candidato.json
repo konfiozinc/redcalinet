@@ -9,7 +9,7 @@
   },
   "dominiosAutorizados": [
     "localhost",
-    "<SUBDOMINIO>.workers.dev",
+    "redcalinet-admin.konfiozinc.workers.dev",
     "konfiozinc.github.io"
   ],
   "politicaDeContrasena": {

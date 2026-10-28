@@ -10,3 +10,6 @@ public/admin/
 # Evidencias de pruebas
 .runtime/
 *.log
+
+# Bundle generado por 'wrangler deploy --dry-run'
+.runtime-dry/
