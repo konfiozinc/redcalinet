@@ -101,13 +101,12 @@ El único cambio fuera del panel es una corrección en el **adaptador local de c
 
 ## 5. Errores encontrados y corregidos
 
-1. **Los videos no se podían subir en local.** El formulario que va al proveedor no lleva el campo `tipo` —añadirlo alteraría los parámetros firmados de Cloudinary—, así que el adaptador local asumía siempre `image` y rechazaba cualquier `.mp4` con «Extensión de archivo no permitida». Ahora deduce el tipo de la extensión ya validada. **La ruta de producción (Cloudinary) no se modificó.**
+1. **Guardar la configuración empresarial y las redes sociales nunca funcionó.** El Worker escribía, para cada colección del contrato, un documento «espejo» de metadatos privados (`_adminRegistros`). `configuracion` no tiene espejo —son dos documentos planos, `empresa` y `contacto`— así que la ruta era `null` y el commit se enviaba con `…/documents/undefined`; Firestore lo rechazaba con `400` y el panel mostraba «No se pudo guardar en Firestore». Ahora el espejo solo se escribe cuando existe. Verificado: `PATCH /admin/api/configuracion/empresa` → `200`, y la ciudad guardada se lee de vuelta en la API y en la auditoría.
+2. **Los videos no se podían subir en local.** El formulario que va al proveedor no lleva el campo `tipo` —añadirlo alteraría los parámetros firmados de Cloudinary—, así que el adaptador local asumía siempre `image` y rechazaba cualquier `.mp4` con «Extensión de archivo no permitida». Ahora deduce el tipo de la extensión ya validada. **La ruta de producción (Cloudinary) no se modificó.**
 2. **Comprobación obsoleta en `test/worker-025.mjs`.** Desde KZ-035 la firma se emite sobre el nombre, no sobre la ruta, así que la prueba de «firma falsificada» recibía `400` (ruta no autorizada) en lugar de `403` (firma inválida) — y llevaba desde entonces en rojo. Se separaron las dos garantías, que ahora se comprueban por separado y las dos pasan:
    - archivo fuera de la carpeta autorizada → `400`;
    - firma falsificada sobre la ruta correcta → `403`.
-3. **La rejilla de miniaturas crecía con la biblioteca.** Con 12 archivos medía 740 px y empujaba las acciones fuera de la vista. Ahora se limita a dos filas con desplazamiento propio (212 px) y muestra un resumen plegado cuando la ficha ya tiene archivos.
-
----
+3. **La rejilla de miniaturas crecía con la biblioteca.** Con 12 archivos medía 740 px y empujaba las acciones fuera de la vista. Ahora se limita a dos filas con desplazamiento propio (212 px) y muestra un resumen plegado cuando la ficha ya tiene archivos.---
 
 ## 6. Verificación
 
@@ -118,9 +117,9 @@ El único cambio fuera del panel es una corrección en el **adaptador local de c
 | `test/worker-025.mjs` — API, permisos, auditoría, idempotencia, multimedia | 29 | **29/29** |
 | `test/interfaz-025.mjs` — panel servido por el Worker, escritorio y móvil | 7 | **7/7** |
 | `test/concurrencia-026.mjs` — testigos de concurrencia | 4 | **4/4** |
-| `test/recorrido-037.mjs` — recorrido completo de 10 pasos (nueva) | 31 | **31/31** |
+| `test/recorrido-037.mjs` — recorrido completo de 10 pasos + editores de configuración y usuarios (nueva) | 34 | **34/34** |
 | `test/diseno-037.mjs` — medidas de diseño táctil y contraste (nueva) | 12 | **12/12** |
-| **Total** | **83** | **83/83** |
+| **Total** | **86** | **86/86** |
 
 Cada paso del recorrido se comprueba dos veces: en la pantalla y en la API. Una interfaz que «parece» funcionar no puede dar por buena una escritura que no ocurrió.
 
@@ -140,6 +139,8 @@ Cada paso del recorrido se comprueba dos veces: en la pantalla y en la API. Una 
 | 10 | Interfaz en móvil y escritorio | 375×667 y 1440×900, 8 secciones sin desbordes, capturas guardadas | ✅ |
 
 Las fichas creadas son datos ficticios del emulador (`demo-redcalinet-admin`). **No se publicó nada en producción.**
+
+Además de los diez pasos, el recorrido comprueba los dos editores que no son de catálogo: **configuración empresarial** (guarda y se relee, con su entrada de auditoría) y **usuarios** (abre con sus bloques y roles; no se guarda para no alterar permisos durante la verificación).
 
 ### Medidas de diseño (antes → después)
 

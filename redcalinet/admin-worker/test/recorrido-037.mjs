@@ -374,6 +374,40 @@ await chk('el video también se oculta desde la sección Videos', async () => {
 });
 
 /* ============================================================
+   Otros editores: configuración y usuarios
+   ============================================================ */
+console.log('\n== Otros editores ==');
+await chk('guarda la configuración empresarial desde el formulario', async () => {
+  await nav('Configuración empresarial').click();
+  await pagina.waitForTimeout(500);
+  await pagina.getByRole('button', { name: 'Editar configuración' }).click();
+  await pagina.locator('#editor-form').waitFor();
+  const campos = await pagina.locator('#editor-form .form-section').count();
+  if (campos !== 1) throw new Error('la configuración debería tener un bloque y tiene ' + campos);
+  await pagina.locator('#editor-form input[name=ciudad]').fill('Cali (QA 037)');
+  await pagina.locator('#editor-form .fixed-actions button[data-destino=""]').click();
+  await pagina.locator('#editor-form').waitFor({ state: 'detached', timeout: 20000 });
+  const empresa = (await api('configuracion')).data.items.find((r) => r.id === 'empresa');
+  if (empresa.ciudad !== 'Cali (QA 037)') throw new Error('la ciudad no se guardó: ' + empresa.ciudad);
+});
+await chk('el editor de usuarios abre con sus campos y roles', async () => {
+  await nav('Usuarios y permisos').click();
+  await pagina.waitForTimeout(700);
+  await pagina.locator('.row-name').first().click();
+  await pagina.locator('#editor-form').waitFor();
+  const secciones = (await pagina.locator('#editor-form .form-section h3').allInnerTexts()).map((t) => t.trim());
+  if (!secciones.includes('Cuenta') || !secciones.includes('Acceso')) throw new Error('faltan bloques: ' + secciones.join(' | '));
+  const roles = await pagina.locator('#editor-form select[name=rol] option').allInnerTexts();
+  if (!roles.includes('PROPIETARIO') || !roles.includes('SUPERADMIN')) throw new Error('faltan roles: ' + roles.join(' | '));
+  // No se guarda: cambiar roles en la verificación no aporta y sí puede molestar.
+  await pagina.getByRole('button', { name: 'Cerrar formulario' }).click();
+});
+await chk('la auditoría registra el cambio de configuración', async () => {
+  const entradas = (await api('auditoria')).data.items;
+  if (!entradas.some((a) => a.coleccion === 'configuracion' && a.accion === 'EDITAR')) throw new Error('no hay entrada de auditoría de configuración');
+});
+
+/* ============================================================
    9. Permisos
    ============================================================ */
 console.log('\n== 9. Permisos ==');

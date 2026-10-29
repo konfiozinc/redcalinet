@@ -44,7 +44,7 @@ $env:RCL_CHROMIUM="$env:LOCALAPPDATA\ms-playwright\chromium-1243\chrome-win64\ch
 node test/worker-025.mjs       # 29/29 · API, permisos, auditoría, idempotencia, multimedia
 node test/interfaz-025.mjs     #  7/7  · panel desde el Worker, escritorio y móvil
 node test/concurrencia-026.mjs #  4/4  · testigos de concurrencia entre validación y commit
-node test/recorrido-037.mjs    # 31/31 · recorrido completo de administración en 10 pasos
+node test/recorrido-037.mjs    # 34/34 · recorrido completo de administración en 10 pasos
 node test/diseno-037.mjs       # 12/12 · medidas de diseño táctil, contraste y desbordes
 ```
 
