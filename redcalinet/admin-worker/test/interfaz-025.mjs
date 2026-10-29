@@ -62,7 +62,7 @@ await chk('escritorio 1440x900 sin desbordes', async () => {
 });
 
 await chk('la biblioteca de multimedia abre sin error', async () => {
-  await pagina.locator('.sidebar nav').getByRole('button', { name: 'Biblioteca multimedia', exact: true }).click();
+  await pagina.locator('.sidebar nav').getByRole('button', { name: 'Fotografías', exact: true }).click();
   await pagina.locator('.loading').waitFor({ state: 'hidden' }).catch(() => {});
   await pagina.waitForTimeout(800);
   const texto = await pagina.locator('.content').innerText();
