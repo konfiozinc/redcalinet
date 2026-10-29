@@ -60,6 +60,8 @@ export const estado = {
   lastFocus: null,
   previewURL: null,
   auditPage: 0,
+  // Qué selectores de medios están desplegados dentro de la ficha abierta.
+  pickers: {},
   // Cada inicio o cierre de sesión incrementa la generación: una respuesta que
   // llega tarde de la sesión anterior se descarta en vez de pintar datos ajenos.
   sesion: 0

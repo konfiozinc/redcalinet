@@ -10,7 +10,7 @@ import { pintar, pintarLogin } from './nucleo/pintar.js';
 import { contenido } from './vistas/index.js';
 import {
   abrirEditor, abrirSubida, abrirEliminar, cerrarModal, guardar, subir, eliminar,
-  alternarMedia, reordenarMedio, quitarMedio, cambiarEstadoMedia, actualizarChecklist, errorFormulario
+  alternarMedia, reordenarMedio, quitarMedio, abrirPicker, cambiarEstadoMedia, actualizarChecklist, errorFormulario
 } from './editor/index.js';
 import { signInWithEmailAndPassword, signOut, sendPasswordResetEmail } from 'firebase/auth';
 
@@ -178,6 +178,7 @@ export function conectar() {
 
     if (accion === 'toggle-media') return alternarMedia(boton.dataset.campo, boton.dataset.id);
     if (accion === 'quitar-media') return quitarMedio(boton.dataset.campo, boton.dataset.id);
+    if (accion === 'abrir-picker') return abrirPicker(boton.dataset.campo);
     if (accion === 'reorder') return reordenarMedio(boton.dataset.field, +boton.dataset.index, +boton.dataset.direction);
 
     if (accion === 'media-estado') {

@@ -62,16 +62,27 @@ await chk('la rejilla de fotografías tiene al menos dos columnas y miniaturas d
   await movil.locator('.row-name').first().click();
   await movil.locator('#editor-form').waitFor();
   await movil.waitForTimeout(400);
+  // Si la ficha ya trae archivos, el selector está plegado: se despliega como lo
+  // haría el propietario, tocando «Cambiar selección».
+  if (await movil.locator('[data-action="abrir-picker"]').count()) {
+    await movil.locator('[data-action="abrir-picker"]').first().click();
+    await movil.waitForTimeout(300);
+  }
   const m = await movil.evaluate(() => {
     const rejilla = document.querySelector('.media-selector .picker-grid');
     if (!rejilla) return null;
     const estilo = getComputedStyle(rejilla).gridTemplateColumns.split(' ').filter(Boolean).length;
     const item = rejilla.querySelector('.picker-item');
-    return { columnas: estilo, ancho: item ? Math.round(item.getBoundingClientRect().width) : 0 };
+    return {
+      columnas: estilo,
+      ancho: item ? Math.round(item.getBoundingClientRect().width) : 0,
+      alto: Math.round(rejilla.getBoundingClientRect().height)
+    };
   });
   if (!m) throw new Error('no hay rejilla de miniaturas');
   if (m.columnas < 2) throw new Error('solo ' + m.columnas + ' columna(s)');
   if (m.ancho < 90) throw new Error('miniatura de ' + m.ancho + ' px');
+  if (m.alto > 240) throw new Error('la rejilla mide ' + m.alto + ' px de alto: debería limitarse a dos filas');
 });
 await chk('el formulario va por secciones, con el precio dentro de las tres primeras', async () => {
   const secciones = (await movil.locator('#editor-form .form-section h3').allInnerTexts()).map((t) => t.trim());

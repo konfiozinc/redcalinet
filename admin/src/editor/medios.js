@@ -33,6 +33,24 @@ export function selectorMedios(campo, tipo, draft) {
   const ayuda = esVideo
     ? 'Toca los videos que quieras mostrar en esta ficha.'
     : 'Toca las fotos que quieras mostrar. La primera es la portada.';
+  const abierto = !ids.length || estado.pickers[campo] === true;
+  const cabecera = `<div class="section-head">
+      <h3>${titulo}</h3>
+      <button type="button" class="secondary" data-action="subir-desde-editor" data-campo="${campo}">+ ${esVideo ? 'Subir video' : 'Subir fotografía'}</button>
+    </div>`;
+  /* Al editar una ficha que ya tiene archivos, la rejilla completa ocupa más de
+     lo que aporta: se muestra un resumen con la selección y el botón para
+     cambiarla. La primera vez (ficha nueva o vacía) la rejilla va abierta. */
+  if (!abierto) return `<section class="form-section media-selector" data-picker="${campo}">
+    ${cabecera}
+    <p class="section-help">${ids.length} ${ids.length === 1 ? 'archivo seleccionado' : 'archivos seleccionados'}${campo === 'imagenes' ? ' · la primera es la portada' : ''}.</p>
+    <div class="picker-resumen">${ids.slice(0, 4).map((mid) => {
+      const m = archivo(mid);
+      return `<span class="picker-mini">${m ? miniatura(m) : ''}</span>`;
+    }).join('')}<button type="button" class="secondary" data-action="abrir-picker" data-campo="${campo}">Cambiar selección</button></div>
+    <div class="gallery-order" data-gallery="${campo}">${ordenMedios(campo, draft)}</div>
+    <div id="media-error" role="alert" class="form-error"></div>
+  </section>`;
   const rejilla = catalogo.length
     ? `<div class="picker-grid">${catalogo.map((m) => {
       const elegido = ids.includes(m.id);
@@ -45,11 +63,8 @@ export function selectorMedios(campo, tipo, draft) {
     }).join('')}</div>`
     : `<p class="picker-vacio">Todavía no hay ${esVideo ? 'videos' : 'fotografías'} en la biblioteca.</p>`;
   return `<section class="form-section media-selector" data-picker="${campo}">
-    <div class="section-head">
-      <h3>${titulo}</h3>
-      <button type="button" class="secondary" data-action="subir-desde-editor" data-campo="${campo}">+ ${esVideo ? 'Subir video' : 'Subir fotografía'}</button>
-    </div>
-    <p class="section-help">${ayuda}</p>
+    ${cabecera}
+    <p class="section-help">${ayuda} ${catalogo.length > 6 ? `<span class="picker-contador">${catalogo.length} archivos en la biblioteca; desplaza la rejilla para verlos todos.</span>` : ''}</p>
     ${rejilla}
     <div class="gallery-order" data-gallery="${campo}">${ordenMedios(campo, draft)}</div>
     <div id="media-error" role="alert" class="form-error"></div>

@@ -169,3 +169,13 @@ td button{min-height:44px;min-width:44px}
   .row-actions button{flex:1 1 40%}
   .picker-name{font-size:11px}
 }
+/* Resumen compacto de medios en fichas que ya tienen archivos */
+.picker-resumen{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:0 0 10px}
+.picker-mini{width:46px;height:46px;border-radius:8px;overflow:hidden;background:#e9eff7;display:grid;place-items:center;border:1px solid var(--border);flex:0 0 auto}
+.picker-mini img{width:100%;height:100%;object-fit:cover}
+.picker-mini .picker-video{font-size:16px}
+.picker-resumen .secondary{min-height:38px;font-size:11px;padding:8px 12px}
+/* La rejilla no crece con la biblioteca: dos filas y desplazamiento propio.
+   Con doce archivos ocupaba 740 px y empujaba las acciones fuera de la vista. */
+.media-selector .picker-grid{max-height:212px;overflow-y:auto;overscroll-behavior:contain;padding:2px 4px 2px 2px}
+.media-selector .picker-contador{font-weight:650;color:#4d6580}

@@ -34,6 +34,7 @@ export function abrirEditor(rid, opciones = {}) {
   const coleccion = kind();
   const record = estado.data[coleccion]?.find((r) => r.id === rid);
   estado.lastFocus = document.activeElement;
+  estado.pickers = { [opciones.foco === 'videos' ? 'videos' : 'imagenes']: opciones.abrirPicker === true };
   const id = coleccion === 'configuracion' ? (rid || (estado.view === 'redes' ? 'contacto' : 'empresa')) : rid;
   estado.modal = {
     tipo: 'editor',
@@ -246,6 +247,7 @@ export async function subir(form) {
     if (pendiente && nuevo?.id) {
       const draft = structuredClone(pendiente.draft);
       draft[pendiente.campo] = [...(draft[pendiente.campo] || []), nuevo.id];
+      estado.pickers = { [pendiente.campo]: true };
       abrirEditor(pendiente.id, { draft, foco: pendiente.campo });
       avisoModal('Archivo subido y añadido a esta ficha.');
     }
@@ -284,6 +286,12 @@ export function alternarMedia(campo, id) {
   const draft = estado.modal.draft;
   const actuales = draft[campo] || [];
   draft[campo] = actuales.includes(id) ? actuales.filter((m) => m !== id) : [...actuales, id];
+  actualizarPicker(campo);
+}
+
+/* Despliega la rejilla de miniaturas de una ficha que ya tenía archivos. */
+export function abrirPicker(campo) {
+  estado.pickers[campo] = true;
   actualizarPicker(campo);
 }
 

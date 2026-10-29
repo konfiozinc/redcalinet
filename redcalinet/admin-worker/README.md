@@ -41,9 +41,22 @@ Cuentas del emulador: `superadmin@rcl.example.test` (SUPERADMIN) y
 
 ```powershell
 $env:RCL_CHROMIUM="$env:LOCALAPPDATA\ms-playwright\chromium-1243\chrome-win64\chrome.exe"
-node test/worker-025.mjs     # 27/27 · API, permisos, auditoría, idempotencia, multimedia
-node test/interfaz-025.mjs   #  7/7  · panel desde el Worker, escritorio y móvil
+node test/worker-025.mjs       # 29/29 · API, permisos, auditoría, idempotencia, multimedia
+node test/interfaz-025.mjs     #  7/7  · panel desde el Worker, escritorio y móvil
+node test/concurrencia-026.mjs #  4/4  · testigos de concurrencia entre validación y commit
+node test/recorrido-037.mjs    # 31/31 · recorrido completo de administración en 10 pasos
+node test/diseno-037.mjs       # 12/12 · medidas de diseño táctil, contraste y desbordes
 ```
+
+`recorrido-037` y `diseno-037` (KZ-037) son las suites que responden a lo que el
+propietario necesita comprobar antes de dar el panel por bueno: crear, editar,
+subir archivos, asociarlos, guardar borradores, publicar una ficha de prueba,
+ocultarla, comprobar permisos y medir la interfaz en 375×667 y 1440×900. Cada paso
+se comprueba en la pantalla **y** en la API, y las capturas quedan en
+`.runtime/recorrido-037/` (no se versionan).
+
+Para que la subida funcione en local hace falta la carpeta
+`admin/.runtime/fixtures/` con `test.png` (la usan las suites del Worker).
 
 ## Qué conserva del diseño anterior
 
