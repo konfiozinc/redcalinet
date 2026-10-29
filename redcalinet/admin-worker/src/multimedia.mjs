@@ -151,16 +151,24 @@ export async function guardarQA(env, { filename, tipo, publicId, bytes, mimeType
   const resto = dentroDeCarpeta(env, rutaPublica);
   if (!resto) throw new Fault(403, 'Identificador de archivo no autorizado.');
   const extension = String(filename || '').split('.').pop().toLowerCase();
-  if (!FORMATOS[tipo].includes(extension)) throw new Fault(415, 'Extensión de archivo no permitida.');
+  const ext = extension === 'jpeg' ? 'jpg' : extension;
+  /* KZ-037 — El formulario que va al proveedor NO lleva el campo `tipo`: enviarlo
+     alteraria los parámetros firmados de Cloudinary. Este adaptador local, que
+     solo existe con MODO_EMULADOR=1, deduce el tipo de la extensión ya validada.
+     Sin esto, cualquier video fallaba en local con «Extensión no permitida». */
+  const tipoReal = FORMATOS[tipo]?.includes(extension) ? tipo
+    : FORMATOS.video.includes(ext) ? 'video'
+      : FORMATOS.image.includes(ext) ? 'image'
+        : (FORMATOS[tipo] ? tipo : 'image');
+  if (!FORMATOS[tipoReal].includes(extension)) throw new Fault(415, 'Extensión de archivo no permitida.');
   if (!bytes || bytes.byteLength === 0) throw new Fault(400, 'Archivo vacío.');
-  if (bytes.byteLength > LIMITES[tipo]) throw new Fault(413, 'Archivo superior al límite permitido.');
+  if (bytes.byteLength > LIMITES[tipoReal]) throw new Fault(413, 'Archivo superior al límite permitido.');
 
   // Los primeros bytes del archivo, en hexadecimal (no un hash: son los bytes).
   const cabecera = [...bytes.subarray(0, 16)].map((b) => b.toString(16).padStart(2, '0')).join('');
-  const compatible = (tipo === 'image')
+  const compatible = (tipoReal === 'image')
     ? { png: '89504e470d0a1a0a', jpg: 'ffd8ff', webp: '52494646' }
     : { mp4: '66747970', webm: '1a45dfa3' };
-  const ext = extension === 'jpeg' ? 'jpg' : extension;
   const esperado = compatible[ext];
   // MP4 lleva `ftyp` en el byte 4, no al principio.
   const real = ext === 'mp4' ? cabecera.slice(8) : cabecera;
@@ -171,7 +179,7 @@ export async function guardarQA(env, { filename, tipo, publicId, bytes, mimeType
     public_id: rutaPublica,
     version: Math.floor(Date.now() / 1000),
     format: ext,
-    resource_type: tipo,
+    resource_type: tipoReal,
     bytes: bytes.byteLength,
     url: '/admin/api/multimedia/qa-archivo/' + resto + '.' + ext,
     secure_url: '/admin/api/multimedia/qa-archivo/' + resto + '.' + ext,

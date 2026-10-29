@@ -203,13 +203,40 @@ await chkAsync('el archivo QA se sirve por su URL', async () => {
   assert.equal(r.status, 200);
   assert.match(r.headers.get('content-type') || '', /image\/png/);
 });
+/* KZ-037 — Desde KZ-035 la firma se emite sobre el NOMBRE, no sobre la ruta
+   (Cloudinary compone carpeta + public_id). Aquí se separan las dos garantías
+   que antes se comprobaban en una sola aserción: un archivo fuera de la carpeta
+   autorizada se rechaza por ruta, y una firma falsificada con la ruta correcta
+   se rechaza por criptografía. Ninguna de las dos se relaja. */
+await chkAsync('un archivo fuera de la carpeta autorizada no se registra', async () => {
+  const firma = ok(await api('multimedia/firma', { method: 'POST', body: { tipo: 'image' } }));
+  const r = await api('multimedia/registrar', {
+    method: 'POST',
+    body: { tipo: 'image', timestamp: firma.timestamp, signature: firma.signature, resultado: { public_id: firma.publicId, format: 'png', resource_type: 'image', bytes: 10, secure_url: 'x' } }
+  });
+  assert.equal(r.status, 400);
+});
 await chkAsync('una firma falsificada no registra nada', async () => {
   const firma = ok(await api('multimedia/firma', { method: 'POST', body: { tipo: 'image' } }));
   const r = await api('multimedia/registrar', {
     method: 'POST',
-    body: { tipo: 'image', timestamp: firma.timestamp, signature: 'f'.repeat(40), resultado: { public_id: firma.publicId, format: 'png', resource_type: 'image', bytes: 10, secure_url: 'x' } }
+    body: { tipo: 'image', timestamp: firma.timestamp, signature: 'f'.repeat(40), resultado: { public_id: firma.rutaPublica, format: 'png', resource_type: 'image', bytes: 10, secure_url: 'x' } }
   });
   assert.equal(r.status, 403);
+});
+await chkAsync('un video se puede cargar en el adaptador local (KZ-037)', async () => {
+  const firma = ok(await api('multimedia/firma', { method: 'POST', body: { tipo: 'video' } }));
+  const mp4 = Buffer.from('000000186674797069736f6d0000020069736f6d69736f32', 'hex');
+  const form = new FormData();
+  form.append('file', new Blob([mp4], { type: 'video/mp4' }), 'test.mp4');
+  form.append('public_id', firma.publicId);
+  const carga = await fetch(WORKER + '/admin/api/multimedia/qa-upload', {
+    method: 'POST', headers: { Origin: WORKER }, body: form
+  });
+  assert.equal(carga.status, 200, 'carga QA de video falló: ' + (await carga.clone().text()));
+  const resultado = await carga.json();
+  assert.equal(resultado.resource_type, 'video');
+  assert.equal(resultado.public_id, firma.rutaPublica);
 });
 
 /* ---------- 8. Dashboard y catálogo ---------- */
