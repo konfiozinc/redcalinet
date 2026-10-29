@@ -46,7 +46,14 @@ node test/interfaz-025.mjs     #  7/7  · panel desde el Worker, escritorio y m�
 node test/concurrencia-026.mjs #  4/4  · testigos de concurrencia entre validación y commit
 node test/recorrido-037.mjs    # 34/34 · recorrido completo de administración en 10 pasos
 node test/diseno-037.mjs       # 12/12 · medidas de diseño táctil, contraste y desbordes
+node test/despliegue-037.mjs   # 10/10 · comprobación posterior al despliegue (sin sesión)
 ```
+
+`despliegue-037` se ejecuta **contra el Worker publicado** y comprueba lo que se
+puede verificar sin credenciales: que sirve el bundle correcto, que `bootstrap`
+responde `local:false`, que Cloudinary sigue en `CLOUDINARY_DIRECT`, que la API
+niega todo sin token y que la pantalla de acceso se ve bien en móvil y escritorio.
+Acepta la URL por variable: `$env:RCL_WORKER="https://…"; node test/despliegue-037.mjs`
 
 `recorrido-037` y `diseno-037` (KZ-037) son las suites que responden a lo que el
 propietario necesita comprobar antes de dar el panel por bueno: crear, editar,

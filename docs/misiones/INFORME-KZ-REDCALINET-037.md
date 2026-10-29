@@ -6,7 +6,7 @@
 | Punto de partida | `1a296bc` (KZ-036, Fotografías y Videos separados) |
 | Commits de esta misión | `334e2a1` (refactor del editor y correcciones) · `25124d7` (selector de medios acotado y documentos) |
 | Fecha | 28-oct-2026 |
-| Alcance | Local y emuladores. **Sin despliegue, sin push, sin tocar producción** |
+| Alcance | Panel y correcciones: verificado en local y emuladores. **Desplegado a producción el 29-oct-2026 con autorización expresa** (ver §12) |
 | Respaldo | `_respaldos/redcalinet/2026-10-28-kz-037/integracion-panel-codex.bundle` (verificado) |
 
 ---
@@ -241,16 +241,108 @@ cd admin; npm run build; cd ..\redcalinet\admin-worker; node scripts\preparar-pa
 
 - Rama `integracion/panel-codex` con los commits de KZ-037 encima de `1a296bc`.
 - Árbol de trabajo limpio.
-- **Sin push**: el repositorio remoto no se tocó (el panel publicado sigue siendo la versión anterior).
-- **Sin despliegue**: no se ejecutó `wrangler deploy` ni se modificó ningún recurso de producción.
+- **Worker desplegado en producción** con autorización expresa el 29-oct-2026 (ver §12).
+- **Sin push**: el repositorio remoto no se tocó; `origin/main` sigue en `1060304`.
 - Panel compilado en `redcalinet/admin-worker/public/admin/` (artefacto local, no versionado).
 
-## 11. Bloqueos
+## 11. Lo que queda en manos del propietario
 
-Ninguno técnico. Para publicar cuando el propietario lo autorice:
+Las comprobaciones 8, 9, 10, 11 y la parte autenticada de la 12 necesitan una
+sesión real en producción, y esta entrega no dispone de credenciales del panel
+(no se guardan en el repositorio, por política). Ver §12.4 para el recorrido de
+cinco minutos.
 
-1. `node scripts/preparar-panel.mjs` (ya hecho) y `wrangler deploy --env produccion`.
-2. Verificar `GET /admin/api/bootstrap` (`local:false`).
-3. Revisar el panel publicado en un teléfono real antes de avisar al propietario.
+---
 
-No se despliega ahora porque la instrucción fue explícita: **no desplegar todavía**.
+## 12. Despliegue autorizado (29-oct-2026)
+
+Autorización: **Darwin Montalvo — KONFÍO ZINC**, sobre el commit `d3bb37c`.
+
+### 12.1 Datos del despliegue
+
+| Dato | Valor |
+|---|---|
+| Worker | `redcalinet-admin` (ningún otro Worker se tocó) |
+| Entorno | `produccion` (`MODO_EMULADOR=0`, `PROYECTO_FIREBASE=red-calinet`) |
+| **Versión desplegada** | **`36b5d230-8a1b-4b8a-b27d-6c667d350b8e`** (100 %) |
+| Fecha | 2026-10-29T04:39:16Z |
+| Arranque del Worker | 10 ms · 69,85 KiB (18,68 KiB gzip) |
+| **Versión anterior (reversión)** | **`89f33331-8261-4efc-915c-7de3f8c210b3`** |
+| URL del panel | https://redcalinet-admin.konfiozinc.workers.dev/admin/ |
+| Verificación posterior | `node test/despliegue-037.mjs` → 10/10 |
+| Respaldo del código | `_respaldos/redcalinet/2026-10-28-kz-037/integracion-panel-codex.bundle` |
+
+Antes de publicar se ejecutó `wrangler deploy --dry-run`: empaquetado correcto,
+enlaces (`vars`) correctos y sin volcar ningún secreto.
+
+### 12.2 Comprobaciones posteriores (sin sesión)
+
+| Comprobación | Resultado |
+|---|---|
+| `bootstrap` → `local:false`, `entorno:WORKER_CLOUDFLARE` | ✅ |
+| **Cloudinary**: `media.mode: CLOUDINARY_DIRECT`, `enabled:true`, `fixture:false` | ✅ el secreto sigue instalado y la subida real está habilitada |
+| Proyecto Firebase: `red-calinet` | ✅ |
+| Lectura real de Firestore con la cuenta de servicio | ✅ `public/catalogo` devuelve 5 categorías, la empresa «Red CaliNet» y el WhatsApp real: el Worker sigue leyendo la base de producción |
+| Panel `/admin/` → 200, sirve `index-DV-19PSi.js` y `index-DUV4TGfv.css` | ✅ |
+| El bundle anterior (`index-BcYQ88ef.js`) ya no se sirve | ✅ 404 |
+| Marcadores de KZ-037 dentro del bundle publicado (18/18) | ✅ |
+| `me`, `productos`, `auditoria`, `usuarios`, `multimedia/firma` sin token → 401 | ✅ |
+| Token inválido → 401 · recurso inexistente → 401 | ✅ |
+| Ningún dato privado en pantalla antes de entrar; `noindex` presente | ✅ |
+| Escritorio 1440×900 y móvil 375×667: acceso completo, sin desbordes, sin excepciones de JS | ✅ |
+| Catálogo público: **0 productos y 0 servicios publicados** | ✅ nada comercial publicado |
+| Secretos intactos (`FIREBASE_SA`, `CLOUDINARY_API_SECRET`) | ✅ ninguno se modificó; el despliegue no los toca |
+| Reglas v3, roles, auditoría, cuentas, otros Workers, GitHub Pages | ✅ sin cambios (`auth.mjs`, `schema.mjs`, `firestore.mjs`, `wrangler.toml` y `firestore.rules` idénticos a `1a296bc`) |
+
+Ninguna petición a producción durante esta fase fue de escritura: solo `GET` y la
+publicación de los archivos estáticos del panel. Ningún archivo multimedia se
+eliminó ni se modificó, y ninguna ficha comercial se publicó.
+
+### 12.3 Pendiente por falta de credenciales
+
+Los pasos 8, 9, 10, 11 y la parte con sesión del 12 requieren entrar al panel con
+una cuenta real:
+
+- **8.** Comprobar Productos, Servicios, Categorías, Fotografías, Videos y
+  configuración empresarial dentro del panel.
+- **9.** Guardar y editar con un registro de prueba.
+- **10.** Verificar SUPERADMIN y PROPIETARIO.
+- **11.** Confirmar que las ocho fichas comerciales siguen en BORRADOR.
+
+**No es un problema de la implementación:** las credenciales del panel no existen
+en esta máquina ni se guardan en el repositorio (política de secretos), y esta
+autorización prohíbe expresamente crear o modificar cuentas. Todo lo que se puede
+comprobar sin sesión está comprobado y en verde.
+
+### 12.4 Recorrido de cinco minutos para cerrar la verificación
+
+Con la cuenta de SUPERADMIN, en el teléfono:
+
+1. Abrir https://redcalinet-admin.konfiozinc.workers.dev/admin/ e iniciar sesión.
+2. Ver que el menú aparece agrupado (Resumen · Catálogo · Contenido · Empresa · Sistema).
+3. Entrar a **Productos**: abrir una ficha y comprobar que el formulario va por
+   bloques, que Guardar / Publicar / Ocultar están a la vista y que **las ocho
+   fichas siguen en BORRADOR**.
+4. Entrar a **Fotografías** y **Videos**: los archivos deben verse separados.
+5. Entrar a **Configuración empresarial**, «Editar configuración», cambiar un campo
+   no comercial y guardar: debe confirmar «Cambios guardados con auditoría» (es la
+   ruta que se arregló en esta misión).
+6. Crear un registro de prueba `ZZ PRUEBA KZ-037`, guardarlo como borrador y
+   ocultarlo después. **No publicarlo.**
+7. Con la cuenta de PROPIETARIO, confirmar que **no** aparecen «Usuarios y
+   permisos» ni «Auditoría».
+
+Reversión inmediata si algo falla:
+
+```powershell
+cd redcalinet/admin-worker
+node node_modules\wrangler\bin\wrangler.js rollback 89f33331-8261-4efc-915c-7de3f8c210b3 --env produccion
+```
+
+### 12.5 Incidencias del despliegue
+
+| Incidencia | Resolución |
+|---|---|
+| La versión publicada servía un bundle (`index-BcYQ88ef.js`) que no corresponde a ninguna compilación de esta rama: había deriva entre lo publicado y lo versionado | El despliegue lo reemplazó por el compilado verificado de `d3bb37c`. Queda anotado para que no vuelva a ocurrir |
+| `/favicon.ico` responde 404 | Preexistente y cosmético: el panel nunca declaró favicon (tampoco la versión anterior). No se corrigió aquí para no salir del commit autorizado |
+| Sin credenciales de producción para la verificación autenticada | Ver §12.3–12.4: se entrega el recorrido manual de cinco minutos |
