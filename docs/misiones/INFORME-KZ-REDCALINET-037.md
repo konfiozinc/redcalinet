@@ -4,7 +4,7 @@
 |---|---|
 | Rama | `integracion/panel-codex` |
 | Punto de partida | `1a296bc` (KZ-036, Fotografías y Videos separados) |
-| Commits de esta misión | `334e2a1` (refactor + correcciones) y el commit de pulido y documentos que cierra KZ-037 |
+| Commits de esta misión | `334e2a1` (refactor del editor y correcciones) · `25124d7` (selector de medios acotado y documentos) |
 | Fecha | 28-oct-2026 |
 | Alcance | Local y emuladores. **Sin despliegue, sin push, sin tocar producción** |
 | Respaldo | `_respaldos/redcalinet/2026-10-28-kz-037/integracion-panel-codex.bundle` (verificado) |
@@ -217,7 +217,7 @@ Cuentas de QA: `superadmin@rcl.example.test` y `admin@rcl.example.test`, contras
 _respaldos/redcalinet/2026-10-28-kz-037/integracion-panel-codex.bundle   3 291 952 bytes
 ```
 
-`git bundle verify` → *«The bundle records a complete history»*, con `refs/heads/integracion/panel-codex` en `334e2a1`.
+`git bundle verify` → *«The bundle records a complete history»*, con `refs/heads/integracion/panel-codex` en el último commit de la rama.
 
 Para recuperar en cualquier otro equipo:
 
