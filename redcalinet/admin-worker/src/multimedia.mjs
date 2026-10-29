@@ -56,9 +56,14 @@ const dentroDeCarpeta = (env, publicId) => {
 export async function emitirFirma(env, tipo) {
   if (!FORMATOS[tipo]) throw new Fault(400, 'Tipo de archivo no admitido.');
   const fixtures = String(env.MODO_EMULADOR || '0') === '1';
-  const publicId = carpeta(env) + '/' + crypto.randomUUID();
+  /* KZ-035 — El nombre se firma SIN la carpeta. Cloudinary compone `folder` +
+     `public_id`: si se firmara la ruta completa la antepondría otra vez y el
+     archivo acabaría en redcalinet/admin/redcalinet/admin/…, que el registro
+     rechaza por no estar en la carpeta autorizada. */
+  const nombre = crypto.randomUUID();
+  const rutaPublica = carpeta(env) + '/' + nombre;
   const timestamp = Math.floor(Date.now() / 1000);
-  const firmados = { timestamp, ...parametrosFirmados(env, tipo, publicId) };
+  const firmados = { timestamp, ...parametrosFirmados(env, tipo, nombre) };
 
   if (!fixtures && !env.CLOUDINARY_API_SECRET) {
     throw new Fault(503, 'La subida de multimedia no está habilitada: falta el secreto de Cloudinary.');
@@ -69,13 +74,14 @@ export async function emitirFirma(env, tipo) {
     fixture: fixtures,
     tipo,
     timestamp,
-    publicId,
+    publicId: nombre,
     signature: await firma(firmados, fixtures ? 'qa-local-worker' : env.CLOUDINARY_API_SECRET),
     apiKey: fixtures ? 'qa-directo' : env.CLOUDINARY_API_KEY,
     cloudName: fixtures ? 'qa-directo' : env.CLOUDINARY_CLOUD_NAME,
     uploadUrl: fixtures
       ? '/admin/api/multimedia/qa-upload'
       : 'https://api.cloudinary.com/v1_1/' + env.CLOUDINARY_CLOUD_NAME + '/auto/upload',
+    rutaPublica,
     carpeta: carpeta(env),
     formatos: FORMATOS[tipo],
     maxBytes: LIMITES[tipo],
@@ -94,7 +100,7 @@ export async function verificarRegistro(env, { tipo, timestamp, signature, resul
   if (!resto) throw new Fault(400, 'El archivo subido no está en la carpeta autorizada.');
 
   const fixtures = String(env.MODO_EMULADOR || '0') === '1';
-  const esperada = await firma({ timestamp, ...parametrosFirmados(env, tipo, resultado.public_id) },
+  const esperada = await firma({ timestamp, ...parametrosFirmados(env, tipo, resto) },
     fixtures ? 'qa-local-worker' : env.CLOUDINARY_API_SECRET);
   if (!iguales(signature, esperada)) throw new Fault(403, 'La firma no corresponde a una subida autorizada por este servidor.');
 
@@ -138,7 +144,11 @@ const archivosQA = new Map();
 export const esEmulador = (env) => String(env.MODO_EMULADOR || '0') === '1';
 
 export async function guardarQA(env, { filename, tipo, publicId, bytes, mimeType }) {
-  const resto = dentroDeCarpeta(env, publicId);
+  /* El navegador envia solo el nombre (igual que a Cloudinary); aqui se compone
+     la ruta con la carpeta autorizada antes de validar. */
+  const nombre = String(publicId || '').replace(/^.*\//, '');
+  const rutaPublica = carpeta(env) + '/' + nombre;
+  const resto = dentroDeCarpeta(env, rutaPublica);
   if (!resto) throw new Fault(403, 'Identificador de archivo no autorizado.');
   const extension = String(filename || '').split('.').pop().toLowerCase();
   if (!FORMATOS[tipo].includes(extension)) throw new Fault(415, 'Extensión de archivo no permitida.');
@@ -158,7 +168,7 @@ export async function guardarQA(env, { filename, tipo, publicId, bytes, mimeType
 
   archivosQA.set(resto + '.' + ext, { bytes: new Uint8Array(bytes), mimeType });
   return {
-    public_id: publicId,
+    public_id: rutaPublica,
     version: Math.floor(Date.now() / 1000),
     format: ext,
     resource_type: tipo,

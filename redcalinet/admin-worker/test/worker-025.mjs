@@ -188,7 +188,7 @@ await chkAsync('firma, carga QA y registro', async () => {
   });
   assert.equal(carga.status, 200, 'carga QA falló: ' + (await carga.clone().text()));
   const resultado = await carga.json();
-  assert.equal(resultado.public_id, firma.publicId);
+  assert.equal(resultado.public_id, firma.rutaPublica);
 
   const registro = ok(await api('multimedia/registrar', {
     method: 'POST',
