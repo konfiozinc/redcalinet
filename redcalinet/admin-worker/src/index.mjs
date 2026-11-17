@@ -177,9 +177,17 @@ async function guardar(env, db, quien, { coleccion: c, rid, valores: entrada, re
     escrituras.push(existente
       ? { actualizar: rutaPublica, datos: publico, mascara: Object.keys(publico), tiempo: existente._updateTime }
       : { crear: rutaPublica, datos: publico });
-    escrituras.push(extra
-      ? { actualizar: rutaMeta, datos: privado, tiempo: extra._updateTime }
-      : { crear: rutaMeta, datos: privado });
+    /* KZ-037 — `configuracion` NO tiene documento espejo de metadatos (son dos
+       documentos planos, `empresa` y `contacto`), así que `rutaMeta` es null. Al
+       empujar igualmente la escritura del espejo se enviaba un commit con la ruta
+       `…/documents/undefined` y Firestore lo rechazaba con 400: guardar la
+       configuración empresarial nunca funcionó desde el panel. Solo se escribe el
+       espejo cuando existe de verdad. */
+    if (rutaMeta) {
+      escrituras.push(extra
+        ? { actualizar: rutaMeta, datos: privado, tiempo: extra._updateTime }
+        : { crear: rutaMeta, datos: privado });
+    }
   } else {
     escrituras.push(existente
       ? { actualizar: rutaPublica, datos: row, tiempo: existente._updateTime }
