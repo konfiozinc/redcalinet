@@ -1316,3 +1316,6 @@ button, input, select, textarea { font: inherit; color: inherit; }
   .hero__valores { gap: 4px 12px; margin-top: 8px; }
   .hero__cta { margin-top: 12px; gap: 8px; }
 }
+
+/* Enlace sobre fondo oscuro (antes era un estilo en línea, que la CSP de plantillas/ bloquea) */
+.enlace-sobre-oscuro { color: #ffffff; text-decoration: underline; font-weight: bold; }
