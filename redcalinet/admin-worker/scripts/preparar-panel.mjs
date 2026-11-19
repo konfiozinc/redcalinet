@@ -24,5 +24,12 @@ await fs.rm(destino, { recursive: true, force: true });
 await fs.mkdir(destino, { recursive: true });
 await fs.cp(origen, destino, { recursive: true });
 
+/* KZ-REDCALINET-024 — La copia se deja IDÉNTICA al original, sin la etiqueta
+   <meta name="redcalinet-api">. La declaración la inyecta el Worker al servir
+   /admin/ (src/index.mjs), no el archivo: así esta misma copia sigue siendo
+   válida abierta como estático (sin la etiqueta no se pide nada y no hay 404).
+   Ponerla aquí rompía la auditoría de calidad, que abre estos archivos desde el
+   disco sin ningún servidor detrás. Se probó. */
+
 const recursos = await fs.readdir(path.join(destino, 'assets')).catch(() => []);
 console.log('Panel: admin/dist → public/admin (' + recursos.length + ' recursos, ruta /admin/ conservada).');

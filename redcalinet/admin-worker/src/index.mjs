@@ -548,6 +548,29 @@ export default {
   async fetch(request, env) {
     const url = new URL(request.url);
     try {
+      /* KZ-REDCALINET-024 — El HTML del panel se sirve declarando que su API está.
+         El panel solo pide su configuración si encuentra esta etiqueta; así, la
+         MISMA página abierta como archivo estático (sin Worker) no hace ninguna
+         petición y no deja un 404 en consola. Se inyecta aquí, en la respuesta,
+         en lugar de dejar la etiqueta escrita en el archivo: el archivo estático
+         tiene que seguir siendo válido por sí solo cuando no hay API.
+         El valor va vacío a propósito: significa «la API está en este origen».
+         Con "/admin" la petición saldría como /admin/admin/api/bootstrap. */
+      if (env.ASSETS && (url.pathname === '/admin/' || url.pathname === '/admin/index.html')) {
+        const respuesta = await env.ASSETS.fetch(request);
+        const tipo = respuesta.headers.get('Content-Type') || '';
+        if (respuesta.ok && tipo.includes('text/html')) {
+          const html = await respuesta.text();
+          const conApi = /name="redcalinet-api"/.test(html)
+            ? html
+            : html.replace('</head>', '<meta name="redcalinet-api" content=""></head>');
+          const cabeceras = new Headers(respuesta.headers);
+          cabeceras.delete('Content-Length');
+          cabeceras.set('Cache-Control', 'no-store');
+          return new Response(conApi, { status: respuesta.status, headers: cabeceras });
+        }
+        return respuesta;
+      }
       if (!url.pathname.startsWith('/admin/api/')) {
         // Todo lo que no es API lo sirve el binding de estáticos (panel).
         if (env.ASSETS) return env.ASSETS.fetch(request);
