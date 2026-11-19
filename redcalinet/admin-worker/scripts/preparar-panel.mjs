@@ -1,8 +1,10 @@
 // KZ-REDCALINET-025 — Copia el panel compilado al directorio que sirve el Worker.
 //
-// El panel se construye con `base: '/admin/'`, así que sus recursos se piden bajo
-// /admin/assets/. Copiarlo a public/admin/ deja exactamente la misma ruta que en
-// local y que en el Worker: lo que se prueba es lo que se publica.
+// El panel se construye con rutas RELATIVAS (KZ-REDCALINET-024). Antes se
+// compilaba con base '/admin/' y sus recursos se pedían bajo /admin/assets/, así
+// que una copia en otra ruta daba 404. En relativo, cada copia resuelve sus
+// recursos a su lado y el panel funciona igual en local, en Hosting y en el
+// Worker: lo que se prueba es lo que se publica.
 //
 // Uso (desde redcalinet/admin-worker): node scripts/preparar-panel.mjs
 

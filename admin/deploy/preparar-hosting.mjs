@@ -1,10 +1,10 @@
 // KZ-REDCALINET-023 — Ensambla el directorio que Firebase Hosting publica.
 //
-// El panel se construye con `base: '/admin/'` y sus recursos quedan en
-// dist/assets/*. Si Hosting sirviera `admin/dist` tal cual, el HTML pediría
-// /admin/assets/... y el archivo no existiría. Copiarlo dentro de
-// hosting-public/admin/ deja la MISMA ruta que en local (/admin/ y
-// /admin/assets/), de modo que lo que se prueba en local es lo que se publica.
+// El panel se construye con rutas RELATIVAS (KZ-REDCALINET-024: antes se
+// compilaba con base '/admin/', y entonces las copias publicadas en otras rutas
+// pedían /admin/assets/… y daban 404). Con rutas relativas, el mismo panel
+// compilado funciona servido desde /admin/, desde /admin/dist/ o desde cualquier
+// carpeta: cada copia resuelve sus recursos a su lado.
 //
 // Uso (desde admin/deploy): node preparar-hosting.mjs
 // Es idempotente: borra el destino antes de copiar.
